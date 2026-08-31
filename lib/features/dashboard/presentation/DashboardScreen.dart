@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/database/database_helper.dart';
+import '../../profile/domain/entities/user_profile.dart';
 
 // --- Shared Theme Colors ---
 class DashboardColors {
@@ -21,6 +23,24 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedBottomNavIndex = 0;
   int _selectedDayIndex = 0;
+  UserProfile? _profile;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    final profile = await DatabaseHelper().getProfile();
+    if (mounted) {
+      setState(() {
+        _profile = profile;
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +79,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               // --- Weekly Activity Section ---
               _buildWeeklyActivitySection(),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
+
+              // --- User Profile Summary Section ---
+              if (!_isLoading && _profile != null) ...[
+                _buildProfileSummarySection(),
+                const SizedBox(height: 20),
+              ],
             ],
           ),
         ),
@@ -77,18 +103,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
+          children: [
+            const Text(
               "Good morning,",
               style: TextStyle(
                 fontSize: 12,
                 color: DashboardColors.textSecondary,
               ),
             ),
-            SizedBox(height: 2),
+            const SizedBox(height: 2),
             Text(
-              "Sarah",
-              style: TextStyle(
+              _profile?.name ?? "Sarah",
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: DashboardColors.textPrimary,
@@ -636,6 +662,70 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ],
                 );
               }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // User Profile Summary Widget
+  Widget _buildProfileSummarySection() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: DashboardColors.cardWhite,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Your Profile Summary",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: DashboardColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          _buildSummaryItem("Age", "${_profile!.age} years"),
+          _buildSummaryItem("Height", "${_profile!.heightCm} cm"),
+          _buildSummaryItem("Weight", "${_profile!.currentWeightKg} kg"),
+          _buildSummaryItem("Activity", _profile!.activityLevel.name.toUpperCase()),
+          if (_profile!.fitnessLevel != null)
+            _buildSummaryItem("Fitness Level", _profile!.fitnessLevel!),
+          if (_profile!.primaryGoal != null)
+            _buildSummaryItem("Primary Goal", _profile!.primaryGoal!.replaceAll('_', ' ').toUpperCase()),
+          if (_profile!.allergies.isNotEmpty)
+            _buildSummaryItem("Allergies", _profile!.allergies.join(', ')),
+          if (_profile!.considerations.isNotEmpty)
+            _buildSummaryItem("Considerations", _profile!.considerations.join(', ')),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryItem(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              color: DashboardColors.textSecondary,
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: DashboardColors.textPrimary,
             ),
           ),
         ],

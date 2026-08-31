@@ -1,0 +1,11 @@
+- `[x]` Add `sqflite` and `path` to `pubspec.yaml`
+- `[x]` Remove `sleepDuration` from `UserProfile` entity
+- `[x]` Create `DatabaseHelper` for SQLite persistence
+- `[x]` Update `onboarding_steps.dart` (Remove SleepStep & Mandatory Selection)
+- `[x]` Update `meal_onboarding_steps.dart` (Mandatory Selection)
+- `[x]` Update `goals_focus_onboarding_steps.dart` (Mandatory Selection)
+- `[x]` Update `ProfileInputScreen` (Remove SleepStep & Persistence logic)
+- `[x]` Integrate User Profile summary into Dashboard
+    - `[x]` Fetch profile from database in `DashboardScreen`
+    - `[x]` Update Dashboard Header with dynamic name
+    - `[x]` Add `_buildProfileSummarySection` to Dashboard

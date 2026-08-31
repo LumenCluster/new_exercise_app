@@ -52,12 +52,12 @@ class GoalsStepHeader extends StatelessWidget {
 // --- Common Action Button ---
 class GoalsActionButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   const GoalsActionButton({
     super.key,
     required this.text,
-    required this.onPressed,
+    this.onPressed,
   });
 
   @override
@@ -165,7 +165,7 @@ class PrimaryGoalStep extends StatefulWidget {
 }
 
 class _PrimaryGoalStepState extends State<PrimaryGoalStep> {
-  String _selectedGoal = 'weight_loss';
+  String? _selectedGoal;
 
   final List<Map<String, String>> _goals = [
     {
@@ -290,7 +290,10 @@ class _PrimaryGoalStepState extends State<PrimaryGoalStep> {
                   },
                 ),
               ),
-              GoalsActionButton(text: "Continue", onPressed: () => widget.onNext(_selectedGoal)),
+              GoalsActionButton(
+                text: "Continue",
+                onPressed: _selectedGoal != null ? () => widget.onNext(_selectedGoal!) : null,
+              ),
               const SizedBox(height: 12),
             ],
           ),
@@ -313,7 +316,7 @@ class TargetFocusStep extends StatefulWidget {
 }
 
 class _TargetFocusStepState extends State<TargetFocusStep> {
-  final Set<String> _selectedAreas = {'full_body'};
+  final Set<String> _selectedAreas = {};
 
   final List<Map<String, String>> _areas = [
     {'id': 'full_body', 'label': 'Full Body', 'subtitle': 'Overall fitness'},
@@ -432,7 +435,10 @@ class _TargetFocusStepState extends State<TargetFocusStep> {
                   ],
                 ),
               ),
-              GoalsActionButton(text: "Continue", onPressed: () => widget.onNext(_selectedAreas.toList())),
+              GoalsActionButton(
+                text: "Continue",
+                onPressed: _selectedAreas.isNotEmpty ? () => widget.onNext(_selectedAreas.toList()) : null,
+              ),
               const SizedBox(height: 12),
             ],
           ),
@@ -455,7 +461,7 @@ class ImproveGoalStep extends StatefulWidget {
 }
 
 class _ImproveGoalStepState extends State<ImproveGoalStep> {
-  String _selectedItem = 'strength';
+  String? _selectedItem;
 
   final List<Map<String, String>> _items = [
     {
@@ -576,7 +582,10 @@ class _ImproveGoalStepState extends State<ImproveGoalStep> {
                   },
                 ),
               ),
-              GoalsActionButton(text: "Next", onPressed: () => widget.onNext(_selectedItem)),
+              GoalsActionButton(
+                text: "Next",
+                onPressed: _selectedItem != null ? () => widget.onNext(_selectedItem!) : null,
+              ),
               const SizedBox(height: 12),
             ],
           ),
@@ -599,7 +608,7 @@ class TargetBodyShapeStep extends StatefulWidget {
 }
 
 class _TargetBodyShapeStepState extends State<TargetBodyShapeStep> {
-  String _selectedShape = 'glass';
+  String? _selectedShape;
   double _sliderValue = 24.0; // 20% - 25% range middle value
 
   final List<Map<String, String>> _shapes = [
@@ -747,7 +756,12 @@ class _TargetBodyShapeStepState extends State<TargetBodyShapeStep> {
 
               GoalsActionButton(
                 text: "Next",
-                onPressed: () => widget.onNext(_selectedShape, _sliderValue),
+                onPressed: _selectedShape != null 
+                  ? () {
+                      print("Next button clicked in TargetBodyShapeStep. Shape: $_selectedShape, Fat: $_sliderValue");
+                      widget.onNext(_selectedShape!, _sliderValue);
+                    } 
+                  : null,
               ),
               const SizedBox(height: 12),
             ],

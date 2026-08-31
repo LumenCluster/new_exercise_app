@@ -118,11 +118,13 @@ class NameGenderStep extends StatefulWidget {
 }
 
 class _NameGenderStepState extends State<NameGenderStep> {
-  final _nameController = TextEditingController(text: "Sara");
-  Gender _gender = Gender.female;
+  final _nameController = TextEditingController();
+  Gender? _gender;
 
   @override
   Widget build(BuildContext context) {
+    bool isEnabled = _nameController.text.trim().isNotEmpty && _gender != null;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F8F3),
       body: SafeArea(
@@ -143,7 +145,9 @@ class _NameGenderStepState extends State<NameGenderStep> {
               const SizedBox(height: 8),
               TextField(
                 controller: _nameController,
+                onChanged: (_) => setState(() {}),
                 decoration: InputDecoration(
+                  hintText: "Enter your name",
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(
@@ -232,7 +236,7 @@ class _NameGenderStepState extends State<NameGenderStep> {
               const Spacer(),
               OnboardingButton(
                 text: "Next",
-                onPressed: () => widget.onNext(_nameController.text, _gender),
+                onPressed: isEnabled ? () => widget.onNext(_nameController.text, _gender!) : null,
               ),
               const SizedBox(height: 12),
               const Center(
@@ -1547,7 +1551,7 @@ class ActivityLevelStep extends StatefulWidget {
 }
 
 class _ActivityLevelStepState extends State<ActivityLevelStep> {
-  ActivityLevel _selectedLevel = ActivityLevel.sedentary;
+  ActivityLevel? _selectedLevel;
 
   @override
   Widget build(BuildContext context) {
@@ -1603,7 +1607,7 @@ class _ActivityLevelStepState extends State<ActivityLevelStep> {
               const SizedBox(height: 12),
               OnboardingButton(
                 text: "Next",
-                onPressed: () => widget.onNext(_selectedLevel),
+                onPressed: _selectedLevel != null ? () => widget.onNext(_selectedLevel!) : null,
               ),
               const SizedBox(height: 12),
             ],
@@ -1711,64 +1715,7 @@ class _ActivityLevelStepState extends State<ActivityLevelStep> {
   }
 }
 
-class SleepStep extends StatefulWidget {
-  final Function(String sleep) onNext;
-
-  const SleepStep({super.key, required this.onNext});
-
-  @override
-  State<SleepStep> createState() => _SleepStepState();
-}
-
-class _SleepStepState extends State<SleepStep> {
-  String _selectedSleep = "7-8 hours";
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF9F8F3),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: Column(
-            children: [
-              const StepHeader(
-                title: "Sleep duration?",
-                subtitle: "Sleep plays a big role in your health and helps us create the right plan.",
-              ),
-              const SizedBox(height: 24),
-              Expanded(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  children: [
-                    _buildSleepCard("Less Than 5h", Icons.sentiment_very_dissatisfied),
-                    _buildSleepCard("5-6 Hours", Icons.sentiment_dissatisfied),
-                    _buildSleepCard("7-8 Hours", Icons.sentiment_satisfied),
-                    _buildSleepCard("More Than 8h", Icons.sentiment_very_satisfied),
-                  ],
-                ),
-              ),
-              OnboardingButton(text: "Next", onPressed: () => widget.onNext(_selectedSleep)),
-              const SizedBox(height: 12),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSleepCard(String title, IconData icon) {
-    final isSelected = _selectedSleep == title;
-    return SelectableCard(
-      title: title,
-      isSelected: isSelected,
-      onTap: () => setState(() => _selectedSleep = title),
-      icon: Icon(icon, size: 40, color: isSelected ? AppColors.accentGreen : AppColors.primary),
-    );
-  }
-}
+// SleepStep class removed
 
 class FrequencyStep extends StatefulWidget {
   final Function(int days) onNext;
@@ -2022,7 +1969,7 @@ class FitnessLevelStep extends StatefulWidget {
 }
 
 class _FitnessLevelStepState extends State<FitnessLevelStep> {
-  String _selectedLevel = "Beginner";
+  String? _selectedLevel;
 
   @override
   Widget build(BuildContext context) {
@@ -2073,7 +2020,7 @@ class _FitnessLevelStepState extends State<FitnessLevelStep> {
               const SizedBox(height: 16),
               OnboardingButton(
                 text: "Next",
-                onPressed: () => widget.onNext(_selectedLevel),
+                onPressed: _selectedLevel != null ? () => widget.onNext(_selectedLevel!) : null,
               ),
               const SizedBox(height: 12),
             ],
@@ -2225,7 +2172,7 @@ class ConsiderationsStep extends StatefulWidget {
 }
 
 class _ConsiderationsStepState extends State<ConsiderationsStep> {
-  final List<String> _selectedIds = ['none'];
+  final List<String> _selectedIds = [];
 
   final List<ConsiderationOption> _options = [
     ConsiderationOption(
@@ -2436,7 +2383,7 @@ class _ConsiderationsStepState extends State<ConsiderationsStep> {
               const SizedBox(height: 12),
               OnboardingButton(
                 text: "Next",
-                onPressed: () => widget.onNext(_selectedIds),
+                onPressed: _selectedIds.isNotEmpty ? () => widget.onNext(_selectedIds) : null,
               ),
               const SizedBox(height: 12),
             ],

@@ -28,7 +28,6 @@ class UserProfile {
   final List<String> allergies;
   final int mealsPerDay;
   final String? bodyShape;
-  final String? sleepDuration;
   final int? workoutDaysPerWeek;
   final String? fitnessLevel;
   final List<String> considerations;
@@ -56,7 +55,6 @@ class UserProfile {
     this.allergies = const [],
     this.mealsPerDay = 3,
     this.bodyShape,
-    this.sleepDuration,
     this.workoutDaysPerWeek,
     this.fitnessLevel,
     this.considerations = const [],
@@ -85,7 +83,6 @@ class UserProfile {
         'allergies': allergies,
         'mealsPerDay': mealsPerDay,
         'bodyShape': bodyShape,
-        'sleepDuration': sleepDuration,
         'workoutDaysPerWeek': workoutDaysPerWeek,
         'fitnessLevel': fitnessLevel,
         'considerations': considerations,
@@ -117,7 +114,6 @@ class UserProfile {
         allergies: List<String>.from(json['allergies'] ?? []),
         mealsPerDay: json['mealsPerDay'] ?? 3,
         bodyShape: json['bodyShape'],
-        sleepDuration: json['sleepDuration'],
         workoutDaysPerWeek: json['workoutDaysPerWeek'],
         fitnessLevel: json['fitnessLevel'],
         considerations: List<String>.from(json['considerations'] ?? []),

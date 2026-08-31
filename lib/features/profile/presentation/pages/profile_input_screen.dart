@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:untitled/core/constants/app_colors.dart';
 import 'package:untitled/features/meal_plan/presentation/providers/meal_plan_provider.dart';
 import 'package:untitled/features/profile/domain/entities/user_profile.dart';
+import '../../../../core/database/database_helper.dart';
 import '../../../dashboard/presentation/DashboardScreen.dart';
 import '../widgets/onboarding_steps.dart';
 import '../widgets/fitness_summary_step.dart';
@@ -19,7 +20,7 @@ class ProfileInputScreen extends StatefulWidget {
 class _ProfileInputScreenState extends State<ProfileInputScreen> {
   final PageController _pageController = PageController();
   int _currentStep = 0;
-  final int _totalSteps = 26;
+  final int _totalSteps = 25;
 
   // Data storage - Part 1 (Fitness)
   String? _name;
@@ -29,7 +30,6 @@ class _ProfileInputScreenState extends State<ProfileInputScreen> {
   double _weight = 65.5;
   String? _bodyShape;
   ActivityLevel _activityLevel = ActivityLevel.moderate;
-  String? _sleepDuration;
   int _workoutDays = 4;
   String? _fitnessLevel;
   List<String> _considerations = [];
@@ -71,40 +71,59 @@ class _ProfileInputScreenState extends State<ProfileInputScreen> {
     );
   }
 
-  void _submit() {
-    final profile = UserProfile(
-      name: _name,
-      country: "Unknown",
-      age: _age,
-      gender: _gender,
-      heightCm: _height,
-      currentWeightKg: _weight,
-      goal: Goal.maintain,
-      activityLevel: _activityLevel,
-      eatingPreference: EatingPreference.none,
-      bodyShape: _bodyShape,
-      sleepDuration: _sleepDuration,
-      workoutDaysPerWeek: _workoutDays,
-      fitnessLevel: _fitnessLevel,
-      considerations: _considerations,
-      allergies: _allergies,
-      eatingStyle: _eatingStyle,
-      dietaryConsiderations: _dietaryConsiderations,
-      ingredientLikes: _ingredientLikes,
-      eatingHabits: _eatingHabits,
-      mealsPerDay: _mealsPerDay,
-      primaryGoal: _primaryGoal,
-      focusAreas: _focusAreas,
-      improvementGoal: _improvementGoal,
-      targetBodyShape: _targetBodyShape,
-      targetBodyFat: _targetBodyFat,
-    );
+  void _submit() async {
+    print("Submit process started...");
+    try {
+      final profile = UserProfile(
+        name: _name,
+        country: "Unknown",
+        age: _age,
+        gender: _gender,
+        heightCm: _height,
+        currentWeightKg: _weight,
+        goal: Goal.maintain,
+        activityLevel: _activityLevel,
+        eatingPreference: EatingPreference.none,
+        bodyShape: _bodyShape,
+        workoutDaysPerWeek: _workoutDays,
+        fitnessLevel: _fitnessLevel,
+        considerations: _considerations,
+        allergies: _allergies,
+        eatingStyle: _eatingStyle,
+        dietaryConsiderations: _dietaryConsiderations,
+        ingredientLikes: _ingredientLikes,
+        eatingHabits: _eatingHabits,
+        mealsPerDay: _mealsPerDay,
+        primaryGoal: _primaryGoal,
+        focusAreas: _focusAreas,
+        improvementGoal: _improvementGoal,
+        targetBodyShape: _targetBodyShape,
+        targetBodyFat: _targetBodyFat,
+      );
 
-    context.read<MealPlanProvider>().submitProfileAndGenerate(profile);
+      print("Saving profile to database...");
+      // Save to database
+      await DatabaseHelper().saveProfile(profile);
+      print("Profile saved successfully.");
 
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const DashboardScreen()),
-    );
+      if (mounted) {
+        print("Triggering meal plan generation...");
+        context.read<MealPlanProvider>().submitProfileAndGenerate(profile);
+
+        print("Navigating to Dashboard...");
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const DashboardScreen()),
+        );
+      }
+    } catch (e, stack) {
+      print("ERROR IN SUBMIT: $e");
+      print(stack);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error saving profile: $e")),
+        );
+      }
+    }
   }
 
   @override
@@ -185,10 +204,6 @@ class _ProfileInputScreenState extends State<ProfileInputScreen> {
                   ),
                   ActivityLevelStep(onNext: (level) {
                     setState(() => _activityLevel = level);
-                    _nextPage();
-                  }),
-                  SleepStep(onNext: (sleep) {
-                    setState(() => _sleepDuration = sleep);
                     _nextPage();
                   }),
                   FrequencyStep(onNext: (days) {

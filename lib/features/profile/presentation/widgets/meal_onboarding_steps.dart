@@ -52,12 +52,12 @@ class MealStepHeader extends StatelessWidget {
 // --- Common Button ---
 class MealActionButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   const MealActionButton({
     super.key,
     required this.text,
-    required this.onPressed,
+    this.onPressed,
   });
 
   @override
@@ -162,7 +162,7 @@ class FoodAllergiesStep extends StatefulWidget {
 }
 
 class _FoodAllergiesStepState extends State<FoodAllergiesStep> {
-  final Set<String> _selected = {'dairy', 'soy', 'seafood'};
+  final Set<String> _selected = {};
 
   final List<Map<String, String>> _items = [
     {'id': 'peanuts', 'label': 'Peanuts', 'image': 'assets/peanut.png'},
@@ -294,7 +294,7 @@ class EatingStyleStep extends StatefulWidget {
 }
 
 class _EatingStyleStepState extends State<EatingStyleStep> {
-  String _selectedStyle = 'standard';
+  String? _selectedStyle;
 
   final List<Map<String, String>> _styles = [
     {'id': 'standard', 'label': 'Standard (No Specialty Diet)', 'image': 'assets/standard.png'},
@@ -388,7 +388,10 @@ class _EatingStyleStepState extends State<EatingStyleStep> {
                   },
                 ),
               ),
-              MealActionButton(text: "Continue", onPressed: () => widget.onNext(_selectedStyle)),
+              MealActionButton(
+                text: "Continue",
+                onPressed: _selectedStyle != null ? () => widget.onNext(_selectedStyle!) : null,
+              ),
               const SizedBox(height: 12),
             ],
           ),
@@ -411,7 +414,7 @@ class DietaryConsiderationsStep extends StatefulWidget {
 }
 
 class _DietaryConsiderationsStepState extends State<DietaryConsiderationsStep> {
-  final Set<String> _selected = {'pregnancy'};
+  final Set<String> _selected = {};
 
   final List<Map<String, String>> _items = [
     {'id': 'diabetes', 'label': 'Diabetes', 'image': 'assets/diabetes.png'},
@@ -523,7 +526,7 @@ class IngredientLikesStep extends StatefulWidget {
 }
 
 class _IngredientLikesStepState extends State<IngredientLikesStep> {
-  final Set<String> _selected = {'chicken', 'eggs', 'sweet_potato'};
+  final Set<String> _selected = {};
 
   final List<Map<String, String>> _items = [
     {'id': 'chicken', 'label': 'Chicken', 'image': 'assets/chicken.png'},
@@ -650,7 +653,7 @@ class EatingHabitsStep extends StatefulWidget {
 }
 
 class _EatingHabitsStepState extends State<EatingHabitsStep> {
-  String _selectedHabit = 'balanced';
+  String? _selectedHabit;
 
   final List<Map<String, String>> _habits = [
     {'id': 'balanced', 'label': 'Balanced Meals'},
@@ -729,7 +732,10 @@ class _EatingHabitsStepState extends State<EatingHabitsStep> {
                   },
                 ),
               ),
-              MealActionButton(text: "Continue", onPressed: () => widget.onNext(_selectedHabit)),
+              MealActionButton(
+                text: "Continue",
+                onPressed: _selectedHabit != null ? () => widget.onNext(_selectedHabit!) : null,
+              ),
               const SizedBox(height: 12),
             ],
           ),
@@ -752,7 +758,7 @@ class MealsPerDayStep extends StatefulWidget {
 }
 
 class _MealsPerDayStepState extends State<MealsPerDayStep> {
-  int _selectedMeals = 3;
+  int? _selectedMeals;
 
   final List<int> _counts = [2, 3, 4, 5];
 
@@ -824,7 +830,10 @@ class _MealsPerDayStepState extends State<MealsPerDayStep> {
                   },
                 ),
               ),
-              MealActionButton(text: "Continue", onPressed: () => widget.onNext(_selectedMeals)),
+              MealActionButton(
+                text: "Continue",
+                onPressed: _selectedMeals != null ? () => widget.onNext(_selectedMeals!) : null,
+              ),
               const SizedBox(height: 12),
             ],
           ),
