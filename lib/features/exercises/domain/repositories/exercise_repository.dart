@@ -1,3 +1,4 @@
+import 'package:untitled/features/profile/domain/entities/user_profile.dart';
 import '../entities/exercise.dart';
 
 abstract class ExerciseRepository {
@@ -13,4 +14,8 @@ abstract class ExerciseRepository {
   });
   Future<List<Exercise>> search(String query);
   Future<List<Exercise>> recommendedSession(FitnessGoal goal, {int limit = 6});
+
+  /// Builds today's exercise list purely from the user's onboarding
+  /// preferences (primary goal + considerations) — no network call.
+  Future<List<Exercise>> recommendedForProfile(UserProfile profile);
 }

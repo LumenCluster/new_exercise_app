@@ -1,6 +1,7 @@
 import 'package:untitled/features/exercises/domain/entities/exercise.dart';
 import 'package:untitled/features/exercises/domain/repositories/exercise_repository.dart';
 import 'package:untitled/features/exercises/data/datasources/exercise_local_data_source.dart';
+import 'package:untitled/features/profile/domain/entities/user_profile.dart';
 
 class ExerciseRepositoryImpl implements ExerciseRepository {
   final ExerciseLocalDataSource localDataSource;
@@ -82,5 +83,36 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
       return order[a.category]!.compareTo(order[b.category]!);
     });
     return matches.take(limit).toList();
+  }
+
+  @override
+  Future<List<Exercise>> recommendedForProfile(UserProfile profile) async {
+    final goal = _goalFromPrimaryGoal(profile.primaryGoal);
+    var exercises = await recommendedSession(goal);
+
+    if (profile.considerations.contains('no_equipment')) {
+      final withoutEquipment = exercises.where((e) => !e.equipmentNeeded).toList();
+      if (withoutEquipment.isNotEmpty) exercises = withoutEquipment;
+    }
+
+    if (exercises.isEmpty) {
+      exercises = await byGoal(goal);
+    }
+
+    return exercises;
+  }
+
+  FitnessGoal _goalFromPrimaryGoal(String? primaryGoal) {
+    switch (primaryGoal) {
+      case 'weight_loss':
+        return FitnessGoal.loseWeight;
+      case 'weight_gain':
+        return FitnessGoal.gainWeight;
+      case 'muscle_gain':
+        return FitnessGoal.gainMuscle;
+      case 'maintain_weight':
+      default:
+        return FitnessGoal.maintainWeight;
+    }
   }
 }

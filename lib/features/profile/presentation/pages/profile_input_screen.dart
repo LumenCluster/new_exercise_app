@@ -71,6 +71,19 @@ class _ProfileInputScreenState extends State<ProfileInputScreen> {
     );
   }
 
+  Goal _mapPrimaryGoalToGoal(String? primaryGoal) {
+    switch (primaryGoal) {
+      case 'weight_loss':
+        return Goal.lose;
+      case 'weight_gain':
+      case 'muscle_gain':
+        return Goal.gain;
+      case 'maintain_weight':
+      default:
+        return Goal.maintain;
+    }
+  }
+
   void _submit() async {
     print("Submit process started...");
     try {
@@ -81,7 +94,7 @@ class _ProfileInputScreenState extends State<ProfileInputScreen> {
         gender: _gender,
         heightCm: _height,
         currentWeightKg: _weight,
-        goal: Goal.maintain,
+        goal: _mapPrimaryGoalToGoal(_primaryGoal),
         activityLevel: _activityLevel,
         eatingPreference: EatingPreference.none,
         bodyShape: _bodyShape,

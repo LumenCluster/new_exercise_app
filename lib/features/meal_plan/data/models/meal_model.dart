@@ -22,6 +22,7 @@ class MealModel extends Meal {
             .map((i) => IngredientModel.fromJson(i))
             .toList(),
         instructions: List<String>.from(json['instructions']),
+        imagePath: json['imagePath'],
       );
 
   Map<String, dynamic> toJson() => {
@@ -34,6 +35,7 @@ class MealModel extends Meal {
             .map((i) => (i as IngredientModel).toJson())
             .toList(),
         'instructions': instructions,
+        'imagePath': imagePath,
       };
 }
 

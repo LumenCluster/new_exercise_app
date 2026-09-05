@@ -21,8 +21,9 @@ class DatabaseHelper {
     String path = join(await getDatabasesPath(), 'user_profile.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -33,6 +34,40 @@ class DatabaseHelper {
         data TEXT
       )
     ''');
+    await _createCacheTable(db);
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await _createCacheTable(db);
+    }
+  }
+
+  Future<void> _createCacheTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS cache (
+        key TEXT PRIMARY KEY,
+        value TEXT
+      )
+    ''');
+  }
+
+  /// Generic string cache, used to remember AI-generated content (e.g. a
+  /// day's meal/workout plan) so it isn't regenerated more than once per day.
+  Future<void> setCacheValue(String key, String value) async {
+    final db = await database;
+    await db.insert(
+      'cache',
+      {'key': key, 'value': value},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<String?> getCacheValue(String key) async {
+    final db = await database;
+    final maps = await db.query('cache', where: 'key = ?', whereArgs: [key], limit: 1);
+    if (maps.isEmpty) return null;
+    return maps.first['value'] as String?;
   }
 
   Future<void> saveProfile(UserProfile profile) async {

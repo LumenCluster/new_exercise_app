@@ -8,8 +8,8 @@ import 'features/meal_plan/presentation/providers/meal_plan_provider.dart';
 import 'features/exercises/data/datasources/exercise_local_data_source.dart';
 import 'features/exercises/data/repositories/exercise_repository_impl.dart';
 import 'features/exercises/domain/repositories/exercise_repository.dart';
-import 'features/profile/presentation/pages/profile_input_screen.dart';
 import 'core/constants/app_colors.dart';
+import 'app_launcher.dart';
 
 void main() {
   final client = http.Client();
@@ -60,7 +60,7 @@ class MealPlannerApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const ProfileInputScreen(),
+      home: const AppLauncher(),
     );
   }
 }

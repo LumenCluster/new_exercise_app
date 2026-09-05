@@ -1,6 +1,12 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../core/database/database_helper.dart';
 import '../../profile/domain/entities/user_profile.dart';
+import '../../meal_plan/domain/entities/meal.dart';
+import '../../meal_plan/presentation/providers/meal_plan_provider.dart';
+import '../../exercises/domain/entities/exercise.dart';
+import '../../exercises/domain/repositories/exercise_repository.dart';
 
 // --- Shared Theme Colors ---
 class DashboardColors {
@@ -25,6 +31,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedDayIndex = 0;
   UserProfile? _profile;
   bool _isLoading = true;
+  final Set<int> _completedExerciseIndices = {};
+
+  List<Exercise> _exercises = [];
+  bool _exercisesLoading = true;
+  String? _exercisesError;
 
   @override
   void initState() {
@@ -34,16 +45,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _loadProfile() async {
     final profile = await DatabaseHelper().getProfile();
-    if (mounted) {
+    if (!mounted) return;
+    setState(() {
+      _profile = profile;
+      _isLoading = false;
+    });
+
+    if (profile != null) {
+      _loadExercises(profile);
+    } else {
+      setState(() => _exercisesLoading = false);
+    }
+  }
+
+  Future<void> _loadExercises(UserProfile profile) async {
+    setState(() {
+      _exercisesLoading = true;
+      _exercisesError = null;
+    });
+    try {
+      final exercises = await context.read<ExerciseRepository>().recommendedForProfile(profile);
+      if (!mounted) return;
       setState(() {
-        _profile = profile;
-        _isLoading = false;
+        _exercises = exercises;
+        _exercisesLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _exercisesError = e.toString();
+        _exercisesLoading = false;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final mealPlanProvider = context.watch<MealPlanProvider>();
+
     return Scaffold(
       backgroundColor: DashboardColors.background,
       body: SafeArea(
@@ -74,7 +113,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 24),
 
               // --- Today's Meals Section ---
-              _buildTodayMealsSection(),
+              _buildTodayMealsSection(mealPlanProvider),
               const SizedBox(height: 24),
 
               // --- Weekly Activity Section ---
@@ -372,14 +411,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // Today's Workout Section
   Widget _buildTodayWorkoutSection() {
-    final exercises = [
-      {'title': 'Barbell Squats', 'reps': '4 / 12', 'done': true, 'image': 'assets/ex_squat.png'},
-      {'title': 'Dumbbell Lunges', 'reps': '3 / 10', 'done': true, 'image': 'assets/ex_lunge.png'},
-      {'title': 'Leg Press', 'reps': '4 / 12', 'done': false, 'image': 'assets/ex_press.png'},
-      {'title': 'Calf Raises', 'reps': '3 / 15', 'done': false, 'image': 'assets/ex_calf.png'},
-      {'title': 'Romanian Deadlift', 'reps': '3 / 10', 'done': false, 'image': 'assets/ex_deadlift.png'},
-    ];
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -391,131 +422,194 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text(
+            children: [
+              const Text(
                 "Today's Workout",
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: DashboardColors.textPrimary),
               ),
-              Text(
-                "Adjust Plan",
-                style: TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+              GestureDetector(
+                onTap: () {},
+                child: const Text(
+                  "Adjust Plan",
+                  style: TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 4),
-          const Text(
-            "Fullbody Strength - 5 exercises",
-            style: TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
-          ),
+          _buildWorkoutSubtitle(),
           const SizedBox(height: 12),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: exercises.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemBuilder: (context, index) {
-              final item = exercises[index];
-              final isDone = item['done'] == true;
-
-              return Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: isDone ? DashboardColors.activeBgGreen : DashboardColors.background,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.asset(
-                        item['image'].toString(),
-                        width: 40,
-                        height: 40,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          width: 40,
-                          height: 40,
-                          color: Colors.white,
-                          child: const Icon(Icons.fitness_center, size: 20, color: DashboardColors.primaryDark),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item['title'].toString(),
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: DashboardColors.textPrimary),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            item['reps'].toString(),
-                            style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isDone ? DashboardColors.activeGreen : Colors.white,
-                        border: isDone ? null : Border.all(color: Colors.black26, width: 1.5),
-                      ),
-                      child: isDone ? const Icon(Icons.check, size: 16, color: Colors.white) : null,
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: DashboardColors.primaryDark,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                elevation: 0,
-              ),
-              onPressed: () {},
-              icon: const Icon(Icons.play_arrow_rounded, size: 20),
-              label: const Text("Start today's session", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-            ),
-          ),
+          _buildWorkoutBody(),
         ],
       ),
     );
   }
 
-  // Today's Meals Section
-  Widget _buildTodayMealsSection() {
-    final meals = [
-      {
-        'category': 'BREAKFAST',
-        'title': 'Berry Oatmeal Bowl',
-        'calories': '312 kcal',
-        'image': 'assets/meal_oatmeal.png',
-      },
-      {
-        'category': 'LUNCH',
-        'title': 'Avocado Chicken Salad',
-        'calories': '540 kcal',
-        'image': 'assets/meal_salad.png',
-      },
-      {
-        'category': 'DINNER',
-        'title': 'Roasted Salmon & Quinoa',
-        'calories': '465 kcal',
-        'image': 'assets/meal_salmon.png',
-      },
-    ];
+  Widget _buildWorkoutSubtitle() {
+    if (!_exercisesLoading && _exercisesError == null) {
+      final goalLabel = _profile?.primaryGoal != null
+          ? _profile!.primaryGoal!.replaceAll('_', ' ')
+          : 'your goals';
+      return Text(
+        "${_exercises.length} exercises - personalized for $goalLabel",
+        style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+      );
+    }
+    return const Text(
+      "Personalized for your goals",
+      style: TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+    );
+  }
 
+  Widget _buildWorkoutBody() {
+    if (_exercisesLoading) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 24),
+        child: Center(
+          child: CircularProgressIndicator(color: DashboardColors.primaryDark),
+        ),
+      );
+    }
+    if (_exercisesError != null) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Column(
+          children: [
+            Text(
+              "Couldn't load exercises.",
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: () {
+                if (_profile != null) _loadExercises(_profile!);
+              },
+              child: const Text("Retry"),
+            ),
+          ],
+        ),
+      );
+    }
+    if (_exercises.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 16),
+        child: Text(
+          "No exercises found for your preferences.",
+          style: TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+        ),
+      );
+    }
+    return Column(
+      children: [
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _exercises.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 8),
+          itemBuilder: (context, index) => _buildExerciseTile(_exercises[index], index),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          width: double.infinity,
+          height: 48,
+          child: ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: DashboardColors.primaryDark,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              elevation: 0,
+            ),
+            onPressed: () {},
+            icon: const Icon(Icons.play_arrow_rounded, size: 20),
+            label: const Text("Start today's session", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildExerciseTile(Exercise exercise, int index) {
+    final isDone = _completedExerciseIndices.contains(index);
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (isDone) {
+            _completedExerciseIndices.remove(index);
+          } else {
+            _completedExerciseIndices.add(index);
+          }
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isDone ? DashboardColors.activeBgGreen : DashboardColors.background,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: SizedBox(
+                width: 40,
+                height: 40,
+                child: _buildExerciseThumbnail(exercise.gifAsset),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    exercise.name,
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: DashboardColors.textPrimary),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    "${exercise.prescriptionLabel} · ${exercise.muscleGroups.join(', ')}",
+                    style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isDone ? DashboardColors.activeGreen : Colors.white,
+                border: isDone ? null : Border.all(color: Colors.black26, width: 1.5),
+              ),
+              child: isDone ? const Icon(Icons.check, size: 16, color: Colors.white) : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExerciseThumbnail(String? gifAsset) {
+    if (gifAsset == null) {
+      return Container(
+        color: Colors.white,
+        child: const Icon(Icons.self_improvement, size: 20, color: DashboardColors.primaryDark),
+      );
+    }
+    return Image.asset(
+      gifAsset,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => Container(
+        color: Colors.white,
+        child: const Icon(Icons.self_improvement, size: 20, color: DashboardColors.primaryDark),
+      ),
+    );
+  }
+
+  // Today's Meals Section
+  Widget _buildTodayMealsSection(MealPlanProvider provider) {
     return Column(
       children: [
         Row(
@@ -535,69 +629,80 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
         const SizedBox(height: 12),
-        ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: meals.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 8),
-          itemBuilder: (context, index) {
-            final meal = meals[index];
-            return Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: DashboardColors.cardWhite,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      meal['image'].toString(),
-                      width: 44,
-                      height: 44,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        width: 44,
-                        height: 44,
-                        color: DashboardColors.background,
-                        child: const Icon(Icons.restaurant, size: 22, color: DashboardColors.textSecondary),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          meal['category'].toString(),
-                          style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: DashboardColors.textSecondary),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          meal['title'].toString(),
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: DashboardColors.textPrimary),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          meal['calories'].toString(),
-                          style: const TextStyle(fontSize: 10, color: DashboardColors.textSecondary),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.add_circle_outline, color: DashboardColors.primaryDark, size: 22),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
+        _buildMealsBody(provider),
       ],
     );
+  }
+
+  Widget _buildMealsBody(MealPlanProvider provider) {
+    switch (provider.planState) {
+      case LoadState.loading:
+        return const Padding(
+          padding: EdgeInsets.symmetric(vertical: 24),
+          child: Center(
+            child: Column(
+              children: [
+                CircularProgressIndicator(color: DashboardColors.primaryDark),
+                SizedBox(height: 12),
+                Text(
+                  "Designing your meals...",
+                  style: TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+                ),
+              ],
+            ),
+          ),
+        );
+      case LoadState.error:
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            children: [
+              Text(
+                provider.errorMessage ?? "Couldn't generate meals.",
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () {
+                  if (provider.profile != null) {
+                    provider.submitProfileAndGenerate(provider.profile!);
+                  }
+                },
+                child: const Text("Retry"),
+              ),
+            ],
+          ),
+        );
+      case LoadState.success:
+        if (provider.meals.isEmpty) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Text(
+              "No meals generated.",
+              style: TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+            ),
+          );
+        }
+        return ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: provider.meals.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 8),
+          itemBuilder: (context, index) => _DashboardMealTile(
+            meal: provider.meals[index],
+            index: index,
+          ),
+        );
+      case LoadState.idle:
+        return const Padding(
+          padding: EdgeInsets.symmetric(vertical: 16),
+          child: Text(
+            "No meal plan yet.",
+            style: TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+          ),
+        );
+    }
   }
 
   // Weekly Activity Section
@@ -785,6 +890,110 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+String _dashboardMealCategoryLabel(int index) {
+  const labels = ['BREAKFAST', 'LUNCH', 'DINNER'];
+  if (index < labels.length) return labels[index];
+  return 'SNACK ${index - labels.length + 1}';
+}
+
+class _DashboardMealTile extends StatefulWidget {
+  final Meal meal;
+  final int index;
+
+  const _DashboardMealTile({required this.meal, required this.index});
+
+  @override
+  State<_DashboardMealTile> createState() => _DashboardMealTileState();
+}
+
+class _DashboardMealTileState extends State<_DashboardMealTile> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<MealPlanProvider>().ensureImageForMeal(widget.meal);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<MealPlanProvider>();
+    final imageState = provider.imageStates[widget.meal.cacheKey] ?? LoadState.idle;
+
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: DashboardColors.cardWhite,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: SizedBox(
+              width: 44,
+              height: 44,
+              child: _buildImage(context, imageState),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _dashboardMealCategoryLabel(widget.index),
+                  style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: DashboardColors.textSecondary),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  widget.meal.name,
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: DashboardColors.textPrimary),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  "${widget.meal.calories} kcal",
+                  style: const TextStyle(fontSize: 10, color: DashboardColors.textSecondary),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add_circle_outline, color: DashboardColors.primaryDark, size: 22),
+            onPressed: () {},
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImage(BuildContext context, LoadState state) {
+    if (widget.meal.imagePath != null) {
+      return Image.file(File(widget.meal.imagePath!), fit: BoxFit.cover);
+    }
+    if (state == LoadState.error) {
+      return GestureDetector(
+        onTap: () => context.read<MealPlanProvider>().ensureImageForMeal(widget.meal),
+        child: Container(
+          color: DashboardColors.background,
+          child: const Icon(Icons.refresh, size: 18, color: DashboardColors.textSecondary),
+        ),
+      );
+    }
+    return Container(
+      color: DashboardColors.background,
+      child: const Center(
+        child: SizedBox(
+          width: 16,
+          height: 16,
+          child: CircularProgressIndicator(strokeWidth: 2),
         ),
       ),
     );
