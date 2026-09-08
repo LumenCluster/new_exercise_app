@@ -21,7 +21,7 @@ class DatabaseHelper {
     String path = join(await getDatabasesPath(), 'user_profile.db');
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -35,11 +35,15 @@ class DatabaseHelper {
       )
     ''');
     await _createCacheTable(db);
+    await _createTrackingTables(db);
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await _createCacheTable(db);
+    }
+    if (oldVersion < 3) {
+      await _createTrackingTables(db);
     }
   }
 
@@ -50,6 +54,61 @@ class DatabaseHelper {
         value TEXT
       )
     ''');
+  }
+
+  Future<void> _createTrackingTables(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS weight_logs (
+        date TEXT PRIMARY KEY,
+        weight REAL
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS water_logs (
+        date TEXT PRIMARY KEY,
+        glasses INTEGER
+      )
+    ''');
+  }
+
+  /// Daily weight check-in, keyed by yyyy-MM-dd.
+  Future<void> logWeight(String date, double weight) async {
+    final db = await database;
+    await db.insert(
+      'weight_logs',
+      {'date': date, 'weight': weight},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<double?> getWeightForDate(String date) async {
+    final db = await database;
+    final maps = await db.query('weight_logs', where: 'date = ?', whereArgs: [date], limit: 1);
+    if (maps.isEmpty) return null;
+    return (maps.first['weight'] as num).toDouble();
+  }
+
+  /// Full weight history, oldest first.
+  Future<List<Map<String, dynamic>>> getWeightHistory() async {
+    final db = await database;
+    return db.query('weight_logs', orderBy: 'date ASC');
+  }
+
+  /// Glasses of water logged for a given day, keyed by yyyy-MM-dd.
+  Future<void> setWaterGlasses(String date, int glasses) async {
+    final db = await database;
+    await db.insert(
+      'water_logs',
+      {'date': date, 'glasses': glasses},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<int?> getWaterGlasses(String date) async {
+    final db = await database;
+    final maps = await db.query('water_logs', where: 'date = ?', whereArgs: [date], limit: 1);
+    if (maps.isEmpty) return null;
+    return maps.first['glasses'] as int;
   }
 
   /// Generic string cache, used to remember AI-generated content (e.g. a

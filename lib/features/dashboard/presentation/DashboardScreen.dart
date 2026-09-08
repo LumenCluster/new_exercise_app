@@ -7,6 +7,8 @@ import '../../meal_plan/domain/entities/meal.dart';
 import '../../meal_plan/presentation/providers/meal_plan_provider.dart';
 import '../../exercises/domain/entities/exercise.dart';
 import '../../exercises/domain/repositories/exercise_repository.dart';
+import '../../tracking/presentation/providers/water_intake_provider.dart';
+import '../../../core/widgets/app_bottom_nav_bar.dart';
 
 // --- Shared Theme Colors ---
 class DashboardColors {
@@ -17,6 +19,8 @@ class DashboardColors {
   static const cardWhite = Colors.white;
   static const textPrimary = Color(0xFF1B2A26);
   static const textSecondary = Color(0xFF757575);
+  static const waterBlue = Color(0xFF29B6F6);
+  static const waterLight = Color(0xFFE1F5FE);
 }
 
 class DashboardScreen extends StatefulWidget {
@@ -27,7 +31,6 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  int _selectedBottomNavIndex = 0;
   int _selectedDayIndex = 0;
   UserProfile? _profile;
   bool _isLoading = true;
@@ -86,52 +89,70 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       backgroundColor: DashboardColors.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // --- Header ---
-              _buildHeader(),
-              const SizedBox(height: 16),
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.only(
+                left: 20.0,
+                right: 20.0,
+                top: 12.0,
+                bottom: 100.0, // Spacing for floating navbar
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // --- Header ---
+                  _buildHeader(),
+                  const SizedBox(height: 16),
 
-              // --- Current Streak Banner ---
-              _buildStreakCard(),
-              const SizedBox(height: 16),
+                  // --- Current Streak Banner ---
+                  _buildStreakCard(),
+                  const SizedBox(height: 16),
 
-              // --- Active Program Banner ---
-              _buildActiveProgramCard(),
-              const SizedBox(height: 20),
+                  // --- Active Program Banner ---
+                  _buildActiveProgramCard(),
+                  const SizedBox(height: 20),
 
-              // --- 30-Day Workout Plan Section ---
-              _buildWorkoutPlanSection(),
-              const SizedBox(height: 20),
+                  // --- 30-Day Workout Plan Section ---
+                  _buildWorkoutPlanSection(),
+                  const SizedBox(height: 20),
 
-              // --- Today's Workout Section ---
-              _buildTodayWorkoutSection(),
-              const SizedBox(height: 24),
+                  // --- Today's Workout Section ---
+                  _buildTodayWorkoutSection(),
+                  const SizedBox(height: 24),
 
-              // --- Today's Meals Section ---
-              _buildTodayMealsSection(mealPlanProvider),
-              const SizedBox(height: 24),
+                  // --- Today's Meals Section ---
+                  _buildTodayMealsSection(mealPlanProvider),
+                  const SizedBox(height: 24),
 
-              // --- Weekly Activity Section ---
-              _buildWeeklyActivitySection(),
-              const SizedBox(height: 24),
+                  // --- Water Intake Section ---
+                  _buildWaterIntakeSection(),
+                  const SizedBox(height: 24),
 
-              // --- User Profile Summary Section ---
-              if (!_isLoading && _profile != null) ...[
-                _buildProfileSummarySection(),
-                const SizedBox(height: 20),
-              ],
-            ],
-          ),
+                  // --- Weekly Activity Section ---
+                  _buildWeeklyActivitySection(),
+                  const SizedBox(height: 24),
+
+                  // --- User Profile Summary Section ---
+                  if (!_isLoading && _profile != null) ...[
+                    _buildProfileSummarySection(),
+                    const SizedBox(height: 20),
+                  ],
+                ],
+              ),
+            ),
+
+            // --- Floating Bottom Navigation Bar ---
+            Positioned(
+              left: 20,
+              right: 20,
+              bottom: 16,
+              child: _buildBottomNavigationBar(),
+            ),
+          ],
         ),
       ),
-
-      // --- Bottom Navigation Bar ---
-      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
@@ -315,13 +336,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // 30-Day Workout Plan Section
   Widget _buildWorkoutPlanSection() {
-    final days = [
-      {'day': 'Day 11', 'label': 'Chest', 'completed': true},
-      {'day': 'Day 12', 'label': 'Full Body', 'completed': false, 'active': true},
-      {'day': 'Day 13', 'label': 'Abs', 'completed': false},
-      {'day': 'Day 14', 'label': 'Upper', 'completed': false},
-      {'day': 'Day 15', 'label': 'HIIT', 'completed': false},
-    ];
+    const weekdayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const workoutLabels = ['Full Body', 'Abs', 'Upper', 'HIIT', 'Chest'];
+    final today = DateTime.now();
+    final days = List.generate(5, (index) {
+      final date = today.add(Duration(days: index));
+      return {
+        'day': weekdayLabels[date.weekday - 1],
+        'label': workoutLabels[index],
+        'completed': false,
+      };
+    });
 
     return Column(
       children: [
@@ -705,17 +730,115 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  // --- Water Intake Component — backed by WaterIntakeProvider so it's ---
+  // --- shared with (and persisted for) the Report screen.            ---
+  Widget _buildWaterIntakeSection() {
+    return Consumer<WaterIntakeProvider>(
+      builder: (context, water, _) {
+        final target = water.targetGlasses;
+        final glasses = water.glasses;
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: DashboardColors.cardWhite,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Water Intake",
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: DashboardColors.textPrimary,
+                    ),
+                  ),
+                  Text(
+                    "$glasses/$target glasses",
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: DashboardColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+
+              // Water Glasses Bar
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(target, (index) {
+                  final isFilled = index < glasses;
+                  return Expanded(
+                    child: GestureDetector(
+                      onTap: () => water.setGlasses(index + 1),
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 3),
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: isFilled ? DashboardColors.waterBlue : DashboardColors.waterLight,
+                          borderRadius: BorderRadius.circular(19),
+                        ),
+                        child: Icon(
+                          Icons.local_drink_rounded,
+                          size: 18,
+                          color: isFilled ? Colors.white : DashboardColors.waterBlue.withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(height: 12),
+
+              // Add / Remove Control Buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "${glasses * 250}ml consumed",
+                    style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+                  ),
+                  GestureDetector(
+                    onTap: water.addGlass,
+                    child: const Text(
+                      "+ Add Glass",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: DashboardColors.waterBlue,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   // Weekly Activity Section
   Widget _buildWeeklyActivitySection() {
-    final activityData = [
-      {'day': 'Mon', 'height': 35.0, 'highlight': false},
-      {'day': 'Tue', 'height': 50.0, 'highlight': false},
-      {'day': 'Wed', 'height': 25.0, 'highlight': false},
-      {'day': 'Thu', 'height': 45.0, 'highlight': false},
-      {'day': 'Fri', 'height': 60.0, 'highlight': true},
-      {'day': 'Sat', 'height': 15.0, 'highlight': false},
-      {'day': 'Sun', 'height': 20.0, 'highlight': false},
-    ];
+    const weekdayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const heights = [35.0, 50.0, 25.0, 45.0, 60.0, 15.0, 20.0];
+    final today = DateTime.now();
+    final activityData = List.generate(7, (index) {
+      final date = today.add(Duration(days: index));
+      return {
+        'day': weekdayLabels[date.weekday - 1],
+        'height': heights[index],
+        'highlight': index == 0,
+      };
+    });
 
     return Container(
       width: double.infinity,
@@ -738,7 +861,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           const SizedBox(height: 24),
           SizedBox(
-            height: 80,
+            height: 88,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -838,61 +961,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // Bottom Navigation Bar Widget
   Widget _buildBottomNavigationBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem(0, Icons.home_filled, "Home"),
-          _buildNavItem(1, Icons.explore_outlined, "Discover"),
-          _buildNavItem(2, Icons.fitness_center_outlined, "Plan"),
-          _buildNavItem(3, Icons.bar_chart_rounded, "Report"),
-          _buildNavItem(4, Icons.person_outline, "Profile"),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem(int index, IconData icon, String label) {
-    final isSelected = _selectedBottomNavIndex == index;
-
-    return GestureDetector(
-      onTap: () => setState(() => _selectedBottomNavIndex = index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? DashboardColors.primaryDark : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: isSelected ? Colors.white : DashboardColors.textSecondary,
-            ),
-            if (isSelected) ...[
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
+    return AppBottomNavBar(currentTab: AppTab.home, profile: _profile);
   }
 }
 

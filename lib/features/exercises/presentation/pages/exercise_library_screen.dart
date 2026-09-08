@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/features/exercises/domain/entities/exercise.dart';
 import 'package:untitled/features/exercises/domain/repositories/exercise_repository.dart';
+import 'package:untitled/features/profile/domain/entities/user_profile.dart';
+import 'package:untitled/core/widgets/app_bottom_nav_bar.dart';
 
 class ExerciseLibraryScreen extends StatefulWidget {
   final ExerciseRepository repository;
-  const ExerciseLibraryScreen({super.key, required this.repository});
+  final UserProfile? profile;
+  const ExerciseLibraryScreen({super.key, required this.repository, this.profile});
 
   @override
   State<ExerciseLibraryScreen> createState() => _ExerciseLibraryScreenState();
@@ -31,13 +34,15 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Stretching Library')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _GoalFilterBar(selected: _selectedGoal, onSelect: _applyGoal),
-            Expanded(
-              child: FutureBuilder<List<Exercise>>(
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 90),
+            child: Column(
+              children: [
+                _GoalFilterBar(selected: _selectedGoal, onSelect: _applyGoal),
+                Expanded(
+                  child: FutureBuilder<List<Exercise>>(
                 future: _future,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState != ConnectionState.done) {
@@ -83,10 +88,18 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                     },
                   );
                 },
-              ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 16,
+            child: AppBottomNavBar(currentTab: AppTab.discover, profile: widget.profile),
+          ),
+        ],
       ),
     );
   }
