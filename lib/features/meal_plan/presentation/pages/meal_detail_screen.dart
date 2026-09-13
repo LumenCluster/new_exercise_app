@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:untitled/core/localization/app_localizations.dart';
 import 'package:untitled/features/meal_plan/domain/entities/meal.dart';
 
 class MealDetailScreen extends StatelessWidget {
@@ -40,7 +41,7 @@ class MealDetailScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  Text('Ingredients', style: Theme.of(context).textTheme.titleMedium),
+                  Text(context.tr('meal_plan_ingredients_title'), style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 8),
                   ...meal.ingredients.map(
                     (i) => Padding(
@@ -55,7 +56,7 @@ class MealDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Text('Instructions', style: Theme.of(context).textTheme.titleMedium),
+                  Text(context.tr('meal_plan_instructions_title'), style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 8),
                   ...meal.instructions.asMap().entries.map(
                         (e) => Padding(

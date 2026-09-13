@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../../exercises/domain/entities/exercise.dart';
 import '../../../exercises/domain/repositories/exercise_repository.dart';
@@ -18,12 +19,12 @@ class FitnessScreen extends StatelessWidget {
     return profile.currentWeightKg / (heightM * heightM);
   }
 
-  String get bmiStatus {
+  String bmiStatus(BuildContext context) {
     final val = bmi;
-    if (val < 18.5) return 'Underweight';
-    if (val < 25.0) return 'Healthy';
-    if (val < 30.0) return 'Overweight';
-    return 'Obese';
+    if (val < 18.5) return context.tr('onboarding_bmi_underweight');
+    if (val < 25.0) return context.tr('onboarding_bmi_healthy');
+    if (val < 30.0) return context.tr('onboarding_bmi_overweight');
+    return context.tr('onboarding_bmi_obese');
   }
 
   FitnessGoal _mapGoal(Goal goal) {
@@ -58,7 +59,7 @@ class FitnessScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Hello, ${profile.name ?? 'Friend'}!",
+                        context.tr('fitness_screen_hello', {'name': profile.name ?? context.tr('fitness_screen_default_name')}),
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -67,7 +68,7 @@ class FitnessScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        "Let's achieve your goals today.",
+                        context.tr('fitness_screen_subtitle'),
                         style: TextStyle(
                           fontSize: 14,
                           color: AppColors.textSecondary.withOpacity(0.8),
@@ -105,9 +106,9 @@ class FitnessScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Your BMI Score",
-                            style: TextStyle(color: Colors.white70, fontSize: 12),
+                          Text(
+                            context.tr('fitness_screen_bmi_score_label'),
+                            style: const TextStyle(color: Colors.white70, fontSize: 12),
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -126,7 +127,7 @@ class FitnessScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              bmiStatus,
+                              bmiStatus(context),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 12,
@@ -148,9 +149,9 @@ class FitnessScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Today's Routine",
-                    style: TextStyle(
+                  Text(
+                    context.tr('fitness_screen_todays_routine'),
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
@@ -162,7 +163,7 @@ class FitnessScreen extends StatelessWidget {
                         builder: (_) => ExerciseLibraryScreen(repository: exerciseRepository),
                       ),
                     ),
-                    child: const Text("View All"),
+                    child: Text(context.tr('dashboard_view_all')),
                   ),
                 ],
               ),
@@ -174,7 +175,7 @@ class FitnessScreen extends StatelessWidget {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Text("No exercises recommended for today.");
+                    return Text(context.tr('fitness_screen_no_exercises'));
                   }
                   final exercises = snapshot.data!.take(3).toList();
                   return Column(
@@ -186,9 +187,9 @@ class FitnessScreen extends StatelessWidget {
               const SizedBox(height: 32),
 
               // Quick Actions
-              const Text(
-                "Quick Actions",
-                style: TextStyle(
+              Text(
+                context.tr('fitness_screen_quick_actions'),
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -199,7 +200,7 @@ class FitnessScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _ActionCard(
-                      title: "Meal Plan",
+                      title: context.tr('fitness_screen_meal_plan_action'),
                       icon: Icons.restaurant_menu,
                       color: const Color(0xFFEBF5DB),
                       onTap: () => Navigator.of(context).push(
@@ -210,7 +211,7 @@ class FitnessScreen extends StatelessWidget {
                   const SizedBox(width: 16),
                   Expanded(
                     child: _ActionCard(
-                      title: "Stretches",
+                      title: context.tr('fitness_screen_stretches_action'),
                       icon: Icons.self_improvement,
                       color: const Color(0xFFFDE7E7),
                       onTap: () => Navigator.of(context).push(

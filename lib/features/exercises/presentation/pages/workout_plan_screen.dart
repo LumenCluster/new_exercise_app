@@ -10,6 +10,7 @@ import '../../../meal_plan/presentation/providers/weekly_meal_plan_provider.dart
 import '../../../meal_plan/presentation/pages/shopping_list_screen.dart';
 import '../../../coach/presentation/pages/coach_chat_screen.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class _WorkoutCard {
   final String name;
@@ -44,7 +45,12 @@ class WorkoutPlanScreen extends StatefulWidget {
 }
 
 class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
-  static const _weekdayLabels = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+  static const _weekdayAbbrevKeys = [
+    'weekday_sun', 'weekday_mon', 'weekday_tue', 'weekday_wed', 'weekday_thu', 'weekday_fri', 'weekday_sat',
+  ];
+
+  String _weekdayAbbrev(int weekday) => context.tr(_weekdayAbbrevKeys[weekday % 7]).toUpperCase();
+
   static const _monthLabels = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
@@ -190,9 +196,9 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
               child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: _PlanColors.textPrimary),
             ),
             const SizedBox(width: 8),
-            const Text(
-              "Your Plan",
-              style: TextStyle(
+            Text(
+              context.tr('exercises_your_plan_title'),
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: _PlanColors.textPrimary,
@@ -201,11 +207,11 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
           ],
         ),
         const SizedBox(height: 2),
-        const Padding(
-          padding: EdgeInsets.only(left: 26.0),
+        Padding(
+          padding: const EdgeInsets.only(left: 26.0),
           child: Text(
-            "Personalized workouts & meals, powered by AI",
-            style: TextStyle(
+            context.tr('exercises_your_plan_subtitle'),
+            style: const TextStyle(
               fontSize: 11,
               color: _PlanColors.textSecondary,
             ),
@@ -275,32 +281,32 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
         physics: const BouncingScrollPhysics(),
         children: [
           _buildCoachCard(
-            title: "Fitness Coach",
-            description: "Your AI fitness coach for smarter workouts. Ask anything!",
+            title: context.tr('exercises_fitness_coach_title'),
+            description: context.tr('exercises_fitness_coach_description'),
             imageAsset: "assets/fitness_coach.png",
             bgColor: const Color(0xFFE8F2E2),
             onChatTap: () => _openCoachChat(
-              title: "Fitness Coach",
-              subtitle: "AI · always available",
+              title: context.tr('exercises_fitness_coach_title'),
+              subtitle: context.tr('exercises_coach_subtitle_always_available'),
               icon: Icons.fitness_center_rounded,
               accentColor: _PlanColors.activeGreen,
               systemPrompt: _fitnessSystemPrompt(),
-              greeting: "Hi! I'm your fitness coach. Ask me about your workouts, form, or how to progress.",
+              greeting: context.tr('exercises_fitness_coach_greeting'),
             ),
           ),
           const SizedBox(width: 12),
           _buildCoachCard(
-            title: "AI Nutrition Coach",
-            description: "Get personalized nutrition advice, meal ideas & more",
+            title: context.tr('exercises_nutrition_coach_title'),
+            description: context.tr('exercises_nutrition_coach_description'),
             imageAsset: "assets/nutrition_coach.png",
             bgColor: const Color(0xFFEFEFE9),
             onChatTap: () => _openCoachChat(
-              title: "Nutrition Coach",
-              subtitle: "AI · always available",
+              title: context.tr('exercises_nutrition_coach_short_title'),
+              subtitle: context.tr('exercises_coach_subtitle_always_available'),
               icon: Icons.eco_rounded,
               accentColor: const Color(0xFF6B8E23),
               systemPrompt: _nutritionSystemPrompt(),
-              greeting: "Hi! I'm your nutrition coach. Ask me about your meals, macros, or diet swaps.",
+              greeting: context.tr('exercises_nutrition_coach_greeting'),
             ),
           ),
         ],
@@ -365,9 +371,9 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
-                    "Chat Now >",
-                    style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold),
+                  child: Text(
+                    context.tr('exercises_chat_now'),
+                    style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -399,7 +405,10 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          "This Week's Plan\n(${_formatDate(_planDays.first)} - ${_formatDate(_planDays.last)})",
+          context.tr('exercises_this_weeks_plan', {
+            'start': _formatDate(_planDays.first),
+            'end': _formatDate(_planDays.last),
+          }),
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
@@ -409,9 +418,9 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
         ),
         GestureDetector(
           onTap: () {},
-          child: const Text(
-            "View All",
-            style: TextStyle(fontSize: 11, color: _PlanColors.textSecondary),
+          child: Text(
+            context.tr('exercises_view_all'),
+            style: const TextStyle(fontSize: 11, color: _PlanColors.textSecondary),
           ),
         ),
       ],
@@ -444,7 +453,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
               child: Column(
                 children: [
                   Text(
-                    _weekdayLabels[date.weekday % 7],
+                    _weekdayAbbrev(date.weekday),
                     style: const TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
@@ -515,28 +524,28 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
                 icon: Icons.local_fire_department_outlined,
                 iconColor: const Color(0xFF6B8E23),
                 bgColor: const Color(0xFFEBF5E8),
-                label: "CALORIES",
+                label: context.tr('exercises_calories_label'),
                 value: hasData ? "$calories Kcal" : "—",
               ),
               _buildNutrientItem(
                 icon: Icons.fitness_center_rounded,
                 iconColor: const Color(0xFFE08A00),
                 bgColor: const Color(0xFFFFF3E0),
-                label: "PROTEIN",
+                label: context.tr('exercises_protein_label'),
                 value: hasData ? "${proteinG.round()} g" : "—",
               ),
               _buildNutrientItem(
                 icon: Icons.eco_outlined,
                 iconColor: const Color(0xFF29B6F6),
                 bgColor: const Color(0xFFE1F5FE),
-                label: "CARBS",
+                label: context.tr('exercises_carbs_label'),
                 value: hasData ? "${carbsG.round()} g" : "—",
               ),
               _buildNutrientItem(
                 icon: Icons.water_drop_outlined,
                 iconColor: const Color(0xFFAB47BC),
                 bgColor: const Color(0xFFF3E5F5),
-                label: "FATS",
+                label: context.tr('exercises_fats_label'),
                 value: hasData ? "${fatG.round()} g" : "—",
               ),
             ],
@@ -577,19 +586,23 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
     );
   }
 
-  static String _mealCategoryLabel(int index) {
-    const labels = ['BREAKFAST', 'LUNCH', 'DINNER'];
-    if (index < labels.length) return labels[index];
-    return 'SNACK ${index - labels.length + 1}';
+  String _mealCategoryLabel(int index) {
+    const keys = ['meal_breakfast', 'meal_lunch', 'meal_dinner'];
+    if (index < keys.length) return context.tr(keys[index]);
+    return context.tr('meal_snack_n', {'n': '${index - keys.length + 1}'});
   }
 
   // Today's Meals Cards — AI-generated recipes for the selected day.
   Widget _buildTodayMealsSection() {
     final selectedDay = _planDays[_selectedDayIndex];
-    final weekdayNames = [
-      'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+    const weekdayNameKeys = [
+      'exercises_weekday_monday', 'exercises_weekday_tuesday', 'exercises_weekday_wednesday',
+      'exercises_weekday_thursday', 'exercises_weekday_friday', 'exercises_weekday_saturday', 'exercises_weekday_sunday',
     ];
-    final title = "Meals (${weekdayNames[selectedDay.weekday - 1]}, ${_formatDate(selectedDay)})";
+    final title = context.tr('exercises_meals_title', {
+      'weekday': context.tr(weekdayNameKeys[selectedDay.weekday - 1]),
+      'date': _formatDate(selectedDay),
+    });
 
     if (widget.profile == null) {
       return Column(
@@ -597,9 +610,9 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
         children: [
           Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: _PlanColors.textPrimary)),
           const SizedBox(height: 12),
-          const Text(
-            "Complete your profile to get AI-generated recipes.",
-            style: TextStyle(fontSize: 12, color: _PlanColors.textSecondary),
+          Text(
+            context.tr('exercises_complete_profile_for_recipes'),
+            style: const TextStyle(fontSize: 12, color: _PlanColors.textSecondary),
           ),
         ],
       );
@@ -627,21 +640,21 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        "Couldn't generate recipes for this day.",
-                        style: TextStyle(fontSize: 11, color: _PlanColors.textSecondary),
+                      Text(
+                        context.tr('exercises_recipes_error'),
+                        style: const TextStyle(fontSize: 11, color: _PlanColors.textSecondary),
                       ),
                       const SizedBox(height: 8),
-                      TextButton(onPressed: _ensureMealsForSelectedDay, child: const Text("Retry")),
+                      TextButton(onPressed: _ensureMealsForSelectedDay, child: Text(context.tr('common_retry'))),
                     ],
                   ),
                 ),
               )
             else if (meals.isEmpty)
-              const SizedBox(
+              SizedBox(
                 height: 60,
                 child: Center(
-                  child: Text("No recipes generated yet.", style: TextStyle(fontSize: 12, color: _PlanColors.textSecondary)),
+                  child: Text(context.tr('exercises_no_recipes_yet'), style: const TextStyle(fontSize: 12, color: _PlanColors.textSecondary)),
                 ),
               )
             else
@@ -698,15 +711,15 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  "Shopping List",
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
+                  context.tr('exercises_shopping_list_title'),
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
-                  "All ingredients you need for this week's meals",
-                  style: TextStyle(fontSize: 9, color: Colors.white70),
+                  context.tr('exercises_shopping_list_subtitle'),
+                  style: const TextStyle(fontSize: 9, color: Colors.white70),
                 ),
               ],
             ),
@@ -721,7 +734,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               elevation: 0,
             ),
-            icon: const Text("View List", style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold)),
+            icon: Text(context.tr('exercises_view_list'), style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold)),
             label: const Icon(Icons.arrow_forward, size: 10),
           ),
         ],
@@ -738,15 +751,15 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              "Workout Plan",
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: _PlanColors.textPrimary),
+            Text(
+              context.tr('exercises_workout_plan_section_title'),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: _PlanColors.textPrimary),
             ),
             GestureDetector(
               onTap: () {},
-              child: const Text(
-                "View Full Plan",
-                style: TextStyle(fontSize: 11, color: _PlanColors.textSecondary),
+              child: Text(
+                context.tr('exercises_view_full_plan'),
+                style: const TextStyle(fontSize: 11, color: _PlanColors.textSecondary),
               ),
             ),
           ],
@@ -771,12 +784,12 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                "Couldn't load your workouts.",
-                style: TextStyle(fontSize: 11, color: _PlanColors.textSecondary),
+              Text(
+                context.tr('exercises_load_workouts_error'),
+                style: const TextStyle(fontSize: 11, color: _PlanColors.textSecondary),
               ),
               const SizedBox(height: 8),
-              TextButton(onPressed: _loadExercises, child: const Text("Retry")),
+              TextButton(onPressed: _loadExercises, child: Text(context.tr('common_retry'))),
             ],
           ),
         ),
@@ -786,10 +799,10 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
     // Default mock cards if repository returned empty
     final workoutList = _exercises.isNotEmpty
         ? _exercises.map((e) => _WorkoutCard(e.name, e.prescriptionLabel)).toList()
-        : const [
-      _WorkoutCard("Full Body Strength", "25 min"),
-      _WorkoutCard("Core & Abs Blast", "15 min"),
-      _WorkoutCard("Full Body Burn", "20 min"),
+        : [
+      _WorkoutCard(context.tr('dashboard_program_name'), '25 ${context.tr('common_minutes')}'),
+      _WorkoutCard(context.tr('exercises_workout_core_abs_blast'), '15 ${context.tr('common_minutes')}'),
+      _WorkoutCard(context.tr('exercises_workout_full_body_burn'), '20 ${context.tr('common_minutes')}'),
     ];
 
     return SizedBox(
@@ -825,7 +838,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      "MON",
+                      context.tr('weekday_mon').toUpperCase(),
                       style: TextStyle(
                         fontSize: 7,
                         fontWeight: FontWeight.bold,
@@ -877,15 +890,15 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  "Built-in Rest Days",
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _PlanColors.textPrimary),
+                  context.tr('exercises_rest_days_title'),
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _PlanColors.textPrimary),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
-                  "Rest days help your body recover so you can grow even stronger.",
-                  style: TextStyle(fontSize: 9, color: _PlanColors.textSecondary),
+                  context.tr('exercises_rest_days_subtitle'),
+                  style: const TextStyle(fontSize: 9, color: _PlanColors.textSecondary),
                 ),
               ],
             ),
@@ -910,33 +923,33 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Plan Progress",
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: _PlanColors.textPrimary),
+              Text(
+                context.tr('exercises_plan_progress_title'),
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: _PlanColors.textPrimary),
               ),
               GestureDetector(
                 onTap: () {},
                 child: Row(
-                  children: const [
-                    Text("View Progress", style: TextStyle(fontSize: 10, color: _PlanColors.textSecondary)),
-                    Icon(Icons.arrow_drop_down, size: 16, color: _PlanColors.textSecondary),
+                  children: [
+                    Text(context.tr('exercises_view_progress'), style: const TextStyle(fontSize: 10, color: _PlanColors.textSecondary)),
+                    const Icon(Icons.arrow_drop_down, size: 16, color: _PlanColors.textSecondary),
                   ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 4),
-          const Text(
-            "Keep up your momentum to reach your fitness targets",
-            style: TextStyle(fontSize: 9, color: _PlanColors.textSecondary),
+          Text(
+            context.tr('exercises_progress_subtitle'),
+            style: const TextStyle(fontSize: 9, color: _PlanColors.textSecondary),
           ),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildProgressStat("Workouts Completed", "5 / 12", Icons.fitness_center),
-              _buildProgressStat("Meals Followed", "18 / 21", Icons.restaurant_menu),
-              _buildProgressStat("Active Streak", "12 Days", Icons.local_fire_department),
+              _buildProgressStat(context.tr('exercises_workouts_completed_label'), context.tr('exercises_fraction', {'a': '5', 'b': '12'}), Icons.fitness_center),
+              _buildProgressStat(context.tr('exercises_meals_followed_label'), context.tr('exercises_fraction', {'a': '18', 'b': '21'}), Icons.restaurant_menu),
+              _buildProgressStat(context.tr('exercises_active_streak_label'), context.tr('exercises_days_count', {'n': '12'}), Icons.local_fire_department),
             ],
           ),
         ],

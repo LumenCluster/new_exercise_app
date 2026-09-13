@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../domain/entities/user_profile.dart';
 import 'onboarding_components.dart';
 
@@ -29,12 +30,12 @@ class FitnessSummaryStep extends StatelessWidget {
     return weightKg / (heightM * heightM);
   }
 
-  String get bmiStatus {
+  String bmiStatus(BuildContext context) {
     final val = bmi;
-    if (val < 18.5) return 'Underweight';
-    if (val < 25.0) return 'Healthy';
-    if (val < 30.0) return 'Overweight';
-    return 'Obese';
+    if (val < 18.5) return context.tr('onboarding_bmi_underweight');
+    if (val < 25.0) return context.tr('onboarding_bmi_healthy');
+    if (val < 30.0) return context.tr('onboarding_bmi_overweight');
+    return context.tr('onboarding_bmi_obese');
   }
 
   Color get bmiColor {
@@ -45,18 +46,18 @@ class FitnessSummaryStep extends StatelessWidget {
     return Colors.red;
   }
 
-  String get activityLabel {
+  String activityLabel(BuildContext context) {
     switch (activityLevel) {
       case ActivityLevel.sedentary:
-        return 'Mostly Sedentary';
+        return context.tr('onboarding_activity_sedentary');
       case ActivityLevel.light:
-        return 'Lightly Active';
+        return context.tr('onboarding_activity_light');
       case ActivityLevel.moderate:
-        return 'Moderately Active';
+        return context.tr('onboarding_activity_moderate');
       case ActivityLevel.active:
-        return 'Very Active';
+        return context.tr('onboarding_activity_active');
       case ActivityLevel.veryActive:
-        return 'Extremely Active';
+        return context.tr('onboarding_activity_very_active');
     }
   }
 
@@ -70,9 +71,9 @@ class FitnessSummaryStep extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const StepHeader(
-                title: "Here's your fitness level summary",
-                subtitle: "This helps us personalize your fitness journey.",
+              StepHeader(
+                title: context.tr('onboarding_fitness_summary_title'),
+                subtitle: context.tr('onboarding_fitness_summary_subtitle'),
               ),
               const SizedBox(height: 24),
 
@@ -100,9 +101,9 @@ class FitnessSummaryStep extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  "BMI Score",
-                                  style: TextStyle(
+                                Text(
+                                  context.tr('onboarding_bmi_score_label'),
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     color: AppColors.textSecondary,
                                     fontWeight: FontWeight.w500,
@@ -119,7 +120,7 @@ class FitnessSummaryStep extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  bmiStatus,
+                                  bmiStatus(context),
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -142,7 +143,7 @@ class FitnessSummaryStep extends StatelessWidget {
                         ],
                       ),
                     ),
-                    
+
                     // BMI Scale
                     Padding(
                       padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
@@ -196,13 +197,13 @@ class FitnessSummaryStep extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 8),
-                          const Row(
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text("<18.5", style: TextStyle(fontSize: 9, color: AppColors.textSecondary)),
-                              Text("18.5 - 24.9", style: TextStyle(fontSize: 9, color: AppColors.textSecondary)),
-                              Text("25 - 29.9", style: TextStyle(fontSize: 9, color: AppColors.textSecondary)),
-                              Text("≥30", style: TextStyle(fontSize: 9, color: AppColors.textSecondary)),
+                              Text(context.tr('onboarding_bmi_range_under'), style: const TextStyle(fontSize: 9, color: AppColors.textSecondary)),
+                              Text(context.tr('onboarding_bmi_range_mid1'), style: const TextStyle(fontSize: 9, color: AppColors.textSecondary)),
+                              Text(context.tr('onboarding_bmi_range_mid2'), style: const TextStyle(fontSize: 9, color: AppColors.textSecondary)),
+                              Text(context.tr('onboarding_bmi_range_over'), style: const TextStyle(fontSize: 9, color: AppColors.textSecondary)),
                             ],
                           ),
                         ],
@@ -217,22 +218,22 @@ class FitnessSummaryStep extends StatelessWidget {
               // Summary Items
               _SummaryItem(
                 icon: Icons.person_outline,
-                label: "LIFESTYLE",
-                value: activityLabel,
+                label: context.tr('onboarding_label_lifestyle'),
+                value: activityLabel(context),
                 onEdit: () => onEdit(7), // Activity Level Step index
               ),
               const Divider(height: 1),
               _SummaryItem(
                 icon: Icons.fitness_center,
-                label: "FITNESS LEVEL",
-                value: fitnessLevel ?? "Beginner",
+                label: context.tr('onboarding_label_fitness_level'),
+                value: fitnessLevel ?? context.tr('onboarding_default_beginner'),
                 onEdit: () => onEdit(10), // Fitness Level Step index
               ),
               const Divider(height: 1),
               _SummaryItem(
                 icon: Icons.accessibility_new,
-                label: "BODY TYPE",
-                value: bodyShape ?? "Average",
+                label: context.tr('onboarding_label_body_type'),
+                value: bodyShape ?? context.tr('onboarding_default_average'),
                 onEdit: () => onEdit(6), // Body Shape Step index
               ),
 
@@ -258,14 +259,14 @@ class FitnessSummaryStep extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            bmi < 25 ? "You are doing great!" : "A bit overweight",
+                            bmi < 25 ? context.tr('onboarding_bmi_good_title') : context.tr('onboarding_bmi_over_title'),
                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            bmi < 25 
-                              ? "Keep up the good work and follow the plan." 
-                              : "A little more sweat goes a long way. Let's build a plan that gets you results...",
+                            bmi < 25
+                              ? context.tr('onboarding_bmi_good_body')
+                              : context.tr('onboarding_bmi_over_body'),
                             style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                           ),
                         ],
@@ -277,7 +278,7 @@ class FitnessSummaryStep extends StatelessWidget {
 
               const SizedBox(height: 32),
               OnboardingButton(
-                text: "continue to part 2",
+                text: context.tr('onboarding_continue_part2'),
                 onPressed: onContinue,
               ),
               const SizedBox(height: 16),

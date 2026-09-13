@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:untitled/core/localization/app_localizations.dart';
 import 'package:untitled/features/meal_plan/domain/entities/meal.dart';
 import 'package:untitled/features/meal_plan/presentation/providers/meal_plan_provider.dart';
 import 'package:untitled/features/meal_plan/presentation/pages/meal_detail_screen.dart';
@@ -11,20 +12,20 @@ class MealPlanScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Today\'s Meal Plan')),
+      appBar: AppBar(title: Text(context.tr('meal_plan_today_title'))),
       body: Consumer<MealPlanProvider>(
         builder: (context, provider, _) {
           switch (provider.planState) {
             case LoadState.loading:
-              return const Center(
+              return Center(
                 child: Padding(
-                  padding: EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(24),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      CircularProgressIndicator(),
-                      SizedBox(height: 16),
-                      Text('Designing your meals...'),
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 16),
+                      Text(context.tr('dashboard_designing_meals')),
                     ],
                   ),
                 ),
@@ -38,7 +39,7 @@ class MealPlanScreen extends StatelessWidget {
                     children: [
                       const Icon(Icons.error_outline, size: 48),
                       const SizedBox(height: 12),
-                      Text(provider.errorMessage ?? 'Something went wrong'),
+                      Text(provider.errorMessage ?? context.tr('common_error')),
                       const SizedBox(height: 16),
                       FilledButton(
                         onPressed: () {
@@ -46,7 +47,7 @@ class MealPlanScreen extends StatelessWidget {
                             provider.submitProfileAndGenerate(provider.profile!);
                           }
                         },
-                        child: const Text('Retry'),
+                        child: Text(context.tr('common_retry')),
                       ),
                     ],
                   ),
@@ -69,7 +70,7 @@ class MealPlanScreen extends StatelessWidget {
                 ],
               );
             case LoadState.idle:
-              return const Center(child: Text('No meal plan yet.'));
+              return Center(child: Text(context.tr('dashboard_no_meal_plan_yet')));
           }
         },
       ),
@@ -89,7 +90,12 @@ class _TargetSummary extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       color: Theme.of(context).colorScheme.primaryContainer,
       child: Text(
-        'Daily target: ${t.calories} kcal  •  P ${t.proteinG}g  •  C ${t.carbsG}g  •  F ${t.fatG}g',
+        context.tr('meal_plan_daily_target', {
+          'kcal': '${t.calories}',
+          'p': '${t.proteinG}',
+          'c': '${t.carbsG}',
+          'f': '${t.fatG}',
+        }),
         style: Theme.of(context).textTheme.bodyMedium,
       ),
     );
@@ -172,14 +178,14 @@ class _MealCardState extends State<_MealCard> {
                 const Icon(Icons.broken_image_outlined),
                 const SizedBox(height: 6),
                 Text(
-                  error ?? 'Image failed to generate',
+                  error ?? context.tr('meal_plan_image_failed'),
                   textAlign: TextAlign.center,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.labelSmall,
                 ),
                 const SizedBox(height: 4),
-                Text('Tap to retry',
+                Text(context.tr('meal_plan_tap_to_retry'),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold)),
               ],
             ),

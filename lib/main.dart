@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'features/meal_plan/data/datasources/meal_remote_data_source.dart';
@@ -15,6 +16,8 @@ import 'features/coach/domain/repositories/coach_repository.dart';
 import 'features/tracking/presentation/providers/water_intake_provider.dart';
 import 'features/tracking/presentation/providers/weight_log_provider.dart';
 import 'core/constants/app_colors.dart';
+import 'core/localization/app_localizations.dart';
+import 'core/localization/locale_provider.dart';
 import 'app_launcher.dart';
 
 void main() {
@@ -49,6 +52,9 @@ void main() {
         ChangeNotifierProvider(
           create: (_) => WeightLogProvider()..load(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => LocaleProvider()..load(),
+        ),
       ],
       child: const MealPlannerApp(),
     ),
@@ -60,9 +66,19 @@ class MealPlannerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final locale = context.watch<LocaleProvider>().locale;
+
     return MaterialApp(
-      title: 'AI Meal Planner',
+      onGenerateTitle: (context) => AppLocalizations.of(context).t('app_title'),
       debugShowCheckedModeBanner: false,
+      locale: locale,
+      supportedLocales: const [Locale('en'), Locale('es'), Locale('fr'), Locale('de'), Locale('hi')],
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppColors.primary,

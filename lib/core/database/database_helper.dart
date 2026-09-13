@@ -153,4 +153,23 @@ class DatabaseHelper {
     }
     return null;
   }
+
+  /// Used by "Restart Data": wipes logged progress and generated-plan
+  /// cache, but keeps the profile so onboarding isn't repeated.
+  Future<void> clearTrackingData() async {
+    final db = await database;
+    await db.delete('weight_logs');
+    await db.delete('water_logs');
+    await db.delete('cache');
+  }
+
+  /// Used by "Delete Data": wipes everything, including the profile, so
+  /// the app falls back to onboarding on next launch.
+  Future<void> clearAllData() async {
+    final db = await database;
+    await db.delete('profile');
+    await db.delete('cache');
+    await db.delete('weight_logs');
+    await db.delete('water_logs');
+  }
 }

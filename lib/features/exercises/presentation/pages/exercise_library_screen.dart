@@ -3,6 +3,7 @@ import 'package:untitled/features/exercises/domain/entities/exercise.dart';
 import 'package:untitled/features/exercises/domain/repositories/exercise_repository.dart';
 import 'package:untitled/features/profile/domain/entities/user_profile.dart';
 import 'package:untitled/core/widgets/app_bottom_nav_bar.dart';
+import 'package:untitled/core/localization/app_localizations.dart';
 
 class ExerciseLibraryScreen extends StatefulWidget {
   final ExerciseRepository repository;
@@ -33,7 +34,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Stretching Library')),
+      appBar: AppBar(title: Text(context.tr('exercises_library_title'))),
       body: Stack(
         children: [
           Padding(
@@ -49,11 +50,11 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
+                    return Center(child: Text(context.tr('exercises_error_prefix', {'message': '${snapshot.error}'})));
                   }
                   final exercises = snapshot.data ?? [];
                   if (exercises.isEmpty) {
-                    return const Center(child: Text('No stretches found.'));
+                    return Center(child: Text(context.tr('exercises_no_stretches_found')));
                   }
                   // Group by category for a scannable, sectioned list.
                   final grouped = <StretchCategory, List<Exercise>>{};
@@ -119,7 +120,7 @@ class _GoalFilterBar extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.zero,
         children: [
-          _chip(context, null, 'All'),
+          _chip(context, null, context.tr('exercises_filter_all')),
           for (final goal in FitnessGoal.values) _chip(context, goal, goal.label),
         ],
       ),
@@ -214,11 +215,11 @@ class _PrescriptionRow extends StatelessWidget {
       children: [
         _infoPill(context, Icons.repeat, exercise.prescriptionLabel, scheme),
         if (exercise.perSide)
-          _infoPill(context, Icons.compare_arrows, 'Both sides', scheme),
+          _infoPill(context, Icons.compare_arrows, context.tr('exercises_both_sides'), scheme),
         if (exercise.equipmentNeeded)
-          _infoPill(context, Icons.fitness_center, 'Needs equipment', scheme)
+          _infoPill(context, Icons.fitness_center, context.tr('exercises_needs_equipment'), scheme)
         else
-          _infoPill(context, Icons.check_circle_outline, 'No equipment', scheme),
+          _infoPill(context, Icons.check_circle_outline, context.tr('exercises_no_equipment'), scheme),
       ],
     );
   }

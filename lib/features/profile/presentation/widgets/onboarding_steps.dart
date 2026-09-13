@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../domain/entities/user_profile.dart';
 import 'onboarding_components.dart';
 import 'dart:math';
@@ -22,10 +23,9 @@ class IntroStep extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              const StepHeader(
-                title: "Let's build\na plan that fits you",
-                subtitle:
-                "We'll ask a few simple questions to understand your goals and lifestyle.",
+              StepHeader(
+                title: context.tr('onboarding_intro_title'),
+                subtitle: context.tr('onboarding_intro_subtitle'),
               ),
               const Spacer(),
               Center(
@@ -45,12 +45,12 @@ class IntroStep extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              OnboardingButton(text: "Let's begin", onPressed: onNext),
+              OnboardingButton(text: context.tr('onboarding_lets_begin'), onPressed: onNext),
               const SizedBox(height: 12),
-              const Center(
+              Center(
                 child: Text(
-                  "Your information is safe and secure with us.",
-                  style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                  context.tr('onboarding_info_safe_secure'),
+                  style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                 ),
               ),
             ],
@@ -77,11 +77,10 @@ class AboutYouIntroStep extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              const StepHeader(
-                partText: "PART 1",
-                title: "About You",
-                subtitle:
-                "Let's start with a few details to personalize your experience.",
+              StepHeader(
+                partText: context.tr('onboarding_part_1'),
+                title: context.tr('onboarding_about_you_title'),
+                subtitle: context.tr('onboarding_about_you_subtitle'),
               ),
               const Spacer(),
               Center(
@@ -93,12 +92,12 @@ class AboutYouIntroStep extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              OnboardingButton(text: "Continue", onPressed: onNext),
+              OnboardingButton(text: context.tr('common_continue'), onPressed: onNext),
               const SizedBox(height: 12),
-              const Center(
+              Center(
                 child: Text(
-                  "About 2 minutes",
-                  style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                  context.tr('onboarding_about_2_minutes'),
+                  style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                 ),
               ),
             ],
@@ -133,21 +132,21 @@ class _NameGenderStepState extends State<NameGenderStep> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const StepHeader(
-                title: "Let's get to know you",
-                subtitle: "This helps us personalize your experience.",
+              StepHeader(
+                title: context.tr('onboarding_name_gender_title'),
+                subtitle: context.tr('onboarding_name_gender_subtitle'),
               ),
               const SizedBox(height: 28),
-              const Text(
-                "What Should We Call You?",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              Text(
+                context.tr('onboarding_what_should_we_call_you'),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: _nameController,
                 onChanged: (_) => setState(() {}),
                 decoration: InputDecoration(
-                  hintText: "Enter your name",
+                  hintText: context.tr('onboarding_enter_name_hint'),
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(
@@ -161,17 +160,17 @@ class _NameGenderStepState extends State<NameGenderStep> {
                 ),
               ),
               const SizedBox(height: 28),
-              const Text(
-                "Select Your Gender",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              Text(
+                context.tr('onboarding_select_gender'),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
               ),
               const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
                     child: SelectableCard(
-                      title: "Female",
-                      subtitle: "Identify as a woman",
+                      title: context.tr('onboarding_female_title'),
+                      subtitle: context.tr('onboarding_female_subtitle'),
                       isSelected: _gender == Gender.female,
                       onTap: () => setState(() => _gender = Gender.female),
                       icon: Stack(
@@ -202,8 +201,8 @@ class _NameGenderStepState extends State<NameGenderStep> {
                   const SizedBox(width: 16),
                   Expanded(
                     child: SelectableCard(
-                      title: "Male",
-                      subtitle: "Identify as a man",
+                      title: context.tr('onboarding_male_title'),
+                      subtitle: context.tr('onboarding_male_subtitle'),
                       isSelected: _gender == Gender.male,
                       onTap: () => setState(() => _gender = Gender.male),
                       icon: Stack(
@@ -235,14 +234,14 @@ class _NameGenderStepState extends State<NameGenderStep> {
               ),
               const Spacer(),
               OnboardingButton(
-                text: "Next",
+                text: context.tr('common_next'),
                 onPressed: isEnabled ? () => widget.onNext(_nameController.text, _gender!) : null,
               ),
               const SizedBox(height: 12),
-              const Center(
+              Center(
                 child: Text(
-                  "Your information is safe with us and will never be shared.",
-                  style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                  context.tr('onboarding_info_safe_never_shared'),
+                  style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
                 ),
               ),
             ],
@@ -282,9 +281,9 @@ class _AgeStepState extends State<AgeStep> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             children: [
-              const StepHeader(
-                title: "What's your age?",
-                subtitle: "We'll use this to make sure your plan fits you perfectly.",
+              StepHeader(
+                title: context.tr('onboarding_age_title'),
+                subtitle: context.tr('onboarding_age_subtitle'),
               ),
               const Spacer(),
 
@@ -295,7 +294,7 @@ class _AgeStepState extends State<AgeStep> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
                     child: Text(
-                      "Select Your Age",
+                      context.tr('onboarding_select_your_age'),
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -344,7 +343,9 @@ class _AgeStepState extends State<AgeStep> {
                           final isSelected = age == _selectedAge;
                           return Center(
                             child: Text(
-                              isSelected ? "$age years" : "$age yrs",
+                              isSelected
+                                  ? context.tr('onboarding_age_years', {'age': '$age'})
+                                  : context.tr('onboarding_age_yrs', {'age': '$age'}),
                               style: TextStyle(
                                 fontSize: isSelected ? 22 : 18,
                                 fontWeight: isSelected
@@ -395,22 +396,22 @@ class _AgeStepState extends State<AgeStep> {
                       ),
                     ),
                     const SizedBox(width: 14),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Your privacy matters",
-                            style: TextStyle(
+                            context.tr('onboarding_privacy_matters'),
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 13,
                               color: AppColors.textPrimary,
                             ),
                           ),
-                          SizedBox(height: 2),
+                          const SizedBox(height: 2),
                           Text(
-                            "Your information is safe with us and will never be shared.",
-                            style: TextStyle(
+                            context.tr('onboarding_info_safe_never_shared'),
+                            style: const TextStyle(
                               fontSize: 11,
                               color: AppColors.textSecondary,
                             ),
@@ -427,9 +428,9 @@ class _AgeStepState extends State<AgeStep> {
               // Optional Skip Button
               GestureDetector(
                 onTap: () => widget.onNext(_selectedAge),
-                child: const Text(
-                  "I don't want to answer",
-                  style: TextStyle(
+                child: Text(
+                  context.tr('onboarding_i_dont_want_to_answer'),
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                     color: AppColors.textSecondary,
@@ -439,7 +440,7 @@ class _AgeStepState extends State<AgeStep> {
 
               const SizedBox(height: 16),
               OnboardingButton(
-                text: "Next",
+                text: context.tr('common_next'),
                 onPressed: () => widget.onNext(_selectedAge),
               ),
               const SizedBox(height: 12),
@@ -477,9 +478,9 @@ class _HeightStepState extends State<HeightStep> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             children: [
-              const StepHeader(
-                title: "How tall are you?",
-                subtitle: "Your height helps us create a plan that's tailored just for you.",
+              StepHeader(
+                title: context.tr('onboarding_height_title'),
+                subtitle: context.tr('onboarding_height_subtitle'),
               ),
               const SizedBox(height: 16),
 
@@ -585,9 +586,9 @@ class _HeightStepState extends State<HeightStep> {
               ),
               const SizedBox(height: 8),
 
-              const Text(
-                "Looks about right? You can adjust using the ruler.",
-                style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
+              Text(
+                context.tr('onboarding_height_looks_right'),
+                style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
               ),
               const SizedBox(height: 12),
 
@@ -666,18 +667,18 @@ class _HeightStepState extends State<HeightStep> {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            const Text(
-                              "Tips for accuracy",
-                              style: TextStyle(
+                            Text(
+                              context.tr('onboarding_tips_for_accuracy'),
+                              style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimary,
                               ),
                             ),
                             const SizedBox(height: 4),
-                            const Text(
-                              "Stand straight against a wall without shoes for the most accurate measurement.",
-                              style: TextStyle(
+                            Text(
+                              context.tr('onboarding_height_tip_body'),
+                              style: const TextStyle(
                                 fontSize: 9,
                                 color: AppColors.textSecondary,
                                 height: 1.3,
@@ -693,7 +694,7 @@ class _HeightStepState extends State<HeightStep> {
 
               const SizedBox(height: 12),
               OnboardingButton(
-                text: "Next",
+                text: context.tr('common_next'),
                 onPressed: () => widget.onNext(_cm.toDouble()),
               ),
               const SizedBox(height: 12),
@@ -831,22 +832,22 @@ class _WeightStepState extends State<WeightStep> {
   }
 
   // Determine BMI Status & Color
-  Map<String, dynamic> get _bmiCategory {
+  Map<String, dynamic> _bmiCategory(BuildContext context) {
     final bmi = _bmi;
     if (bmi < 18.5) {
-      return {'label': 'Underweight', 'color': Colors.orange};
+      return {'label': context.tr('onboarding_bmi_underweight'), 'color': Colors.orange};
     } else if (bmi < 25.0) {
-      return {'label': 'Normal Weight', 'color': const Color(0xFF4CAF50)};
+      return {'label': context.tr('onboarding_bmi_normal'), 'color': const Color(0xFF4CAF50)};
     } else if (bmi < 30.0) {
-      return {'label': 'Overweight', 'color': Colors.amber.shade700};
+      return {'label': context.tr('onboarding_bmi_overweight'), 'color': Colors.amber.shade700};
     } else {
-      return {'label': 'Obese', 'color': Colors.redAccent};
+      return {'label': context.tr('onboarding_bmi_obese'), 'color': Colors.redAccent};
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final category = _bmiCategory;
+    final category = _bmiCategory(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F8F3),
@@ -855,9 +856,9 @@ class _WeightStepState extends State<WeightStep> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             children: [
-              const StepHeader(
-                title: "What's your weight?",
-                subtitle: "This helps us personalize your plan for your goals.",
+              StepHeader(
+                title: context.tr('onboarding_weight_title'),
+                subtitle: context.tr('onboarding_weight_subtitle'),
               ),
               const SizedBox(height: 16),
 
@@ -982,9 +983,9 @@ class _WeightStepState extends State<WeightStep> {
                         children: [
                           Row(
                             children: [
-                              const Text(
-                                "Estimated BMI: ",
-                                style: TextStyle(
+                              Text(
+                                context.tr('onboarding_estimated_bmi_label'),
+                                style: const TextStyle(
                                   fontSize: 13,
                                   color: AppColors.textSecondary,
                                 ),
@@ -1049,10 +1050,10 @@ class _WeightStepState extends State<WeightStep> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        "Weigh yourself in the morning before eating for the most accurate results.",
-                        style: TextStyle(
+                        context.tr('onboarding_weight_tip_body'),
+                        style: const TextStyle(
                           fontSize: 11,
                           color: AppColors.textSecondary,
                         ),
@@ -1064,7 +1065,7 @@ class _WeightStepState extends State<WeightStep> {
 
               const SizedBox(height: 16),
               OnboardingButton(
-                text: "Next",
+                text: context.tr('common_next'),
                 onPressed: () => widget.onNext(_weightKg),
               ),
               const SizedBox(height: 12),
@@ -1234,6 +1235,42 @@ class _BodyShapeStepState extends State<BodyShapeStep> {
     super.dispose();
   }
 
+  String _shapeTitle(BuildContext context, String id) {
+    switch (id) {
+      case 'curvy':
+        return context.tr('onboarding_body_shape_curvy_title');
+      case 'heavy':
+        return context.tr('onboarding_body_shape_heavy_title');
+      case 'obese':
+        return context.tr('onboarding_body_shape_obese_title');
+    }
+    return id;
+  }
+
+  String _shapeSubtitle(BuildContext context, String id) {
+    switch (id) {
+      case 'curvy':
+        return context.tr('onboarding_body_shape_curvy_subtitle');
+      case 'heavy':
+        return context.tr('onboarding_body_shape_heavy_subtitle');
+      case 'obese':
+        return context.tr('onboarding_body_shape_obese_subtitle');
+    }
+    return id;
+  }
+
+  String _shapeFeedback(BuildContext context, String id) {
+    switch (id) {
+      case 'curvy':
+        return context.tr('onboarding_body_shape_curvy_feedback');
+      case 'heavy':
+        return context.tr('onboarding_body_shape_heavy_feedback');
+      case 'obese':
+        return context.tr('onboarding_body_shape_obese_feedback');
+    }
+    return id;
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentShape = _shapes[_selectedIndex];
@@ -1248,11 +1285,11 @@ class _BodyShapeStepState extends State<BodyShapeStep> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.0),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: StepHeader(
-                    title: "What's your current body shape?",
-                    subtitle: "This helps us personalize your plan for your goals.",
+                    title: context.tr('onboarding_body_shape_title'),
+                    subtitle: context.tr('onboarding_body_shape_subtitle'),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -1337,7 +1374,7 @@ class _BodyShapeStepState extends State<BodyShapeStep> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    item.title,
+                                    _shapeTitle(context, item.id),
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -1346,7 +1383,7 @@ class _BodyShapeStepState extends State<BodyShapeStep> {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    item.subtitle,
+                                    _shapeSubtitle(context, item.id),
                                     textAlign: TextAlign.center,
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
@@ -1367,9 +1404,9 @@ class _BodyShapeStepState extends State<BodyShapeStep> {
                 ),
 
                 const SizedBox(height: 20),
-                const Text(
-                  "How Would You Describe Your Body Fat?",
-                  style: TextStyle(
+                Text(
+                  context.tr('onboarding_body_fat_question'),
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -1426,17 +1463,17 @@ class _BodyShapeStepState extends State<BodyShapeStep> {
                       const SizedBox(height: 6),
 
                       // Level Labels
-                      const Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Lower",
-                              style: TextStyle(
+                          Text(context.tr('onboarding_fat_level_lower'),
+                              style: const TextStyle(
                                   fontSize: 10, color: AppColors.textSecondary)),
-                          Text("Moderate",
-                              style: TextStyle(
+                          Text(context.tr('onboarding_fat_level_moderate'),
+                              style: const TextStyle(
                                   fontSize: 10, color: AppColors.textSecondary)),
-                          Text("Higher",
-                              style: TextStyle(
+                          Text(context.tr('onboarding_fat_level_higher'),
+                              style: const TextStyle(
                                   fontSize: 10, color: AppColors.textSecondary)),
                         ],
                       ),
@@ -1484,9 +1521,9 @@ class _BodyShapeStepState extends State<BodyShapeStep> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                "Your Estimated Body Fat",
-                                style: TextStyle(
+                              Text(
+                                context.tr('onboarding_estimated_body_fat_label'),
+                                style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w500,
                                   color: AppColors.textSecondary,
@@ -1503,7 +1540,7 @@ class _BodyShapeStepState extends State<BodyShapeStep> {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                currentShape.feedbackText,
+                                _shapeFeedback(context, currentShape.id),
                                 style: const TextStyle(
                                   fontSize: 10,
                                   color: AppColors.textSecondary,
@@ -1524,7 +1561,7 @@ class _BodyShapeStepState extends State<BodyShapeStep> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: OnboardingButton(
-                    text: "Next",
+                    text: context.tr('common_next'),
                     onPressed: () => widget.onNext(
                       currentShape.title,
                       currentShape.fatRange,
@@ -1562,9 +1599,9 @@ class _ActivityLevelStepState extends State<ActivityLevelStep> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             children: [
-              const StepHeader(
-                title: "What's your activity level like?",
-                subtitle: "This helps us personalize your plan for your lifestyle.",
+              StepHeader(
+                title: context.tr('onboarding_activity_title'),
+                subtitle: context.tr('onboarding_activity_subtitle'),
               ),
               const SizedBox(height: 24),
               Expanded(
@@ -1573,32 +1610,32 @@ class _ActivityLevelStepState extends State<ActivityLevelStep> {
                   children: [
                     _buildLevelCard(
                       level: ActivityLevel.sedentary,
-                      title: "Mostly Sedentary",
-                      subtitle: "Little to no exercise. Desk job or spending most time at home.",
+                      title: context.tr('onboarding_activity_sedentary_title'),
+                      subtitle: context.tr('onboarding_activity_sedentary_subtitle'),
                       icon: Icons.chair_outlined,
                     ),
                     _buildLevelCard(
                       level: ActivityLevel.light, // Updated from lightlyActive
-                      title: "Lightly Active",
-                      subtitle: "Light exercise or walking 1-3 days per week.",
+                      title: context.tr('onboarding_activity_light_title'),
+                      subtitle: context.tr('onboarding_activity_light_subtitle'),
                       icon: Icons.desktop_windows_outlined,
                     ),
                     _buildLevelCard(
                       level: ActivityLevel.moderate, // Updated from moderatelyActive
-                      title: "Moderately Active",
-                      subtitle: "Moderate exercise or walking 3-5 days per week.",
+                      title: context.tr('onboarding_activity_moderate_title'),
+                      subtitle: context.tr('onboarding_activity_moderate_subtitle'),
                       icon: Icons.directions_walk_outlined,
                     ),
                     _buildLevelCard(
                       level: ActivityLevel.active, // Updated to match domain entity
-                      title: "Very Active",
-                      subtitle: "Hard exercise 6-7 days per week. Physically demanding job or training.",
+                      title: context.tr('onboarding_activity_active_title'),
+                      subtitle: context.tr('onboarding_activity_active_subtitle'),
                       icon: Icons.fitness_center_outlined,
                     ),
                     _buildLevelCard(
                       level: ActivityLevel.veryActive, // Updated from extremelyActive
-                      title: "Extremely Active",
-                      subtitle: "Very hard exercise, physical training or sports 2x per day.",
+                      title: context.tr('onboarding_activity_very_active_title'),
+                      subtitle: context.tr('onboarding_activity_very_active_subtitle'),
                       icon: Icons.directions_run_outlined,
                     ),
                   ],
@@ -1606,7 +1643,7 @@ class _ActivityLevelStepState extends State<ActivityLevelStep> {
               ),
               const SizedBox(height: 12),
               OnboardingButton(
-                text: "Next",
+                text: context.tr('common_next'),
                 onPressed: _selectedLevel != null ? () => widget.onNext(_selectedLevel!) : null,
               ),
               const SizedBox(height: 12),
@@ -1730,14 +1767,14 @@ class _FrequencyStepState extends State<FrequencyStep> {
   // Store selected day indices: 0: SUN, 1: MON, 2: TUE, 3: WED, 4: THU, 5: FRI, 6: SAT
   final Set<int> _selectedDays = {0, 2, 4, 6};
 
-  final List<String> _daysOfWeek = [
-    'SUN',
-    'MON',
-    'TUE',
-    'WED',
-    'THU',
-    'FRI',
-    'SAT',
+  static const List<String> _dayKeys = [
+    'onboarding_weekday_sun',
+    'onboarding_weekday_mon',
+    'onboarding_weekday_tue',
+    'onboarding_weekday_wed',
+    'onboarding_weekday_thu',
+    'onboarding_weekday_fri',
+    'onboarding_weekday_sat',
   ];
 
   void _toggleDay(int index) {
@@ -1762,9 +1799,9 @@ class _FrequencyStepState extends State<FrequencyStep> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             children: [
-              const StepHeader(
-                title: "How many days would you like to work out?",
-                subtitle: "Choose the days you prefer to stay active each week.",
+              StepHeader(
+                title: context.tr('onboarding_frequency_title'),
+                subtitle: context.tr('onboarding_frequency_subtitle'),
               ),
               const SizedBox(height: 20),
 
@@ -1785,9 +1822,9 @@ class _FrequencyStepState extends State<FrequencyStep> {
                 ),
                 child: Column(
                   children: [
-                    const Text(
-                      "You selected",
-                      style: TextStyle(
+                    Text(
+                      context.tr('onboarding_you_selected'),
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: AppColors.textSecondary,
@@ -1804,9 +1841,9 @@ class _FrequencyStepState extends State<FrequencyStep> {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    const Text(
-                      "days per week",
-                      style: TextStyle(
+                    Text(
+                      context.tr('onboarding_days_per_week'),
+                      style: const TextStyle(
                         fontSize: 11,
                         color: AppColors.textSecondary,
                       ),
@@ -1872,22 +1909,22 @@ class _FrequencyStepState extends State<FrequencyStep> {
                       ),
                     ),
                     const SizedBox(width: 14),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Consistency is key",
-                            style: TextStyle(
+                            context.tr('onboarding_consistency_key_title'),
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                               color: AppColors.textPrimary,
                             ),
                           ),
-                          SizedBox(height: 2),
+                          const SizedBox(height: 2),
                           Text(
-                            "Regular workouts help build healthy habits and bring better results over time.",
-                            style: TextStyle(
+                            context.tr('onboarding_consistency_key_body'),
+                            style: const TextStyle(
                               fontSize: 10,
                               color: AppColors.textSecondary,
                               height: 1.2,
@@ -1904,7 +1941,7 @@ class _FrequencyStepState extends State<FrequencyStep> {
 
               // Action Button
               OnboardingButton(
-                text: "Next",
+                text: context.tr('common_next'),
                 onPressed: () => widget.onNext(_selectedDays.length),
               ),
               const SizedBox(height: 12),
@@ -1923,7 +1960,7 @@ class _FrequencyStepState extends State<FrequencyStep> {
       child: Column(
         children: [
           Text(
-            _daysOfWeek[index],
+            context.tr(_dayKeys[index]),
             style: const TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w600,
@@ -1980,9 +2017,9 @@ class _FitnessLevelStepState extends State<FitnessLevelStep> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             children: [
-              const StepHeader(
-                title: "What's your fitness level?",
-                subtitle: "This helps us personalize workouts that match your current level.",
+              StepHeader(
+                title: context.tr('onboarding_fitness_level_title'),
+                subtitle: context.tr('onboarding_fitness_level_subtitle'),
               ),
               const SizedBox(height: 24),
               Expanded(
@@ -1992,26 +2029,32 @@ class _FitnessLevelStepState extends State<FitnessLevelStep> {
                     _buildLevelCard(
                       title: "Beginner",
                       subtitle: "New to exercise or just getting started.",
+                      displayTitle: context.tr('onboarding_fitness_level_beginner_title'),
+                      displaySubtitle: context.tr('onboarding_fitness_level_beginner_subtitle'),
                       imagePath: "assets/begnner.png",
                     ),
                     _buildLevelCard(
                       title: "Middle",
                       subtitle: "Some experience and exercise occasionally.",
+                      displayTitle: context.tr('onboarding_fitness_level_middle_title'),
+                      displaySubtitle: context.tr('onboarding_fitness_level_middle_subtitle'),
                       imagePath: "assets/middle.png",
                     ),
                     _buildLevelCard(
                       title: "Advanced",
                       subtitle: "Experienced and work out regularly with intensity.",
+                      displayTitle: context.tr('onboarding_fitness_level_advanced_title'),
+                      displaySubtitle: context.tr('onboarding_fitness_level_advanced_subtitle'),
                       imagePath: "assets/advance.png",
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                "No pressure, you can always update this\nlater as your fitness improves.",
+              Text(
+                context.tr('onboarding_fitness_level_footer_note'),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 11,
                   color: AppColors.textSecondary,
                   height: 1.3,
@@ -2019,7 +2062,7 @@ class _FitnessLevelStepState extends State<FitnessLevelStep> {
               ),
               const SizedBox(height: 16),
               OnboardingButton(
-                text: "Next",
+                text: context.tr('common_next'),
                 onPressed: _selectedLevel != null ? () => widget.onNext(_selectedLevel!) : null,
               ),
               const SizedBox(height: 12),
@@ -2034,6 +2077,8 @@ class _FitnessLevelStepState extends State<FitnessLevelStep> {
     required String title,
     required String subtitle,
     required String imagePath,
+    String? displayTitle,
+    String? displaySubtitle,
   }) {
     final isSelected = _selectedLevel == title;
 
@@ -2090,7 +2135,7 @@ class _FitnessLevelStepState extends State<FitnessLevelStep> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        title,
+                        displayTitle ?? title,
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
@@ -2099,7 +2144,7 @@ class _FitnessLevelStepState extends State<FitnessLevelStep> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        subtitle,
+                        displaySubtitle ?? subtitle,
                         style: const TextStyle(
                           fontSize: 10,
                           color: AppColors.textSecondary,

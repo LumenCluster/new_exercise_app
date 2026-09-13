@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 // --- Shared Colors ---
 class MealColors {
@@ -119,16 +120,16 @@ class DietIntroStep extends StatelessWidget {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
-                    "PART 2",
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                  child: Text(
+                    context.tr('onboarding_part2_badge'),
+                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
               const SizedBox(height: 12),
-              const MealStepHeader(
-                title: "Diet Preferences",
-                subtitle: "Tell us about your eating habits & preferences.",
+              MealStepHeader(
+                title: context.tr('onboarding_diet_intro_title'),
+                subtitle: context.tr('onboarding_diet_intro_subtitle'),
               ),
               const Spacer(),
               Image.asset(
@@ -139,7 +140,7 @@ class DietIntroStep extends StatelessWidget {
                 const Icon(Icons.restaurant, size: 140, color: MealColors.activeGreen),
               ),
               const Spacer(),
-              MealActionButton(text: "Continue", onPressed: onNext),
+              MealActionButton(text: context.tr('common_continue'), onPressed: onNext),
               const SizedBox(height: 12),
             ],
           ),
@@ -164,16 +165,16 @@ class FoodAllergiesStep extends StatefulWidget {
 class _FoodAllergiesStepState extends State<FoodAllergiesStep> {
   final Set<String> _selected = {};
 
-  final List<Map<String, String>> _items = [
-    {'id': 'peanuts', 'label': 'Peanuts', 'image': 'assets/peanut.png'},
-    {'id': 'tree_nuts', 'label': 'Tree Nuts', 'image': 'assets/tree_nuts.png'},
-    {'id': 'dairy', 'label': 'Dairy', 'image': 'assets/dairy.png'},
-    {'id': 'egg', 'label': 'Egg', 'image': 'assets/egg.png'},
-    {'id': 'wheat_gluten', 'label': 'Wheat/Gluten', 'image': 'assets/wheat.png'},
-    {'id': 'soy', 'label': 'Soy', 'image': 'assets/soy.png'},
-    {'id': 'fish', 'label': 'Fish', 'image': 'assets/fish.png'},
-    {'id': 'seafood', 'label': 'Shelfish', 'image': 'assets/shelfish.png'},
-    {'id': 'sesame', 'label': 'Sesame', 'image': 'assets/sasme.png'},
+  static const List<Map<String, String>> _items = [
+    {'id': 'peanuts', 'labelKey': 'onboarding_allergy_peanuts', 'image': 'assets/peanut.png'},
+    {'id': 'tree_nuts', 'labelKey': 'onboarding_allergy_tree_nuts', 'image': 'assets/tree_nuts.png'},
+    {'id': 'dairy', 'labelKey': 'onboarding_allergy_dairy', 'image': 'assets/dairy.png'},
+    {'id': 'egg', 'labelKey': 'onboarding_allergy_egg', 'image': 'assets/egg.png'},
+    {'id': 'wheat_gluten', 'labelKey': 'onboarding_allergy_wheat_gluten', 'image': 'assets/wheat.png'},
+    {'id': 'soy', 'labelKey': 'onboarding_allergy_soy', 'image': 'assets/soy.png'},
+    {'id': 'fish', 'labelKey': 'onboarding_allergy_fish', 'image': 'assets/fish.png'},
+    {'id': 'seafood', 'labelKey': 'onboarding_allergy_shellfish', 'image': 'assets/shelfish.png'},
+    {'id': 'sesame', 'labelKey': 'onboarding_allergy_sesame', 'image': 'assets/sasme.png'},
   ];
 
   @override
@@ -185,9 +186,9 @@ class _FoodAllergiesStepState extends State<FoodAllergiesStep> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             children: [
-              const MealStepHeader(
-                title: "Do you have any food allergies?",
-                subtitle: "Select all that apply for you.",
+              MealStepHeader(
+                title: context.tr('onboarding_allergies_title'),
+                subtitle: context.tr('onboarding_allergies_subtitle'),
               ),
               const SizedBox(height: 20),
               Expanded(
@@ -203,7 +204,7 @@ class _FoodAllergiesStepState extends State<FoodAllergiesStep> {
                   itemBuilder: (context, index) {
                     final item = _items[index];
                     final itemId = item['id']!;
-                    final itemLabel = item['label']!;
+                    final itemLabel = context.tr(item['labelKey']!);
                     final itemImage = item['image']!;
                     final isSelected = _selected.contains(itemId);
 
@@ -264,15 +265,15 @@ class _FoodAllergiesStepState extends State<FoodAllergiesStep> {
                 ),
                 onPressed: () {},
                 icon: const Icon(Icons.add, size: 16),
-                label: const Text("Add custom food"),
+                label: Text(context.tr('onboarding_add_custom_food')),
               ),
               const SizedBox(height: 8),
               TextButton(
                 onPressed: () => widget.onNext([]),
-                child: const Text("I do not have any", style: TextStyle(color: MealColors.textSecondary)),
+                child: Text(context.tr('onboarding_none_of_these'), style: const TextStyle(color: MealColors.textSecondary)),
               ),
               const SizedBox(height: 8),
-              MealActionButton(text: "Continue", onPressed: () => widget.onNext(_selected.toList())),
+              MealActionButton(text: context.tr('common_continue'), onPressed: () => widget.onNext(_selected.toList())),
               const SizedBox(height: 12),
             ],
           ),
@@ -296,14 +297,14 @@ class EatingStyleStep extends StatefulWidget {
 class _EatingStyleStepState extends State<EatingStyleStep> {
   String? _selectedStyle;
 
-  final List<Map<String, String>> _styles = [
-    {'id': 'standard', 'label': 'Standard (No Specialty Diet)', 'image': 'assets/standard.png'},
-    {'id': 'pescatarian', 'label': 'Pescatarian', 'image': 'assets/pest.png'},
-    {'id': 'vegetarian', 'label': 'Vegetarian', 'image': 'assets/veg.png'},
-    {'id': 'vegan', 'label': 'Vegan', 'image': 'assets/vegan.png'},
-    {'id': 'keto', 'label': 'Keto / Low Carb', 'image': 'assets/keto.png'},
-    {'id': 'mediterranean', 'label': 'Mediterranean', 'image': 'assets/medi.png'},
-    {'id': 'paleo', 'label': 'Paleo', 'image': 'assets/paleo.png'},
+  static const List<Map<String, String>> _styles = [
+    {'id': 'standard', 'labelKey': 'onboarding_style_standard', 'image': 'assets/standard.png'},
+    {'id': 'pescatarian', 'labelKey': 'onboarding_style_pescatarian', 'image': 'assets/pest.png'},
+    {'id': 'vegetarian', 'labelKey': 'onboarding_style_vegetarian', 'image': 'assets/veg.png'},
+    {'id': 'vegan', 'labelKey': 'onboarding_style_vegan', 'image': 'assets/vegan.png'},
+    {'id': 'keto', 'labelKey': 'onboarding_style_keto', 'image': 'assets/keto.png'},
+    {'id': 'mediterranean', 'labelKey': 'onboarding_style_mediterranean', 'image': 'assets/medi.png'},
+    {'id': 'paleo', 'labelKey': 'onboarding_style_paleo', 'image': 'assets/paleo.png'},
   ];
 
   @override
@@ -315,9 +316,9 @@ class _EatingStyleStepState extends State<EatingStyleStep> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             children: [
-              const MealStepHeader(
-                title: "What best describes your eating style?",
-                subtitle: "Choose the one that best describes you.",
+              MealStepHeader(
+                title: context.tr('onboarding_eating_style_title'),
+                subtitle: context.tr('onboarding_eating_style_subtitle'),
               ),
               const SizedBox(height: 20),
               Expanded(
@@ -327,7 +328,7 @@ class _EatingStyleStepState extends State<EatingStyleStep> {
                   itemBuilder: (context, index) {
                     final item = _styles[index];
                     final itemId = item['id']!;
-                    final itemLabel = item['label']!;
+                    final itemLabel = context.tr(item['labelKey']!);
                     final itemImage = item['image']!;
                     final isSelected = _selectedStyle == itemId;
 
@@ -389,7 +390,7 @@ class _EatingStyleStepState extends State<EatingStyleStep> {
                 ),
               ),
               MealActionButton(
-                text: "Continue",
+                text: context.tr('common_continue'),
                 onPressed: _selectedStyle != null ? () => widget.onNext(_selectedStyle!) : null,
               ),
               const SizedBox(height: 12),
@@ -416,11 +417,11 @@ class DietaryConsiderationsStep extends StatefulWidget {
 class _DietaryConsiderationsStepState extends State<DietaryConsiderationsStep> {
   final Set<String> _selected = {};
 
-  final List<Map<String, String>> _items = [
-    {'id': 'diabetes', 'label': 'Diabetes', 'image': 'assets/diabetes.png'},
-    {'id': 'pcos', 'label': 'PCOS', 'image': 'assets/pcos.png'},
-    {'id': 'pregnancy', 'label': 'Pregnancy', 'image': 'assets/preg.png'},
-    {'id': 'allergy_aware', 'label': 'Allergy-aware', 'image': 'assets/allergy.png'},
+  static const List<Map<String, String>> _items = [
+    {'id': 'diabetes', 'labelKey': 'onboarding_consideration_diabetes', 'image': 'assets/diabetes.png'},
+    {'id': 'pcos', 'labelKey': 'onboarding_consideration_pcos', 'image': 'assets/pcos.png'},
+    {'id': 'pregnancy', 'labelKey': 'onboarding_consideration_pregnancy', 'image': 'assets/preg.png'},
+    {'id': 'allergy_aware', 'labelKey': 'onboarding_consideration_allergy_aware', 'image': 'assets/allergy.png'},
   ];
 
   @override
@@ -432,9 +433,9 @@ class _DietaryConsiderationsStepState extends State<DietaryConsiderationsStep> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             children: [
-              const MealStepHeader(
-                title: "Any dietary considerations?",
-                subtitle: "Select all that apply to you.",
+              MealStepHeader(
+                title: context.tr('onboarding_considerations_title'),
+                subtitle: context.tr('onboarding_considerations_subtitle'),
               ),
               const SizedBox(height: 20),
               Expanded(
@@ -450,7 +451,7 @@ class _DietaryConsiderationsStepState extends State<DietaryConsiderationsStep> {
                   itemBuilder: (context, index) {
                     final item = _items[index];
                     final itemId = item['id']!;
-                    final itemLabel = item['label']!;
+                    final itemLabel = context.tr(item['labelKey']!);
                     final itemImage = item['image']!;
                     final isSelected = _selected.contains(itemId);
 
@@ -503,10 +504,10 @@ class _DietaryConsiderationsStepState extends State<DietaryConsiderationsStep> {
               ),
               TextButton(
                 onPressed: () => widget.onNext([]),
-                child: const Text("I do not have any", style: TextStyle(color: MealColors.textSecondary)),
+                child: Text(context.tr('onboarding_none_of_these'), style: const TextStyle(color: MealColors.textSecondary)),
               ),
               const SizedBox(height: 8),
-              MealActionButton(text: "Continue", onPressed: () => widget.onNext(_selected.toList())),
+              MealActionButton(text: context.tr('common_continue'), onPressed: () => widget.onNext(_selected.toList())),
               const SizedBox(height: 12),
             ],
           ),
@@ -528,19 +529,19 @@ class IngredientLikesStep extends StatefulWidget {
 class _IngredientLikesStepState extends State<IngredientLikesStep> {
   final Set<String> _selected = {};
 
-  final List<Map<String, String>> _items = [
-    {'id': 'chicken', 'label': 'Chicken', 'image': 'assets/chicken.png'},
-    {'id': 'beef', 'label': 'Beef', 'image': 'assets/meat.png'},
-    {'id': 'milk', 'label': 'Milk', 'image': 'assets/dairy.png'},
-    {'id': 'eggs', 'label': 'Eggs', 'image': 'assets/egg.png'},
-    {'id': 'bread', 'label': 'Bread', 'image': 'assets/bread.png'},
-    {'id': 'greens', 'label': 'Greens', 'image': 'assets/veg.png'},
-    {'id': 'fish', 'label': 'Fish', 'image': 'assets/fish.png'},
-    {'id': 'sweet_potato', 'label': 'Sweet Potato', 'image': 'assets/sweat.png'},
-    {'id': 'yogurt', 'label': 'Yogurt', 'image': 'assets/yogurt.png'},
-    {'id': 'cheese', 'label': 'Cheese', 'image': 'assets/cheese.png'},
-    {'id': 'shrimp', 'label': 'Shrimp', 'image': 'assets/shrimp.png'},
-    {'id': 'corn', 'label': 'Corn', 'image': 'assets/corn.png'},
+  static const List<Map<String, String>> _items = [
+    {'id': 'chicken', 'labelKey': 'onboarding_ingredient_chicken', 'image': 'assets/chicken.png'},
+    {'id': 'beef', 'labelKey': 'onboarding_ingredient_beef', 'image': 'assets/meat.png'},
+    {'id': 'milk', 'labelKey': 'onboarding_ingredient_milk', 'image': 'assets/dairy.png'},
+    {'id': 'eggs', 'labelKey': 'onboarding_ingredient_eggs', 'image': 'assets/egg.png'},
+    {'id': 'bread', 'labelKey': 'onboarding_ingredient_bread', 'image': 'assets/bread.png'},
+    {'id': 'greens', 'labelKey': 'onboarding_ingredient_greens', 'image': 'assets/veg.png'},
+    {'id': 'fish', 'labelKey': 'onboarding_ingredient_fish', 'image': 'assets/fish.png'},
+    {'id': 'sweet_potato', 'labelKey': 'onboarding_ingredient_sweet_potato', 'image': 'assets/sweat.png'},
+    {'id': 'yogurt', 'labelKey': 'onboarding_ingredient_yogurt', 'image': 'assets/yogurt.png'},
+    {'id': 'cheese', 'labelKey': 'onboarding_ingredient_cheese', 'image': 'assets/cheese.png'},
+    {'id': 'shrimp', 'labelKey': 'onboarding_ingredient_shrimp', 'image': 'assets/shrimp.png'},
+    {'id': 'corn', 'labelKey': 'onboarding_ingredient_corn', 'image': 'assets/corn.png'},
   ];
 
   @override
@@ -552,9 +553,9 @@ class _IngredientLikesStepState extends State<IngredientLikesStep> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             children: [
-              const MealStepHeader(
-                title: "What material do you like the most?",
-                subtitle: "Select all that apply for you.",
+              MealStepHeader(
+                title: context.tr('onboarding_ingredients_title'),
+                subtitle: context.tr('onboarding_ingredients_subtitle'),
               ),
               const SizedBox(height: 16),
               Expanded(
@@ -570,7 +571,7 @@ class _IngredientLikesStepState extends State<IngredientLikesStep> {
                   itemBuilder: (context, index) {
                     final item = _items[index];
                     final itemId = item['id']!;
-                    final itemLabel = item['label']!;
+                    final itemLabel = context.tr(item['labelKey']!);
                     final itemImage = item['image']!;
                     final isSelected = _selected.contains(itemId);
 
@@ -627,10 +628,10 @@ class _IngredientLikesStepState extends State<IngredientLikesStep> {
               TextButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.refresh, size: 16, color: MealColors.textSecondary),
-                label: const Text("Discover More", style: TextStyle(color: MealColors.textSecondary)),
+                label: Text(context.tr('onboarding_discover_more'), style: const TextStyle(color: MealColors.textSecondary)),
               ),
               const SizedBox(height: 8),
-              MealActionButton(text: "Continue", onPressed: () => widget.onNext(_selected.toList())),
+              MealActionButton(text: context.tr('common_continue'), onPressed: () => widget.onNext(_selected.toList())),
               const SizedBox(height: 12),
             ],
           ),
@@ -655,11 +656,11 @@ class EatingHabitsStep extends StatefulWidget {
 class _EatingHabitsStepState extends State<EatingHabitsStep> {
   String? _selectedHabit;
 
-  final List<Map<String, String>> _habits = [
-    {'id': 'balanced', 'label': 'Balanced Meals'},
-    {'id': 'high_protein', 'label': 'High Protein / Low Carb'},
-    {'id': 'low_cal', 'label': 'Low Calorie / Lean'},
-    {'id': 'quick', 'label': 'Quick & Easy Prep Meals'},
+  static const List<Map<String, String>> _habits = [
+    {'id': 'balanced', 'labelKey': 'onboarding_habit_balanced'},
+    {'id': 'high_protein', 'labelKey': 'onboarding_habit_high_protein'},
+    {'id': 'low_cal', 'labelKey': 'onboarding_habit_low_cal'},
+    {'id': 'quick', 'labelKey': 'onboarding_habit_quick'},
   ];
 
   @override
@@ -671,9 +672,9 @@ class _EatingHabitsStepState extends State<EatingHabitsStep> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             children: [
-              const MealStepHeader(
-                title: "How would you describe your eating habits?",
-                subtitle: "This helps us plan your meals better.",
+              MealStepHeader(
+                title: context.tr('onboarding_habits_title'),
+                subtitle: context.tr('onboarding_habits_subtitle'),
               ),
               const SizedBox(height: 24),
               Expanded(
@@ -682,7 +683,7 @@ class _EatingHabitsStepState extends State<EatingHabitsStep> {
                   itemBuilder: (context, index) {
                     final item = _habits[index];
                     final itemId = item['id']!;
-                    final itemLabel = item['label']!;
+                    final itemLabel = context.tr(item['labelKey']!);
                     final isSelected = _selectedHabit == itemId;
 
                     return Padding(
@@ -733,7 +734,7 @@ class _EatingHabitsStepState extends State<EatingHabitsStep> {
                 ),
               ),
               MealActionButton(
-                text: "Continue",
+                text: context.tr('common_continue'),
                 onPressed: _selectedHabit != null ? () => widget.onNext(_selectedHabit!) : null,
               ),
               const SizedBox(height: 12),
@@ -771,9 +772,9 @@ class _MealsPerDayStepState extends State<MealsPerDayStep> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             children: [
-              const MealStepHeader(
-                title: "How many meals do you prefer per day?",
-                subtitle: "This helps us plan your daily routine.",
+              MealStepHeader(
+                title: context.tr('onboarding_meals_per_day_title'),
+                subtitle: context.tr('onboarding_meals_per_day_subtitle'),
               ),
               const SizedBox(height: 24),
               Expanded(
@@ -801,7 +802,7 @@ class _MealsPerDayStepState extends State<MealsPerDayStep> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "$count Meals",
+                                context.tr('onboarding_meals_count', {'count': '$count'}),
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
@@ -831,7 +832,7 @@ class _MealsPerDayStepState extends State<MealsPerDayStep> {
                 ),
               ),
               MealActionButton(
-                text: "Continue",
+                text: context.tr('common_continue'),
                 onPressed: _selectedMeals != null ? () => widget.onNext(_selectedMeals!) : null,
               ),
               const SizedBox(height: 12),
@@ -861,27 +862,27 @@ class AllSetStep extends StatelessWidget {
           child: Column(
             children: [
               const Spacer(),
-              const Text(
-                "All set!",
+              Text(
+                context.tr('onboarding_all_set_title'),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: MealColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 12),
-              const Text(
-                "We've got everything we need to\ncreate your personalized nutrition plan.",
+              Text(
+                context.tr('onboarding_all_set_body'),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 13,
                   color: MealColors.textSecondary,
                   height: 1.4,
                 ),
               ),
               const Spacer(),
-              MealActionButton(text: "Get goals and focus", onPressed: onFinish),
+              MealActionButton(text: context.tr('onboarding_get_goals_button'), onPressed: onFinish),
               const SizedBox(height: 12),
             ],
           ),
