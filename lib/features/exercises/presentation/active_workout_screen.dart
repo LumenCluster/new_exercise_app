@@ -176,7 +176,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                   child: Image.network(
                     'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80',
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const Center(
+                    errorBuilder: (_, _, _) => const Center(
                       child: Icon(Icons.fitness_center, size: 40, color: Colors.black38),
                     ),
                   ),

@@ -11,11 +11,13 @@ import '../../../meal_plan/presentation/pages/shopping_list_screen.dart';
 import '../../../coach/presentation/pages/coach_chat_screen.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../../core/localization/app_localizations.dart';
+import 'exercise_detail_screen.dart';
 
 class _WorkoutCard {
   final String name;
   final String subtitle;
-  const _WorkoutCard(this.name, this.subtitle);
+  final Exercise? exercise;
+  const _WorkoutCard(this.name, this.subtitle, {this.exercise});
 }
 
 class _PlanColors {
@@ -386,7 +388,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
               width: 80,
               height: 110,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
+              errorBuilder: (_, _, _) => Container(
                 width: 70,
                 height: 100,
                 color: Colors.white24,
@@ -702,7 +704,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.12),
+              color: Colors.white.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(Icons.shopping_bag_outlined, color: Colors.white, size: 22),
@@ -798,7 +800,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
 
     // Default mock cards if repository returned empty
     final workoutList = _exercises.isNotEmpty
-        ? _exercises.map((e) => _WorkoutCard(e.name, e.prescriptionLabel)).toList()
+        ? _exercises.map((e) => _WorkoutCard(e.name, e.prescriptionLabel, exercise: e)).toList()
         : [
       _WorkoutCard(context.tr('dashboard_program_name'), '25 ${context.tr('common_minutes')}'),
       _WorkoutCard(context.tr('exercises_workout_core_abs_blast'), '15 ${context.tr('common_minutes')}'),
@@ -815,7 +817,13 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
           final workout = workoutList[index];
           final isActive = index < 2;
 
-          return Container(
+          return GestureDetector(
+            onTap: workout.exercise == null
+                ? null
+                : () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => ExerciseDetailScreen(exercise: workout.exercise!)),
+                    ),
+            child: Container(
             width: 125,
             margin: const EdgeInsets.only(right: 10),
             padding: const EdgeInsets.all(10),
@@ -861,6 +869,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
                   style: const TextStyle(fontSize: 9, color: _PlanColors.textSecondary),
                 ),
               ],
+            ),
             ),
           );
         },
@@ -1038,7 +1047,7 @@ class _PlanMealCardState extends State<_PlanMealCard> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: _PlanColors.primaryDark.withOpacity(0.85),
+                    color: _PlanColors.primaryDark.withValues(alpha: 0.85),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(

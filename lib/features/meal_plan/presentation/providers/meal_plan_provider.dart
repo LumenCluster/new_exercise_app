@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:untitled/core/database/database_helper.dart';
+import 'package:untitled/core/database/firestore_service.dart';
 import 'package:untitled/features/meal_plan/data/models/meal_model.dart';
 import 'package:untitled/features/meal_plan/domain/entities/meal.dart';
 import 'package:untitled/features/meal_plan/domain/repositories/meal_repository.dart';
@@ -37,7 +37,7 @@ class MealPlanProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final cached = await DatabaseHelper().getCacheValue(_mealsCacheKey);
+      final cached = await FirestoreService().getCacheValue(_mealsCacheKey);
       if (cached != null) {
         final decoded = jsonDecode(cached) as List;
         meals = decoded.map((m) => MealModel.fromJson(m)).toList();
@@ -66,7 +66,7 @@ class MealPlanProvider extends ChangeNotifier {
     final encoded = jsonEncode(
       meals.map((m) => (m as MealModel).toJson()).toList(),
     );
-    await DatabaseHelper().setCacheValue(_mealsCacheKey, encoded);
+    await FirestoreService().setCacheValue(_mealsCacheKey, encoded);
   }
 
   Future<void> ensureImageForMeal(Meal meal) async {

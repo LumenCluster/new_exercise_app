@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:untitled/core/constants/app_colors.dart';
 import 'package:untitled/features/meal_plan/presentation/providers/meal_plan_provider.dart';
 import 'package:untitled/features/profile/domain/entities/user_profile.dart';
-import '../../../../core/database/database_helper.dart';
-import '../../../dashboard/presentation/DashboardScreen.dart';
+import '../../../../core/database/firestore_service.dart';
+import '../../../dashboard/presentation/dashboard_screen.dart';
 import '../widgets/onboarding_steps.dart';
 import '../widgets/fitness_summary_step.dart';
 import '../widgets/meal_onboarding_steps.dart';
@@ -116,7 +116,7 @@ class _ProfileInputScreenState extends State<ProfileInputScreen> {
 
       print("Saving profile to database...");
       // Save to database
-      await DatabaseHelper().saveProfile(profile);
+      await FirestoreService().saveProfile(profile);
       print("Profile saved successfully.");
 
       if (mounted) {

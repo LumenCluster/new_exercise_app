@@ -77,6 +77,11 @@ class Exercise {
   /// with its own asset, so there's no remote lookup involved.
   final String? gifAsset;
 
+  /// Firebase Storage path for this exercise's demo video, e.g.
+  /// 'exercise_videos/standing_quad_stretch.mp4'. Null if no video exists
+  /// yet for this exercise. Resolved to a download URL at playback time.
+  final String? videoStoragePath;
+
   const Exercise({
     required this.id,
     required this.name,
@@ -94,6 +99,7 @@ class Exercise {
     this.equipmentNeeded = false,
     this.imageAsset,
     this.gifAsset,
+    this.videoStoragePath,
   });
 
   /// Human-readable prescription, e.g. "3 x 10 reps · each side"
@@ -119,6 +125,7 @@ class Exercise {
     int? reps,
     int? holdSeconds,
     bool? perSide,
+    String? videoStoragePath,
   }) {
     return Exercise(
       id: id,
@@ -137,6 +144,7 @@ class Exercise {
       equipmentNeeded: equipmentNeeded,
       imageAsset: imageAsset,
       gifAsset: gifAsset ?? this.gifAsset,
+      videoStoragePath: videoStoragePath ?? this.videoStoragePath,
     );
   }
 }

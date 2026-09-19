@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../../../core/database/database_helper.dart';
+import '../../../core/database/firestore_service.dart';
 import '../../../core/localization/app_language.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/localization/locale_provider.dart';
@@ -11,6 +11,8 @@ import '../../tracking/presentation/providers/water_intake_provider.dart';
 import '../../tracking/presentation/providers/weight_log_provider.dart';
 import '../domain/entities/user_profile.dart';
 import 'pages/profile_input_screen.dart';
+import 'UpgradePremiumScreen.dart';
+import 'RemindersScreen.dart';
 
 class ProfileSettingsScreen extends StatefulWidget {
   final UserProfile? profile;
@@ -48,7 +50,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
   }
 
   Future<void> _loadSettings() async {
-    final db = DatabaseHelper();
+    final db = FirestoreService();
     final reminders = await db.getCacheValue('settings_reminders_enabled');
     final sound = await db.getCacheValue('settings_sound_enabled');
     final voice = await db.getCacheValue('settings_voice_enabled');
@@ -68,7 +70,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
   }
 
   Future<void> _persist(String key, String value) async {
-    await DatabaseHelper().setCacheValue(key, value);
+    await FirestoreService().setCacheValue(key, value);
   }
 
   void _toast(String message) {
@@ -113,7 +115,10 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                         subtitle: context.tr('settings_reminders_subtitle'),
                         trailingText: _remindersEnabled ? context.tr('settings_on') : context.tr('settings_off'),
                         trailingTextColor: _remindersEnabled ? activeGreen : textSecondary,
-                        onTap: _showRemindersDialog,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const RemindersScreen()),
+                        ),
                       ),
                       _SettingsItem(
                         icon: Icons.volume_up_outlined,
@@ -181,7 +186,12 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                         subtitle: _isPremium
                             ? context.tr('settings_premium_active_subtitle')
                             : context.tr('settings_premium_subtitle'),
-                        onTap: _isPremium ? null : _showPremiumDialog,
+                        onTap: _isPremium
+                            ? null
+                            : () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const UpgradePremiumScreen()),
+                                ),
                         customWidget: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
@@ -261,36 +271,6 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
   // ---------------------------------------------------------------------
   // Preferences
   // ---------------------------------------------------------------------
-
-  Future<void> _showRemindersDialog() async {
-    bool value = _remindersEnabled;
-    await showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text(context.tr('settings_reminders_title')),
-          content: SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(context.tr('settings_reminders_dialog_switch')),
-            value: value,
-            activeColor: activeGreen,
-            onChanged: (v) => setDialogState(() => value = v),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: Text(context.tr('common_cancel'))),
-            FilledButton(
-              onPressed: () async {
-                setState(() => _remindersEnabled = value);
-                await _persist('settings_reminders_enabled', value.toString());
-                if (context.mounted) Navigator.pop(context);
-              },
-              child: Text(context.tr('common_save')),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Future<void> _showSoundSettingsDialog() async {
     bool sound = _soundEnabled;
@@ -431,7 +411,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
 
     setState(() => _busy = true);
     try {
-      await DatabaseHelper().clearTrackingData();
+      await FirestoreService().clearTrackingData();
       if (!mounted) return;
       await context.read<WaterIntakeProvider>().load();
       await context.read<WeightLogProvider>().load();
@@ -465,7 +445,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
 
     setState(() => _busy = true);
     try {
-      await DatabaseHelper().clearAllData();
+      await FirestoreService().clearAllData();
       if (!mounted) return;
       await context.read<WaterIntakeProvider>().load();
       await context.read<WeightLogProvider>().load();
@@ -476,33 +456,6 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
       );
     } finally {
       if (mounted) setState(() => _busy = false);
-    }
-  }
-
-  // ---------------------------------------------------------------------
-  // Upgrade
-  // ---------------------------------------------------------------------
-
-  Future<void> _showPremiumDialog() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.tr('settings_go_premium_title')),
-        content: Text(context.tr('settings_go_premium_body')),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.tr('settings_not_now'))),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: const Color(0xFFFFB300)),
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(context.tr('settings_upgrade_now')),
-          ),
-        ],
-      ),
-    );
-    if (confirmed == true) {
-      setState(() => _isPremium = true);
-      await _persist('settings_premium', 'true');
-      _toast(context.tr('settings_premium_welcome_toast'));
     }
   }
 

@@ -1,19 +1,34 @@
 import 'package:untitled/features/exercises/domain/entities/exercise.dart';
 import 'package:untitled/features/exercises/domain/repositories/exercise_repository.dart';
 import 'package:untitled/features/exercises/data/datasources/exercise_local_data_source.dart';
+import 'package:untitled/features/exercises/data/datasources/exercise_remote_data_source.dart';
 import 'package:untitled/features/profile/domain/entities/user_profile.dart';
 
 class ExerciseRepositoryImpl implements ExerciseRepository {
   final ExerciseLocalDataSource localDataSource;
+  final ExerciseRemoteDataSource remoteDataSource;
 
   List<Exercise>? _cache;
 
-  ExerciseRepositoryImpl({required this.localDataSource});
+  ExerciseRepositoryImpl({required this.localDataSource, required this.remoteDataSource});
 
+  /// Exercises live in Firestore (so content — and video links — can be
+  /// updated without an app release). Falls back to the bundled JSON if
+  /// Firestore is unreachable or hasn't been seeded, so the feature never
+  /// dead-ends the way the app-launch profile check once did.
   Future<List<Exercise>> _load() async {
     if (_cache != null) return _cache!;
-    final models = await localDataSource.getExercises();
-    _cache = models;
+    try {
+      final remote = await remoteDataSource.getExercises();
+      if (remote.isNotEmpty) {
+        _cache = remote;
+        return _cache!;
+      }
+    } catch (_) {
+      // Fall through to the local bundle below.
+    }
+    final local = await localDataSource.getExercises();
+    _cache = local;
     return _cache!;
   }
 

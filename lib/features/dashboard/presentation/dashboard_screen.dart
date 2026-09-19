@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/database/database_helper.dart';
+import '../../../core/database/firestore_service.dart';
 import '../../profile/domain/entities/user_profile.dart';
 import '../../meal_plan/domain/entities/meal.dart';
 import '../../meal_plan/presentation/providers/meal_plan_provider.dart';
@@ -9,7 +9,9 @@ import '../../exercises/domain/entities/exercise.dart';
 import '../../exercises/domain/repositories/exercise_repository.dart';
 import '../../tracking/presentation/providers/water_intake_provider.dart';
 import '../../../core/widgets/app_bottom_nav_bar.dart';
-import '../../exercises/presentation/ActiveWorkoutScreen.dart';
+import '../../exercises/presentation/active_workout_screen.dart';
+import '../../exercises/presentation/pages/exercise_detail_screen.dart';
+import '../../exercises/presentation/pages/workout_plan_screen.dart';
 import '../../../core/localization/app_localizations.dart';
 
 // --- Shared Theme Colors ---
@@ -49,7 +51,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _loadProfile() async {
-    final profile = await DatabaseHelper().getProfile();
+    final profile = await FirestoreService().getProfile();
     if (!mounted) return;
     setState(() {
       _profile = profile;
@@ -282,7 +284,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -441,6 +443,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  void _openWorkoutPlan() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => WorkoutPlanScreen(
+          profile: _profile,
+          repository: context.read<ExerciseRepository>(),
+        ),
+      ),
+    );
+  }
+
+  void _openExerciseDetail(Exercise exercise) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => ExerciseDetailScreen(exercise: exercise)),
+    );
+  }
+
   // Today's Workout Section
   Widget _buildTodayWorkoutSection() {
     return Container(
@@ -460,7 +479,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: DashboardColors.textPrimary),
               ),
               GestureDetector(
-                onTap: () {},
+                onTap: _openWorkoutPlan,
                 child: Text(
                   context.tr('dashboard_adjust_plan'),
                   style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
@@ -541,7 +560,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: _exercises.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 8),
+          separatorBuilder: (_, _) => const SizedBox(height: 8),
           itemBuilder: (context, index) => _buildExerciseTile(_exercises[index], index),
         ),
         const SizedBox(height: 16),
@@ -590,12 +609,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
         child: Row(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: SizedBox(
-                width: 40,
-                height: 40,
-                child: _buildExerciseThumbnail(exercise.gifAsset),
+            GestureDetector(
+              onTap: () => _openExerciseDetail(exercise),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      _buildExerciseThumbnail(exercise.gifAsset),
+                      if (exercise.videoStoragePath != null)
+                        Container(
+                          decoration: const BoxDecoration(color: Colors.black38, shape: BoxShape.circle),
+                          padding: const EdgeInsets.all(3),
+                          child: const Icon(Icons.play_arrow_rounded, size: 14, color: Colors.white),
+                        ),
+                    ],
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -641,7 +674,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Image.asset(
       gifAsset,
       fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) => Container(
+      errorBuilder: (_, _, _) => Container(
         color: Colors.white,
         child: const Icon(Icons.self_improvement, size: 20, color: DashboardColors.primaryDark),
       ),
@@ -728,7 +761,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: provider.meals.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 8),
+          separatorBuilder: (_, _) => const SizedBox(height: 8),
           itemBuilder: (context, index) => _DashboardMealTile(
             meal: provider.meals[index],
             index: index,
@@ -804,7 +837,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         child: Icon(
                           Icons.local_drink_rounded,
                           size: 18,
-                          color: isFilled ? Colors.white : DashboardColors.waterBlue.withOpacity(0.5),
+                          color: isFilled ? Colors.white : DashboardColors.waterBlue.withValues(alpha: 0.5),
                         ),
                       ),
                     ),

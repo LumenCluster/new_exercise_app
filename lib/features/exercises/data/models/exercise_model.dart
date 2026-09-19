@@ -18,6 +18,7 @@ class ExerciseModel extends Exercise {
     super.equipmentNeeded,
     super.imageAsset,
     super.gifAsset,
+    super.videoStoragePath,
   });
 
   factory ExerciseModel.fromJson(Map<String, dynamic> json) {
@@ -46,6 +47,7 @@ class ExerciseModel extends Exercise {
       equipmentNeeded: json['equipmentNeeded'] as bool? ?? false,
       imageAsset: json['imageAsset'] as String?,
       gifAsset: json['gifAsset'] as String?,
+      videoStoragePath: json['videoStoragePath'] as String?,
     );
   }
 
@@ -66,5 +68,6 @@ class ExerciseModel extends Exercise {
     'equipmentNeeded': equipmentNeeded,
     'imageAsset': imageAsset,
     'gifAsset': gifAsset,
+    'videoStoragePath': videoStoragePath,
   };
 }
