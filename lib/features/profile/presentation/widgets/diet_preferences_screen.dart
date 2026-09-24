@@ -36,8 +36,15 @@ class _DietPreferencesScreenState extends State<DietPreferencesScreen> {
   }
 
   void _finishOnboarding() {
-    // Submit preference data to Provider or Repository
-    Navigator.of(context).pop();
+    // Hand the collected preferences back to whoever pushed this screen.
+    Navigator.of(context).pop(<String, dynamic>{
+      'allergies': _allergies,
+      'eatingStyle': _eatingStyle,
+      'considerations': _considerations,
+      'likedIngredients': _likedIngredients,
+      'eatingHabit': _eatingHabit,
+      'mealsPerDay': _mealsPerDay,
+    });
   }
 
   @override

@@ -30,7 +30,7 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
 
     final response = await client.post(
       Uri.parse(ApiConfig.geminiEndpoint),
-      headers: {'Content-Type': 'application/json'},
+      headers: ApiConfig.geminiHeaders,
       body: jsonEncode({
         'contents': [
           {
@@ -114,7 +114,7 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
       response = await client.post(
         Uri.parse(ApiConfig.imageEndpoint),
-        headers: {'Content-Type': 'application/json'},
+        headers: ApiConfig.geminiHeaders,
         body: body,
       );
 

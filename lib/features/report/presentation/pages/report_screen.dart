@@ -947,7 +947,7 @@ class _ReportScreenState extends State<ReportScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: completed ? _ReportColors.activeBgGreen.withOpacity(0.5) : _ReportColors.cardWhite,
+        color: completed ? _ReportColors.activeBgGreen.withValues(alpha: 0.5) : _ReportColors.cardWhite,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(

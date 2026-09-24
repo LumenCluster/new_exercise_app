@@ -3,10 +3,6 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../domain/entities/user_profile.dart';
 import 'onboarding_components.dart';
-import 'dart:math';
-import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import 'onboarding_components.dart';
 class IntroStep extends StatelessWidget {
   final VoidCallback onNext;
 
@@ -298,7 +294,7 @@ class _AgeStepState extends State<AgeStep> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary.withOpacity(0.7),
+                        color: AppColors.textPrimary.withValues(alpha: 0.7),
                       ),
                     ),
                   ),
@@ -322,7 +318,7 @@ class _AgeStepState extends State<AgeStep> {
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.03),
+                            color: Colors.black.withValues(alpha: 0.03),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -353,7 +349,7 @@ class _AgeStepState extends State<AgeStep> {
                                     : FontWeight.w400,
                                 color: isSelected
                                     ? AppColors.textPrimary
-                                    : AppColors.textSecondary.withOpacity(0.35),
+                                    : AppColors.textSecondary.withValues(alpha: 0.35),
                               ),
                             ),
                           );
@@ -375,7 +371,7 @@ class _AgeStepState extends State<AgeStep> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
+                      color: Colors.black.withValues(alpha: 0.02),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -510,7 +506,7 @@ class _HeightStepState extends State<HeightStep> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
+                      color: Colors.black.withValues(alpha: 0.02),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -645,7 +641,7 @@ class _HeightStepState extends State<HeightStep> {
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
+                              color: Colors.black.withValues(alpha: 0.04),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -956,7 +952,7 @@ class _WeightStepState extends State<WeightStep> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
+                      color: Colors.black.withValues(alpha: 0.02),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -967,7 +963,7 @@ class _WeightStepState extends State<WeightStep> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: (category['color'] as Color).withOpacity(0.12),
+                        color: (category['color'] as Color).withValues(alpha: 0.12),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -1007,7 +1003,7 @@ class _WeightStepState extends State<WeightStep> {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: (category['color'] as Color).withOpacity(0.15),
+                              color: (category['color'] as Color).withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -1107,7 +1103,7 @@ class HorizontalRulerPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF2E4D38).withOpacity(0.4)
+      ..color = const Color(0xFF2E4D38).withValues(alpha: 0.4)
       ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
 
@@ -1335,7 +1331,7 @@ class _BodyShapeStepState extends State<BodyShapeStep> {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.03),
+                                color: Colors.black.withValues(alpha: 0.03),
                                 blurRadius: 8,
                                 offset: const Offset(0, 3),
                               ),
@@ -1493,7 +1489,7 @@ class _BodyShapeStepState extends State<BodyShapeStep> {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.02),
+                          color: Colors.black.withValues(alpha: 0.02),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -1678,7 +1674,7 @@ class _ActivityLevelStepState extends State<ActivityLevelStep> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -1691,7 +1687,7 @@ class _ActivityLevelStepState extends State<ActivityLevelStep> {
                 size: 28,
                 color: isSelected
                     ? const Color(0xFF8CC63F)
-                    : AppColors.textSecondary.withOpacity(0.6),
+                    : AppColors.textSecondary.withValues(alpha: 0.6),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -1814,7 +1810,7 @@ class _FrequencyStepState extends State<FrequencyStep> {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
+                      color: Colors.black.withValues(alpha: 0.02),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -1888,7 +1884,7 @@ class _FrequencyStepState extends State<FrequencyStep> {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
+                      color: Colors.black.withValues(alpha: 0.02),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -2098,7 +2094,7 @@ class _FitnessLevelStepState extends State<FitnessLevelStep> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -2318,7 +2314,7 @@ class _ConsiderationsStepState extends State<ConsiderationsStep> {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.02),
+                              color: Colors.black.withValues(alpha: 0.02),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),

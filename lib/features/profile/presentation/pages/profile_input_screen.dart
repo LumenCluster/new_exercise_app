@@ -85,7 +85,7 @@ class _ProfileInputScreenState extends State<ProfileInputScreen> {
   }
 
   void _submit() async {
-    print("Submit process started...");
+    debugPrint("Submit process started...");
     try {
       final profile = UserProfile(
         name: _name,
@@ -114,23 +114,23 @@ class _ProfileInputScreenState extends State<ProfileInputScreen> {
         targetBodyFat: _targetBodyFat,
       );
 
-      print("Saving profile to database...");
+      debugPrint("Saving profile to database...");
       // Save to database
       await FirestoreService().saveProfile(profile);
-      print("Profile saved successfully.");
+      debugPrint("Profile saved successfully.");
 
       if (mounted) {
-        print("Triggering meal plan generation...");
+        debugPrint("Triggering meal plan generation...");
         context.read<MealPlanProvider>().submitProfileAndGenerate(profile);
 
-        print("Navigating to Dashboard...");
+        debugPrint("Navigating to Dashboard...");
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const DashboardScreen()),
         );
       }
     } catch (e, stack) {
-      print("ERROR IN SUBMIT: $e");
-      print(stack);
+      debugPrint("ERROR IN SUBMIT: $e");
+      debugPrint("$stack");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Error saving profile: $e")),

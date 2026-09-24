@@ -241,12 +241,12 @@ class _PrimaryGoalStepState extends State<PrimaryGoalStep> {
                                 height: 36,
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: isSelected ? GoalsColors.activeGreen.withOpacity(0.2) : const Color(0xFFF0F0F0),
+                                  color: isSelected ? GoalsColors.activeGreen.withValues(alpha: 0.2) : const Color(0xFFF0F0F0),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Image.asset(
                                   itemImage,
-                                  errorBuilder: (_, __, ___) => const Icon(Icons.flag, size: 20, color: GoalsColors.primaryDark),
+                                  errorBuilder: (_, _, _) => const Icon(Icons.flag, size: 20, color: GoalsColors.primaryDark),
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -539,7 +539,7 @@ class _ImproveGoalStepState extends State<ImproveGoalStep> {
                                 item['image']!,
                                 width: 28,
                                 height: 28,
-                                errorBuilder: (_, __, ___) => const Icon(Icons.bolt, color: GoalsColors.primaryDark),
+                                errorBuilder: (_, _, _) => const Icon(Icons.bolt, color: GoalsColors.primaryDark),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
@@ -663,7 +663,7 @@ class _TargetBodyShapeStepState extends State<TargetBodyShapeStep> {
                                   child: Image.asset(
                                     item['image']!,
                                     fit: BoxFit.contain,
-                                    errorBuilder: (_, __, ___) =>
+                                    errorBuilder: (_, _, _) =>
                                     const Icon(Icons.person, size: 60, color: GoalsColors.primaryDark),
                                   ),
                                 ),
