@@ -15,6 +15,7 @@ import 'widgets/storage_videos_section.dart';
 class DashboardColors {
   static const background = Color(0xFFF9F8F3);
   static const primaryDark = Color(0xFF1B2A26);
+  static const programDark = Color(0xFF14261C);
   static const activeGreen = Color(0xFF8CC63F);
   static const activeBgGreen = Color(0xFFEBF5E8);
   static const cardWhite = Colors.white;
@@ -22,6 +23,8 @@ class DashboardColors {
   static const textSecondary = Color(0xFF757575);
   static const waterBlue = Color(0xFF29B6F6);
   static const waterLight = Color(0xFFE1F5FE);
+  static const emptyGrey = Color(0xFFECECEF);
+  static const barIdle = Color(0xFFE3EAF2);
 }
 
 class DashboardScreen extends StatefulWidget {
@@ -32,7 +35,6 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  int _selectedDayIndex = 0;
   UserProfile? _profile;
   bool _isLoading = true;
 
@@ -81,10 +83,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                   // --- Active Program Banner ---
                   _buildActiveProgramCard(),
-                  const SizedBox(height: 20),
-
-                  // --- 30-Day Workout Plan Section ---
-                  _buildWorkoutPlanSection(),
                   const SizedBox(height: 20),
 
                   // --- Today's Workout Section (goal videos from Firebase Storage) ---
@@ -251,8 +249,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: DashboardColors.primaryDark,
-        borderRadius: BorderRadius.circular(20),
+        color: DashboardColors.programDark,
+        borderRadius: BorderRadius.circular(22),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,12 +261,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.15),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   context.tr('dashboard_day_of'),
-                  style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: DashboardColors.primaryDark),
                 ),
               ),
               Text(
@@ -277,24 +275,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            context.tr('dashboard_program_name'),
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 14),
           Row(
             children: [
-              const Icon(Icons.access_time, size: 14, color: Colors.white70),
+              Expanded(
+                child: Text(
+                  context.tr('dashboard_program_name'),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(Icons.access_time_rounded, size: 14, color: DashboardColors.activeGreen),
               const SizedBox(width: 4),
-              Text(context.tr('dashboard_program_duration'), style: const TextStyle(fontSize: 11, color: Colors.white70)),
-              const SizedBox(width: 12),
-              const Icon(Icons.local_fire_department_outlined, size: 14, color: Colors.white70),
-              const SizedBox(width: 4),
-              Text(context.tr('dashboard_program_kcal'), style: const TextStyle(fontSize: 11, color: Colors.white70)),
+              Text(
+                context.tr('dashboard_program_duration'),
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: DashboardColors.activeGreen),
+              ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Icon(Icons.local_fire_department_outlined, size: 14, color: DashboardColors.activeGreen),
+              const SizedBox(width: 4),
+              Text(
+                context.tr('dashboard_program_kcal'),
+                style: const TextStyle(fontSize: 11, color: DashboardColors.activeGreen),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -322,105 +334,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   ];
 
   String _weekdayLabel(int weekday) => context.tr(_weekdayKeys[weekday - 1]);
-
-  // 30-Day Workout Plan Section
-  Widget _buildWorkoutPlanSection() {
-    final workoutLabelKeys = ['workout_full_body', 'workout_abs', 'workout_upper', 'workout_hiit', 'workout_chest'];
-    final today = DateTime.now();
-    final days = List.generate(5, (index) {
-      final date = today.add(Duration(days: index));
-      return {
-        'day': _weekdayLabel(date.weekday),
-        'label': context.tr(workoutLabelKeys[index]),
-        'completed': false,
-      };
-    });
-
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              context.tr('dashboard_workout_plan_title'),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: DashboardColors.textPrimary),
-            ),
-            GestureDetector(
-              onTap: () {},
-              child: Text(
-                context.tr('dashboard_view_all'),
-                style: const TextStyle(fontSize: 12, color: DashboardColors.textSecondary),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: List.generate(days.length, (index) {
-            final item = days[index];
-            final isCompleted = item['completed'] == true;
-            final isActive = index == _selectedDayIndex;
-
-            return Expanded(
-              child: GestureDetector(
-                onTap: () => setState(() => _selectedDayIndex = index),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: isCompleted
-                        ? DashboardColors.primaryDark
-                        : isActive
-                        ? DashboardColors.activeBgGreen
-                        : Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: isActive ? DashboardColors.activeGreen : Colors.transparent,
-                      width: 1.5,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        item['day'].toString(),
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: isCompleted ? Colors.white70 : DashboardColors.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Container(
-                        width: 22,
-                        height: 22,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: isCompleted ? DashboardColors.activeGreen : Colors.transparent,
-                          border: isCompleted ? null : Border.all(color: Colors.black26, width: 1.5),
-                        ),
-                        child: isCompleted
-                            ? const Icon(Icons.check, size: 14, color: Colors.white)
-                            : null,
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        item['label'].toString(),
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: isCompleted ? Colors.white : DashboardColors.textPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }),
-        ),
-      ],
-    );
-  }
 
   void _openWorkoutPlan() {
     Navigator.of(context).push(
@@ -578,17 +491,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   return Expanded(
                     child: GestureDetector(
                       onTap: () => water.setGlasses(index + 1),
-                      child: Container(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
                         margin: const EdgeInsets.symmetric(horizontal: 3),
-                        height: 38,
+                        height: 30,
                         decoration: BoxDecoration(
-                          color: isFilled ? DashboardColors.waterBlue : DashboardColors.waterLight,
-                          borderRadius: BorderRadius.circular(19),
-                        ),
-                        child: Icon(
-                          Icons.local_drink_rounded,
-                          size: 18,
-                          color: isFilled ? Colors.white : DashboardColors.waterBlue.withValues(alpha: 0.5),
+                          color: isFilled ? DashboardColors.waterBlue : DashboardColors.emptyGrey,
+                          borderRadius: BorderRadius.circular(15),
                         ),
                       ),
                     ),
@@ -627,14 +536,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // Weekly Activity Section
   Widget _buildWeeklyActivitySection() {
-    const heights = [35.0, 50.0, 25.0, 45.0, 60.0, 15.0, 20.0];
-    final today = DateTime.now();
+    const heights = [70.0, 95.0, 45.0, 88.0, 100.0, 6.0, 6.0];
+    final todayWeekday = DateTime.now().weekday;
+    // Mon → Sun, with today's bar highlighted.
     final activityData = List.generate(7, (index) {
-      final date = today.add(Duration(days: index));
       return {
-        'day': _weekdayLabel(date.weekday),
+        'day': _weekdayLabel(index + 1),
         'height': heights[index],
-        'highlight': index == 0,
+        'highlight': index + 1 == todayWeekday,
       };
     });
 
@@ -657,9 +566,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             context.tr('dashboard_avg_kcal_burn'),
             style: const TextStyle(fontSize: 10, color: DashboardColors.textSecondary),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           SizedBox(
-            height: 88,
+            height: 126,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -669,11 +578,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Container(
-                      width: 14,
+                      width: 10,
                       height: (item['height'] as double),
                       decoration: BoxDecoration(
-                        color: isHighlight ? DashboardColors.activeGreen : const Color(0xFFE2E6E2),
-                        borderRadius: BorderRadius.circular(7),
+                        color: isHighlight ? DashboardColors.activeGreen : DashboardColors.barIdle,
+                        borderRadius: BorderRadius.circular(5),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -799,15 +708,15 @@ class _DashboardMealTileState extends State<_DashboardMealTile> {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: DashboardColors.cardWhite,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
             child: SizedBox(
-              width: 44,
-              height: 44,
+              width: 52,
+              height: 52,
               child: _buildImage(context, imageState),
             ),
           ),
@@ -834,8 +743,14 @@ class _DashboardMealTileState extends State<_DashboardMealTile> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.add_circle_outline, color: DashboardColors.primaryDark, size: 22),
             onPressed: () {},
+            style: IconButton.styleFrom(
+              backgroundColor: DashboardColors.background,
+              side: const BorderSide(color: Colors.black12),
+              minimumSize: const Size(32, 32),
+              padding: EdgeInsets.zero,
+            ),
+            icon: const Icon(Icons.chevron_right_rounded, color: DashboardColors.primaryDark, size: 20),
           ),
         ],
       ),
