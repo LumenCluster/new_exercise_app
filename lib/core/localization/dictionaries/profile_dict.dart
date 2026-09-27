@@ -1,0 +1,90 @@
+/// Static UI strings for ProfileSettingsScreen.
+const Map<String, Map<String, String>> profileDict = {
+  'settings_header_title': {'en': 'Profile & Settings', 'es': 'Perfil y Ajustes', 'fr': 'Profil et Paramètres', 'de': 'Profil & Einstellungen', 'hi': 'प्रोफ़ाइल और सेटिंग्स'},
+  'settings_header_subtitle': {'en': 'Manage your account and preferences', 'es': 'Administra tu cuenta y preferencias', 'fr': 'Gérez votre compte et vos préférences', 'de': 'Verwalte dein Konto und deine Einstellungen', 'hi': 'अपना खाता और प्राथमिकताएं प्रबंधित करें'},
+
+  'settings_guest_name': {'en': 'Guest', 'es': 'Invitado', 'fr': 'Invité', 'de': 'Gast', 'hi': 'अतिथि'},
+  'settings_goal_label': {'en': 'Goal: {goal}', 'es': 'Objetivo: {goal}', 'fr': 'Objectif : {goal}', 'de': 'Ziel: {goal}', 'hi': 'लक्ष्य: {goal}'},
+  'settings_complete_profile': {'en': 'Complete your profile to get started', 'es': 'Completa tu perfil para empezar', 'fr': 'Complétez votre profil pour commencer', 'de': 'Vervollständige dein Profil, um loszulegen', 'hi': 'शुरू करने के लिए अपनी प्रोफ़ाइल पूरी करें'},
+  'settings_premium_badge': {'en': 'Premium', 'es': 'Premium', 'fr': 'Premium', 'de': 'Premium', 'hi': 'प्रीमियम'},
+
+  'settings_section_preferences': {'en': 'Preferences', 'es': 'Preferencias', 'fr': 'Préférences', 'de': 'Einstellungen', 'hi': 'प्राथमिकताएं'},
+  'settings_section_account_data': {'en': 'Account & Data', 'es': 'Cuenta y Datos', 'fr': 'Compte et Données', 'de': 'Konto & Daten', 'hi': 'खाता और डेटा'},
+  'settings_section_upgrade': {'en': 'Upgrade', 'es': 'Mejorar', 'fr': 'Mise à Niveau', 'de': 'Upgrade', 'hi': 'अपग्रेड'},
+  'settings_section_support': {'en': 'Support', 'es': 'Soporte', 'fr': 'Assistance', 'de': 'Support', 'hi': 'सहायता'},
+
+  'settings_reminders_title': {'en': 'Reminders', 'es': 'Recordatorios', 'fr': 'Rappels', 'de': 'Erinnerungen', 'hi': 'रिमाइंडर'},
+  'settings_reminders_subtitle': {'en': 'Manage Your Workout And Meal Reminders', 'es': 'Administra tus recordatorios de entreno y comidas', 'fr': "Gérez vos rappels d'entraînement et de repas", 'de': 'Verwalte deine Trainings- und Essenserinnerungen', 'hi': 'अपने वर्कआउट और भोजन रिमाइंडर प्रबंधित करें'},
+  'settings_on': {'en': 'On', 'es': 'Activado', 'fr': 'Activé', 'de': 'An', 'hi': 'चालू'},
+  'settings_off': {'en': 'Off', 'es': 'Desactivado', 'fr': 'Désactivé', 'de': 'Aus', 'hi': 'बंद'},
+  'settings_reminders_dialog_switch': {'en': 'Workout & meal reminders', 'es': 'Recordatorios de entreno y comidas', 'fr': "Rappels d'entraînement et de repas", 'de': 'Trainings- & Essenserinnerungen', 'hi': 'वर्कआउट और भोजन रिमाइंडर'},
+
+  'settings_sound_title': {'en': 'Sound & Voice Settings', 'es': 'Sonido y Voz', 'fr': 'Son et Voix', 'de': 'Ton- & Spracheinstellungen', 'hi': 'ध्वनि और आवाज़ सेटिंग्स'},
+  'settings_sound_subtitle': {'en': 'Adjust Volume, Voice Cues & Sounds', 'es': 'Ajusta volumen, voz y sonidos', 'fr': 'Ajustez le volume, la voix et les sons', 'de': 'Lautstärke, Sprachhinweise & Töne anpassen', 'hi': 'वॉल्यूम, वॉइस संकेत और ध्वनियाँ समायोजित करें'},
+  'settings_sound_effects': {'en': 'Sound Effects', 'es': 'Efectos de Sonido', 'fr': 'Effets Sonores', 'de': 'Soundeffekte', 'hi': 'ध्वनि प्रभाव'},
+  'settings_voice_cues': {'en': 'Voice Cues', 'es': 'Indicaciones de Voz', 'fr': 'Indications Vocales', 'de': 'Sprachhinweise', 'hi': 'आवाज़ संकेत'},
+
+  'settings_language_title': {'en': 'Language', 'es': 'Idioma', 'fr': 'Langue', 'de': 'Sprache', 'hi': 'भाषा'},
+  'settings_language_subtitle': {'en': 'Choose Your Preferred Language', 'es': 'Elige tu idioma preferido', 'fr': 'Choisissez votre langue préférée', 'de': 'Wähle deine bevorzugte Sprache', 'hi': 'अपनी पसंदीदा भाषा चुनें'},
+  'settings_choose_language': {'en': 'Choose Language', 'es': 'Elegir Idioma', 'fr': 'Choisir la Langue', 'de': 'Sprache Wählen', 'hi': 'भाषा चुनें'},
+  'settings_language_set_to': {'en': 'Language set to {language}', 'es': 'Idioma configurado a {language}', 'fr': 'Langue définie sur {language}', 'de': 'Sprache auf {language} eingestellt', 'hi': 'भाषा {language} पर सेट की गई'},
+
+  'settings_wearable_title': {'en': 'Wearable (Sync)', 'es': 'Dispositivo (Sincronizar)', 'fr': 'Objet Connecté (Sync)', 'de': 'Wearable (Sync)', 'hi': 'वियरेबल (सिंक)'},
+  'settings_wearable_subtitle': {'en': 'Connect And Sync Your Wearable Device', 'es': 'Conecta y sincroniza tu dispositivo', 'fr': 'Connectez et synchronisez votre appareil', 'de': 'Verbinde und synchronisiere dein Wearable', 'hi': 'अपना वियरेबल डिवाइस कनेक्ट और सिंक करें'},
+  'settings_connected': {'en': 'Connected', 'es': 'Conectado', 'fr': 'Connecté', 'de': 'Verbunden', 'hi': 'कनेक्टेड'},
+  'settings_not_connected': {'en': 'Not Connected', 'es': 'No Conectado', 'fr': 'Non Connecté', 'de': 'Nicht Verbunden', 'hi': 'कनेक्ट नहीं है'},
+  'settings_wearable_connected_body': {'en': 'Your wearable device is connected and syncing your activity data.', 'es': 'Tu dispositivo está conectado y sincronizando tus datos de actividad.', 'fr': 'Votre appareil est connecté et synchronise vos données d\'activité.', 'de': 'Dein Wearable ist verbunden und synchronisiert deine Aktivitätsdaten.', 'hi': 'आपका वियरेबल डिवाइस कनेक्टेड है और आपकी गतिविधि डेटा सिंक कर रहा है।'},
+  'settings_wearable_disconnected_body': {'en': 'No wearable device connected. Connect one to sync steps, heart rate and workouts automatically.', 'es': 'No hay ningún dispositivo conectado. Conecta uno para sincronizar pasos, ritmo cardíaco y entrenos automáticamente.', 'fr': "Aucun appareil connecté. Connectez-en un pour synchroniser automatiquement les pas, la fréquence cardiaque et les entraînements.", 'de': 'Kein Wearable verbunden. Verbinde eines, um Schritte, Herzfrequenz und Workouts automatisch zu synchronisieren.', 'hi': 'कोई वियरेबल डिवाइस कनेक्ट नहीं है। कदम, हृदय गति और वर्कआउट को स्वचालित रूप से सिंक करने के लिए एक कनेक्ट करें।'},
+  'settings_disconnect': {'en': 'Disconnect', 'es': 'Desconectar', 'fr': 'Déconnecter', 'de': 'Trennen', 'hi': 'डिस्कनेक्ट करें'},
+  'settings_connect': {'en': 'Connect', 'es': 'Conectar', 'fr': 'Connecter', 'de': 'Verbinden', 'hi': 'कनेक्ट करें'},
+  'settings_wearable_connected_toast': {'en': 'Wearable connected', 'es': 'Dispositivo conectado', 'fr': 'Appareil connecté', 'de': 'Wearable verbunden', 'hi': 'वियरेबल कनेक्ट हो गया'},
+  'settings_wearable_disconnected_toast': {'en': 'Wearable disconnected', 'es': 'Dispositivo desconectado', 'fr': 'Appareil déconnecté', 'de': 'Wearable getrennt', 'hi': 'वियरेबल डिस्कनेक्ट हो गया'},
+
+  'settings_restart_data_title': {'en': 'Restart Data', 'es': 'Reiniciar Datos', 'fr': 'Réinitialiser les Données', 'de': 'Daten Zurücksetzen', 'hi': 'डेटा पुनः आरंभ करें'},
+  'settings_restart_data_subtitle': {'en': 'Reset Your App Data And Progress', 'es': 'Reinicia los datos y progreso de la app', 'fr': "Réinitialisez les données et la progression de l'application", 'de': 'Setze deine App-Daten und deinen Fortschritt zurück', 'hi': 'अपना ऐप डेटा और प्रगति रीसेट करें'},
+  'settings_restart_data_confirm_body': {'en': 'This resets your logged weight, water intake and generated plans. Your profile stays intact. Continue?', 'es': 'Esto reinicia tu peso registrado, consumo de agua y planes generados. Tu perfil se mantiene intacto. ¿Continuar?', 'fr': 'Cela réinitialise votre poids enregistré, votre consommation d\'eau et vos plans générés. Votre profil reste intact. Continuer ?', 'de': 'Dies setzt dein erfasstes Gewicht, deine Wasseraufnahme und erstellte Pläne zurück. Dein Profil bleibt erhalten. Fortfahren?', 'hi': 'यह आपके दर्ज वजन, पानी के सेवन और तैयार योजनाओं को रीसेट करता है। आपकी प्रोफ़ाइल बरकरार रहेगी। जारी रखें?'},
+  'settings_reset': {'en': 'Reset', 'es': 'Reiniciar', 'fr': 'Réinitialiser', 'de': 'Zurücksetzen', 'hi': 'रीसेट करें'},
+  'settings_restart_data_success_toast': {'en': 'Your progress has been reset.', 'es': 'Tu progreso se ha reiniciado.', 'fr': 'Votre progression a été réinitialisée.', 'de': 'Dein Fortschritt wurde zurückgesetzt.', 'hi': 'आपकी प्रगति रीसेट कर दी गई है।'},
+
+  'settings_delete_data_title': {'en': 'Delete Data', 'es': 'Eliminar Datos', 'fr': 'Supprimer les Données', 'de': 'Daten Löschen', 'hi': 'डेटा हटाएं'},
+  'settings_delete_data_subtitle': {'en': 'Permanently Delete All Your Data', 'es': 'Elimina permanentemente todos tus datos', 'fr': 'Supprimez définitivement toutes vos données', 'de': 'Lösche alle deine Daten dauerhaft', 'hi': 'अपना सारा डेटा स्थायी रूप से हटाएं'},
+  'settings_delete_data_confirm_body': {'en': 'This permanently deletes your profile and all app data. This cannot be undone. Continue?', 'es': 'Esto elimina permanentemente tu perfil y todos los datos de la app. No se puede deshacer. ¿Continuar?', 'fr': "Cela supprime définitivement votre profil et toutes les données de l'application. Cette action est irréversible. Continuer ?", 'de': 'Dies löscht dein Profil und alle App-Daten dauerhaft. Dies kann nicht rückgängig gemacht werden. Fortfahren?', 'hi': 'यह आपकी प्रोफ़ाइल और सभी ऐप डेटा को स्थायी रूप से हटा देगा। इसे पूर्ववत नहीं किया जा सकता। जारी रखें?'},
+  'settings_delete_everything': {'en': 'Delete Everything', 'es': 'Eliminar Todo', 'fr': 'Tout Supprimer', 'de': 'Alles Löschen', 'hi': 'सब कुछ हटाएं'},
+
+  'settings_premium_title': {'en': 'Remove Ads & Go Premium', 'es': 'Quitar Anuncios y Hazte Premium', 'fr': 'Retirer les Pubs et Passer Premium', 'de': 'Werbung Entfernen & Premium Werden', 'hi': 'विज्ञापन हटाएं और प्रीमियम लें'},
+  'settings_premium_active_title': {'en': 'Premium Active', 'es': 'Premium Activo', 'fr': 'Premium Actif', 'de': 'Premium Aktiv', 'hi': 'प्रीमियम सक्रिय'},
+  'settings_premium_subtitle': {'en': 'Unlock All Features And Support This App', 'es': 'Desbloquea todo y apoya esta app', 'fr': "Débloquez tout et soutenez l'application", 'de': 'Alle Funktionen freischalten und die App unterstützen', 'hi': 'सभी सुविधाएं अनलॉक करें और इस ऐप का समर्थन करें'},
+  'settings_premium_active_subtitle': {'en': 'Thanks for supporting the app!', 'es': '¡Gracias por apoyar la app!', 'fr': "Merci de soutenir l'application !", 'de': 'Danke, dass du die App unterstützt!', 'hi': 'ऐप का समर्थन करने के लिए धन्यवाद!'},
+  'settings_upgrade_badge': {'en': 'Upgrade', 'es': 'Mejorar', 'fr': 'Mettre à Niveau', 'de': 'Upgrade', 'hi': 'अपग्रेड'},
+  'settings_active_badge': {'en': 'Active', 'es': 'Activo', 'fr': 'Actif', 'de': 'Aktiv', 'hi': 'सक्रिय'},
+  'settings_go_premium_title': {'en': 'Go Premium', 'es': 'Hazte Premium', 'fr': 'Passer Premium', 'de': 'Premium Werden', 'hi': 'प्रीमियम लें'},
+  'settings_go_premium_body': {'en': 'Remove ads, unlock unlimited AI meal & workout plans, and support ongoing development.', 'es': 'Elimina anuncios, desbloquea planes ilimitados de comidas y entreno con IA, y apoya el desarrollo continuo.', 'fr': "Retirez les pubs, débloquez des plans de repas et d'entraînement IA illimités, et soutenez le développement continu.", 'de': 'Entferne Werbung, schalte unbegrenzte KI-Essens- und Trainingspläne frei und unterstütze die Weiterentwicklung.', 'hi': 'विज्ञापन हटाएं, असीमित एआई भोजन और वर्कआउट योजनाएं अनलॉक करें, और चल रहे विकास का समर्थन करें।'},
+  'settings_not_now': {'en': 'Not now', 'es': 'Ahora no', 'fr': 'Pas maintenant', 'de': 'Nicht jetzt', 'hi': 'अभी नहीं'},
+  'settings_upgrade_now': {'en': 'Upgrade Now', 'es': 'Mejorar Ahora', 'fr': 'Mettre à Niveau', 'de': 'Jetzt Upgraden', 'hi': 'अभी अपग्रेड करें'},
+  'settings_premium_welcome_toast': {'en': 'Welcome to Premium!', 'es': '¡Bienvenido a Premium!', 'fr': 'Bienvenue dans Premium !', 'de': 'Willkommen bei Premium!', 'hi': 'प्रीमियम में आपका स्वागत है!'},
+
+  'settings_rate_us_title': {'en': 'Rate Us', 'es': 'Califícanos', 'fr': 'Notez-Nous', 'de': 'Bewerte Uns', 'hi': 'हमें रेट करें'},
+  'settings_rate_us_subtitle': {'en': 'Enjoying The App? Rate Us On The Store', 'es': '¿Te gusta la app? Califícanos en la tienda', 'fr': "Vous aimez l'application ? Notez-nous sur le store", 'de': 'Gefällt dir die App? Bewerte uns im Store', 'hi': 'ऐप पसंद आ रहा है? स्टोर पर हमें रेट करें'},
+  'settings_rate_us_submit_toast': {'en': 'Thanks for the {rating}-star rating!', 'es': '¡Gracias por tu calificación de {rating} estrellas!', 'fr': 'Merci pour votre note de {rating} étoiles !', 'de': 'Danke für deine {rating}-Sterne-Bewertung!', 'hi': '{rating}-स्टार रेटिंग के लिए धन्यवाद!'},
+
+  'settings_share_app_title': {'en': 'Share App', 'es': 'Compartir App', 'fr': "Partager l'App", 'de': 'App Teilen', 'hi': 'ऐप साझा करें'},
+  'settings_share_app_subtitle': {'en': 'Share The App With Your Friends', 'es': 'Comparte la app con tus amigos', 'fr': "Partagez l'application avec vos amis", 'de': 'Teile die App mit deinen Freunden', 'hi': 'ऐप को अपने दोस्तों के साथ साझा करें'},
+  'settings_share_text': {'en': "I'm reaching my fitness goals with this app — check it out!", 'es': '¡Estoy alcanzando mis metas de fitness con esta app, échale un vistazo!', 'fr': "J'atteins mes objectifs de forme avec cette application, jetez-y un œil !", 'de': 'Ich erreiche meine Fitnessziele mit dieser App – schau sie dir an!', 'hi': 'मैं इस ऐप से अपने फिटनेस लक्ष्य हासिल कर रहा हूँ — इसे देखें!'},
+  'settings_copy_link': {'en': 'Copy Link', 'es': 'Copiar Enlace', 'fr': 'Copier le Lien', 'de': 'Link Kopieren', 'hi': 'लिंक कॉपी करें'},
+  'settings_copied_toast': {'en': 'Copied to clipboard', 'es': 'Copiado al portapapeles', 'fr': 'Copié dans le presse-papiers', 'de': 'In die Zwischenablage kopiert', 'hi': 'क्लिपबोर्ड पर कॉपी हो गया'},
+
+  'settings_feedback_title': {'en': 'Feedback', 'es': 'Comentarios', 'fr': 'Retour', 'de': 'Feedback', 'hi': 'प्रतिक्रिया'},
+  'settings_feedback_subtitle': {'en': 'Help Us Improve The App', 'es': 'Ayúdanos a mejorar la app', 'fr': "Aidez-nous à améliorer l'application", 'de': 'Hilf uns, die App zu verbessern', 'hi': 'ऐप को बेहतर बनाने में हमारी मदद करें'},
+  'settings_feedback_hint': {'en': 'Tell us what you think or what we can improve...', 'es': 'Cuéntanos qué piensas o qué podemos mejorar...', 'fr': 'Dites-nous ce que vous pensez ou ce que nous pouvons améliorer...', 'de': 'Sag uns, was du denkst oder was wir verbessern können...', 'hi': 'हमें बताएं आप क्या सोचते हैं या हम क्या सुधार सकते हैं...'},
+  'settings_feedback_thanks_toast': {'en': 'Thanks for your feedback!', 'es': '¡Gracias por tus comentarios!', 'fr': 'Merci pour votre retour !', 'de': 'Danke für dein Feedback!', 'hi': 'आपकी प्रतिक्रिया के लिए धन्यवाद!'},
+
+  'settings_privacy_policy_title': {'en': 'Privacy Policy', 'es': 'Política de Privacidad', 'fr': 'Politique de Confidentialité', 'de': 'Datenschutzrichtlinie', 'hi': 'गोपनीयता नीति'},
+  'settings_privacy_policy_subtitle': {'en': 'Read Our Privacy Policy', 'es': 'Lee nuestra política de privacidad', 'fr': 'Lisez notre politique de confidentialité', 'de': 'Lies unsere Datenschutzrichtlinie', 'hi': 'हमारी गोपनीयता नीति पढ़ें'},
+  'settings_privacy_policy_body': {
+    'en': 'We store your profile, workout and meal data locally on your device to personalize your plans. We do not sell your personal data. Generated meal and workout content may be requested from third-party AI services using the details you provide during onboarding. You can erase all locally stored data at any time from Profile & Settings → Delete Data.',
+    'es': 'Guardamos tu perfil y datos de entreno y comidas localmente en tu dispositivo para personalizar tus planes. No vendemos tus datos personales. El contenido de comidas y entrenos generado puede solicitarse a servicios de IA de terceros usando los datos que proporcionas durante el registro. Puedes borrar todos los datos guardados localmente en cualquier momento desde Perfil y Ajustes → Eliminar Datos.',
+    'fr': "Nous stockons votre profil, vos données d'entraînement et de repas localement sur votre appareil pour personnaliser vos plans. Nous ne vendons pas vos données personnelles. Le contenu de repas et d'entraînement généré peut être demandé à des services d'IA tiers à l'aide des informations que vous fournissez lors de l'intégration. Vous pouvez effacer toutes les données stockées localement à tout moment depuis Profil et Paramètres → Supprimer les Données.",
+    'de': 'Wir speichern dein Profil sowie Trainings- und Essensdaten lokal auf deinem Gerät, um deine Pläne zu personalisieren. Wir verkaufen deine persönlichen Daten nicht. Generierte Essens- und Trainingsinhalte können bei Drittanbieter-KI-Diensten unter Verwendung der von dir beim Onboarding angegebenen Daten angefordert werden. Du kannst jederzeit alle lokal gespeicherten Daten über Profil & Einstellungen → Daten Löschen entfernen.',
+    'hi': 'हम आपकी योजनाओं को वैयक्तिकृत करने के लिए आपकी प्रोफ़ाइल, वर्कआउट और भोजन डेटा को आपके डिवाइस पर स्थानीय रूप से संग्रहीत करते हैं। हम आपका व्यक्तिगत डेटा नहीं बेचते। जनरेट किया गया भोजन और वर्कआउट कंटेंट ऑनबोर्डिंग के दौरान आपके द्वारा दी गई जानकारी का उपयोग करके थर्ड-पार्टी एआई सेवाओं से मांगा जा सकता है। आप किसी भी समय प्रोफ़ाइल और सेटिंग्स → डेटा हटाएं से सभी स्थानीय रूप से संग्रहीत डेटा मिटा सकते हैं।',
+  },
+};
