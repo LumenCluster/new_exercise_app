@@ -77,137 +77,127 @@ class FitnessSummaryStep extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
-              // BMI Card
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
+              // BMI section on the photo background (no card)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: Stack(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  context.tr('onboarding_bmi_score_label'),
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.textSecondary,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  bmi.toStringAsFixed(1),
-                                  style: const TextStyle(
-                                    fontSize: 36,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  bmiStatus(context),
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: bmiColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Placeholder Image for Scales
-                          Container(
-                            width: 120,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(Icons.scale, size: 48, color: Colors.black12),
-                          ),
-                        ],
+                    // Zoomed slightly so the white frame/shadow baked into new.png is cropped off
+                    Positioned.fill(
+                      child: Transform.scale(
+                        scale: 1.2,
+                        child: Image.asset('assets/new.png', fit: BoxFit.cover),
                       ),
                     ),
-
-                    // BMI Scale
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                      child: Column(
-                        children: [
-                          Stack(
-                            alignment: Alignment.topCenter,
+                    Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Row(
                             children: [
-                              Container(
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(4),
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Colors.green,
-                                      Colors.yellow,
-                                      Colors.orange,
-                                      Colors.red,
-                                    ],
-                                  ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      context.tr('onboarding_bmi_score_label'),
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.textSecondary,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      bmi.toStringAsFixed(1),
+                                      style: const TextStyle(
+                                        fontSize: 36,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      bmiStatus(context),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: bmiColor,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              // Marker
-                              LayoutBuilder(
-                                builder: (context, constraints) {
-                                  double position = (bmi - 15) / (35 - 15);
-                                  position = position.clamp(0.0, 1.0);
-                                  return Align(
-                                    alignment: Alignment(position * 2 - 1, 0),
-                                    child: Transform.translate(
-                                      offset: const Offset(0, -12),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(Icons.arrow_drop_down, size: 20),
-                                          Container(
-                                            width: 12,
-                                            height: 12,
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              shape: BoxShape.circle,
-                                              border: Border.all(color: Colors.black, width: 2),
-                                            ),
-                                          ),
+                            ],
+                          ),
+                        ),
+
+                        // BMI Scale
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                          child: Column(
+                            children: [
+                              Stack(
+                                alignment: Alignment.topCenter,
+                                children: [
+                                  Container(
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(4),
+                                      gradient: const LinearGradient(
+                                        colors: [
+                                          Colors.green,
+                                          Colors.yellow,
+                                          Colors.orange,
+                                          Colors.red,
                                         ],
                                       ),
                                     ),
-                                  );
-                                },
+                                  ),
+                                  // Marker
+                                  LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      double position = (bmi - 15) / (35 - 15);
+                                      position = position.clamp(0.0, 1.0);
+                                      return Align(
+                                        alignment: Alignment(position * 2 - 1, 0),
+                                        child: Transform.translate(
+                                          offset: const Offset(0, -12),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Icon(Icons.arrow_drop_down, size: 20),
+                                              Container(
+                                                width: 12,
+                                                height: 12,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(color: Colors.black, width: 2),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(context.tr('onboarding_bmi_range_under'), style: const TextStyle(fontSize: 9, color: AppColors.textSecondary)),
+                                  Text(context.tr('onboarding_bmi_range_mid1'), style: const TextStyle(fontSize: 9, color: AppColors.textSecondary)),
+                                  Text(context.tr('onboarding_bmi_range_mid2'), style: const TextStyle(fontSize: 9, color: AppColors.textSecondary)),
+                                  Text(context.tr('onboarding_bmi_range_over'), style: const TextStyle(fontSize: 9, color: AppColors.textSecondary)),
+                                ],
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(context.tr('onboarding_bmi_range_under'), style: const TextStyle(fontSize: 9, color: AppColors.textSecondary)),
-                              Text(context.tr('onboarding_bmi_range_mid1'), style: const TextStyle(fontSize: 9, color: AppColors.textSecondary)),
-                              Text(context.tr('onboarding_bmi_range_mid2'), style: const TextStyle(fontSize: 9, color: AppColors.textSecondary)),
-                              Text(context.tr('onboarding_bmi_range_over'), style: const TextStyle(fontSize: 9, color: AppColors.textSecondary)),
-                            ],
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

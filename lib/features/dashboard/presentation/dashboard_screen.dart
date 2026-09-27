@@ -5,14 +5,11 @@ import '../../../core/database/firestore_service.dart';
 import '../../profile/domain/entities/user_profile.dart';
 import '../../meal_plan/domain/entities/meal.dart';
 import '../../meal_plan/presentation/providers/meal_plan_provider.dart';
-import '../../exercises/domain/entities/exercise.dart';
-import '../../exercises/domain/repositories/exercise_repository.dart';
 import '../../tracking/presentation/providers/water_intake_provider.dart';
 import '../../../core/widgets/app_bottom_nav_bar.dart';
-import '../../exercises/presentation/active_workout_screen.dart';
-import '../../exercises/presentation/pages/exercise_detail_screen.dart';
 import '../../exercises/presentation/pages/workout_plan_screen.dart';
 import '../../../core/localization/app_localizations.dart';
+import 'widgets/storage_videos_section.dart';
 
 // --- Shared Theme Colors ---
 class DashboardColors {
@@ -38,11 +35,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedDayIndex = 0;
   UserProfile? _profile;
   bool _isLoading = true;
-  final Set<int> _completedExerciseIndices = {};
-
-  List<Exercise> _exercises = [];
-  bool _exercisesLoading = true;
-  String? _exercisesError;
 
   @override
   void initState() {
@@ -57,33 +49,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _profile = profile;
       _isLoading = false;
     });
-
-    if (profile != null) {
-      _loadExercises(profile);
-    } else {
-      setState(() => _exercisesLoading = false);
-    }
-  }
-
-  Future<void> _loadExercises(UserProfile profile) async {
-    setState(() {
-      _exercisesLoading = true;
-      _exercisesError = null;
-    });
-    try {
-      final exercises = await context.read<ExerciseRepository>().recommendedForProfile(profile);
-      if (!mounted) return;
-      setState(() {
-        _exercises = exercises;
-        _exercisesLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _exercisesError = e.toString();
-        _exercisesLoading = false;
-      });
-    }
   }
 
   @override
@@ -122,9 +87,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   _buildWorkoutPlanSection(),
                   const SizedBox(height: 20),
 
-                  // --- Today's Workout Section ---
-                  _buildTodayWorkoutSection(),
-                  const SizedBox(height: 24),
+                  // --- Today's Workout Section (goal videos from Firebase Storage) ---
+                  // Waits for the profile so it lists the user's goal folder
+                  // directly instead of loading a fallback folder first.
+                  if (!_isLoading) ...[
+                    StorageVideosSection(
+                      primaryGoal: _profile?.primaryGoal,
+                      titleKey: 'dashboard_todays_workout',
+                      trailing: GestureDetector(
+                        onTap: _openWorkoutPlan,
+                        child: Text(
+                          context.tr('dashboard_adjust_plan'),
+                          style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
 
                   // --- Today's Meals Section ---
                   _buildTodayMealsSection(mealPlanProvider),
@@ -448,235 +427,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       MaterialPageRoute(
         builder: (_) => WorkoutPlanScreen(
           profile: _profile,
-          repository: context.read<ExerciseRepository>(),
         ),
-      ),
-    );
-  }
-
-  void _openExerciseDetail(Exercise exercise) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => ExerciseDetailScreen(exercise: exercise)),
-    );
-  }
-
-  // Today's Workout Section
-  Widget _buildTodayWorkoutSection() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: DashboardColors.cardWhite,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                context.tr('dashboard_todays_workout'),
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: DashboardColors.textPrimary),
-              ),
-              GestureDetector(
-                onTap: _openWorkoutPlan,
-                child: Text(
-                  context.tr('dashboard_adjust_plan'),
-                  style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          _buildWorkoutSubtitle(),
-          const SizedBox(height: 12),
-          _buildWorkoutBody(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWorkoutSubtitle() {
-    if (!_exercisesLoading && _exercisesError == null) {
-      final goalLabel = _profile?.primaryGoal != null
-          ? _profile!.primaryGoal!.replaceAll('_', ' ')
-          : context.tr('dashboard_your_goals');
-      return Text(
-        context.tr('dashboard_exercises_personalized_for', {
-          'count': '${_exercises.length}',
-          'goal': goalLabel,
-        }),
-        style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
-      );
-    }
-    return Text(
-      context.tr('dashboard_personalized_for_your_goals'),
-      style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
-    );
-  }
-
-  Widget _buildWorkoutBody() {
-    if (_exercisesLoading) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 24),
-        child: Center(
-          child: CircularProgressIndicator(color: DashboardColors.primaryDark),
-        ),
-      );
-    }
-    if (_exercisesError != null) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        child: Column(
-          children: [
-            Text(
-              context.tr('dashboard_exercises_load_error'),
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
-            ),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: () {
-                if (_profile != null) _loadExercises(_profile!);
-              },
-              child: Text(context.tr('common_retry')),
-            ),
-          ],
-        ),
-      );
-    }
-    if (_exercises.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        child: Text(
-          context.tr('dashboard_no_exercises_found'),
-          style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
-        ),
-      );
-    }
-    return Column(
-      children: [
-        ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: _exercises.length,
-          separatorBuilder: (_, _) => const SizedBox(height: 8),
-          itemBuilder: (context, index) => _buildExerciseTile(_exercises[index], index),
-        ),
-        const SizedBox(height: 16),
-        SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: DashboardColors.primaryDark,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-              elevation: 0,
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ActiveWorkoutScreen()),
-              );
-            },
-            icon: const Icon(Icons.play_arrow_rounded, size: 20),
-            label: Text(context.tr('dashboard_start_todays_session'), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildExerciseTile(Exercise exercise, int index) {
-    final isDone = _completedExerciseIndices.contains(index);
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          if (isDone) {
-            _completedExerciseIndices.remove(index);
-          } else {
-            _completedExerciseIndices.add(index);
-          }
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: isDone ? DashboardColors.activeBgGreen : DashboardColors.background,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Row(
-          children: [
-            GestureDetector(
-              onTap: () => _openExerciseDetail(exercise),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      _buildExerciseThumbnail(exercise.gifAsset),
-                      if (exercise.videoStoragePath != null)
-                        Container(
-                          decoration: const BoxDecoration(color: Colors.black38, shape: BoxShape.circle),
-                          padding: const EdgeInsets.all(3),
-                          child: const Icon(Icons.play_arrow_rounded, size: 14, color: Colors.white),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    exercise.name,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: DashboardColors.textPrimary),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    "${exercise.prescriptionLabel} · ${exercise.muscleGroups.join(', ')}",
-                    style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isDone ? DashboardColors.activeGreen : Colors.white,
-                border: isDone ? null : Border.all(color: Colors.black26, width: 1.5),
-              ),
-              child: isDone ? const Icon(Icons.check, size: 16, color: Colors.white) : null,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildExerciseThumbnail(String? gifAsset) {
-    if (gifAsset == null) {
-      return Container(
-        color: Colors.white,
-        child: const Icon(Icons.self_improvement, size: 20, color: DashboardColors.primaryDark),
-      );
-    }
-    return Image.asset(
-      gifAsset,
-      fit: BoxFit.cover,
-      errorBuilder: (_, _, _) => Container(
-        color: Colors.white,
-        child: const Icon(Icons.self_improvement, size: 20, color: DashboardColors.primaryDark),
       ),
     );
   }

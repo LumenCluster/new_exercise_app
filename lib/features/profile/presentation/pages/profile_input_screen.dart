@@ -201,15 +201,16 @@ class _ProfileInputScreenState extends State<ProfileInputScreen> {
                     setState(() => _age = age);
                     _nextPage();
                   }),
-                  HeightStep(onNext: (height) {
+                  HeightStep(gender: _gender, onNext: (height) {
                     setState(() => _height = height);
                     _nextPage();
                   }),
-                  WeightStep(onNext: (weight) {
+                  WeightStep(userHeightCm: _height, onNext: (weight) {
                     setState(() => _weight = weight);
                     _nextPage();
                   }),
                   BodyShapeStep(
+                    gender: _gender,
                     onNext: (shape, fatRange) {
                       setState(() => _bodyShape = shape);
                       _nextPage();
@@ -267,7 +268,14 @@ class _ProfileInputScreenState extends State<ProfileInputScreen> {
                     setState(() => _mealsPerDay = count);
                     _nextPage();
                   }),
-                  AllSetStep(onFinish: _nextPage),
+                  AllSetStep(
+                    allergies: _allergies,
+                    eatingStyle: _eatingStyle,
+                    considerations: _dietaryConsiderations,
+                    eatingHabit: _eatingHabits,
+                    mealsPerDay: _mealsPerDay,
+                    onFinish: _nextPage,
+                  ),
 
                   // --- Part 3: Goals & Focus ---
                   GoalsIntroStep(onNext: _nextPage),
@@ -275,7 +283,7 @@ class _ProfileInputScreenState extends State<ProfileInputScreen> {
                     setState(() => _primaryGoal = goal);
                     _nextPage();
                   }),
-                  TargetFocusStep(onNext: (areas) {
+                  TargetFocusStep(gender: _gender, onNext: (areas) {
                     setState(() => _focusAreas = areas);
                     _nextPage();
                   }),
@@ -283,7 +291,7 @@ class _ProfileInputScreenState extends State<ProfileInputScreen> {
                     setState(() => _improvementGoal = goal);
                     _nextPage();
                   }),
-                  TargetBodyShapeStep(onNext: (shape, fat) {
+                  TargetBodyShapeStep(gender: _gender, onNext: (shape, fat) {
                     setState(() {
                       _targetBodyShape = shape;
                       _targetBodyFat = fat;

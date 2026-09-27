@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:untitled/core/localization/app_localizations.dart';
+import '../domain/entities/workout_video.dart';
+import 'widgets/exercise_video_player.dart';
 
 // --- Colors ---
 class AppColors {
@@ -16,15 +19,114 @@ class AppColors {
 // 1. ACTIVE WORKOUT SCREEN (Left Image)
 // =============================================================================
 class ActiveWorkoutScreen extends StatefulWidget {
-  const ActiveWorkoutScreen({super.key});
+  /// Sets per exercise. One play-through of the video counts as one set.
+  static const setsPerExercise = 12;
+
+  /// Every exercise in the category, in playlist order.
+  final List<WorkoutVideo> videos;
+
+  /// Exercise to start with. The playlist starts here and wraps around, so
+  /// every exercise in [videos] is still played once.
+  final int startIndex;
+
+  /// Header title (e.g. the goal name). Falls back to the program name.
+  final String? title;
+
+  const ActiveWorkoutScreen({
+    super.key,
+    required this.videos,
+    this.startIndex = 0,
+    this.title,
+  }) : assert(videos.length > 0);
 
   @override
   State<ActiveWorkoutScreen> createState() => _ActiveWorkoutScreenState();
 }
 
 class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
+  static const _sets = ActiveWorkoutScreen.setsPerExercise;
+
+  final _playerKey = GlobalKey<ExerciseVideoPlayerState>();
+  late final List<WorkoutVideo> _playlist;
+  int _index = 0;
+  int _currentSet = 1;
+  bool _paused = false;
+  bool _finished = false;
+  Duration _elapsed = Duration.zero;
+  Timer? _timer;
+
+  WorkoutVideo get _current => _playlist[_index];
+
+  @override
+  void initState() {
+    super.initState();
+    final start = widget.startIndex.clamp(0, widget.videos.length - 1);
+    _playlist = [
+      ...widget.videos.sublist(start),
+      ...widget.videos.sublist(0, start),
+    ];
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!_paused && mounted) setState(() => _elapsed += const Duration(seconds: 1));
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  /// Called by the player each time the video ends. Returns whether the
+  /// video should play again (i.e. there are sets left for this exercise).
+  bool _onVideoCompleted() {
+    if (_currentSet < _sets) {
+      setState(() => _currentSet++);
+      return true;
+    }
+    _goToNextExercise();
+    return false;
+  }
+
+  void _completeSet() {
+    if (_currentSet < _sets) {
+      setState(() => _currentSet++);
+      _playerKey.currentState?.restart();
+    } else {
+      _goToNextExercise();
+    }
+  }
+
+  /// Moves on to the next exercise (after 12 sets, or when skipped), or to
+  /// the completion screen after the last one.
+  void _goToNextExercise() {
+    if (_finished) return;
+    if (_index + 1 < _playlist.length) {
+      setState(() {
+        _index++;
+        _currentSet = 1;
+      });
+    } else {
+      _finished = true;
+      _timer?.cancel();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const WorkoutCompleteScreen()),
+      );
+    }
+  }
+
+  void _togglePause() => setState(() => _paused = !_paused);
+
+  String _formatElapsed() {
+    final minutes = _elapsed.inMinutes.toString().padLeft(2, '0');
+    final seconds = (_elapsed.inSeconds % 60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final upNext = _playlist.sublist(_index + 1);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -41,25 +143,25 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                     _buildProgressBar(),
                     const SizedBox(height: 16),
                     _buildActiveExerciseCard(),
-                    const SizedBox(height: 20),
-                    Text(
-                      context.tr('exercises_up_next'),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                    if (upNext.isNotEmpty) ...[
+                      const SizedBox(height: 20),
+                      Text(
+                        context.tr('exercises_up_next'),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    _buildUpNextTile(
-                      context.tr('exercise_name_romanian_deadlifts'),
-                      '3 ${context.tr('common_sets')} • 12 ${context.tr('common_reps')}',
-                    ),
-                    const SizedBox(height: 10),
-                    _buildUpNextTile(
-                      context.tr('exercise_name_shoulder_press'),
-                      '3 ${context.tr('common_sets')} • 10 ${context.tr('common_reps')}',
-                    ),
+                      const SizedBox(height: 10),
+                      for (final video in upNext) ...[
+                        _buildUpNextTile(
+                          video.name,
+                          '$_sets ${context.tr('common_sets')}',
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                    ],
                   ],
                 ),
               ),
@@ -75,19 +177,22 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Container(
-          width: 36,
-          height: 36,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
+        GestureDetector(
+          onTap: () => Navigator.maybePop(context),
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.arrow_back_ios_new, size: 16, color: AppColors.textPrimary),
           ),
-          child: const Icon(Icons.arrow_back_ios_new, size: 16, color: AppColors.textPrimary),
         ),
         Column(
           children: [
             Text(
-              context.tr('dashboard_program_name'),
+              widget.title ?? context.tr('dashboard_program_name'),
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
@@ -96,43 +201,54 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
             ),
             const SizedBox(height: 2),
             Row(
-              children: const [
-                Icon(Icons.timer_outlined, size: 12, color: AppColors.textSecondary),
-                SizedBox(width: 4),
+              children: [
+                const Icon(Icons.timer_outlined, size: 12, color: AppColors.textSecondary),
+                const SizedBox(width: 4),
                 Text(
-                  "12:34",
-                  style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                  _formatElapsed(),
+                  style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                 ),
               ],
             ),
           ],
         ),
-        Container(
-          width: 36,
-          height: 36,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
+        GestureDetector(
+          onTap: _togglePause,
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              _paused ? Icons.play_arrow_rounded : Icons.pause,
+              size: 18,
+              color: AppColors.textPrimary,
+            ),
           ),
-          child: const Icon(Icons.pause, size: 18, color: AppColors.textPrimary),
         ),
       ],
     );
   }
 
   Widget _buildProgressBar() {
+    final total = _playlist.length;
+    final done = _index;
+    final progress = done / total;
+
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              context.tr('exercises_progress_completed', {'done': '3', 'total': '5'}),
+              context.tr('exercises_progress_completed', {'done': '$done', 'total': '$total'}),
               style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
             ),
-            const Text(
-              "60%",
-              style: TextStyle(
+            Text(
+              '${(progress * 100).round()}%',
+              style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
                 color: AppColors.activeGreen,
@@ -143,10 +259,10 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
         const SizedBox(height: 6),
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
-          child: const LinearProgressIndicator(
-            value: 0.6,
+          child: LinearProgressIndicator(
+            value: progress,
             minHeight: 6,
-            backgroundColor: Color(0xFFE2E6E2),
+            backgroundColor: const Color(0xFFE2E6E2),
             color: AppColors.activeGreen,
           ),
         ),
@@ -164,7 +280,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Image Container
+          // Video Container
           Stack(
             children: [
               ClipRRect(
@@ -173,12 +289,14 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                   height: 180,
                   width: double.infinity,
                   color: Colors.grey.shade300,
-                  child: Image.network(
-                    'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80',
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) => const Center(
-                      child: Icon(Icons.fitness_center, size: 40, color: Colors.black38),
-                    ),
+                  child: ExerciseVideoPlayer(
+                    key: _playerKey,
+                    videoStoragePath: _current.storagePath,
+                    backgroundColor: AppColors.primaryDark,
+                    accentColor: AppColors.activeGreen,
+                    autoPlay: true,
+                    paused: _paused,
+                    onPlaybackCompleted: _onVideoCompleted,
                   ),
                 ),
               ),
@@ -206,7 +324,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
           ),
           const SizedBox(height: 14),
           Text(
-            context.tr('exercise_name_leg_press'),
+            _current.name,
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -220,12 +338,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
               children: [
                 TextSpan(text: '${context.tr('exercises_set_prefix')} '),
                 TextSpan(
-                  text: '2 ${context.tr('exercises_of')} 3',
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-                ),
-                const TextSpan(text: " - "),
-                TextSpan(
-                  text: '12 ${context.tr('common_reps')}',
+                  text: '$_currentSet ${context.tr('exercises_of')} $_sets',
                   style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                 ),
               ],
@@ -342,12 +455,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
             width: double.infinity,
             height: 52,
             child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const WorkoutCompleteScreen()),
-                );
-              },
+              onPressed: _completeSet,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryDark,
                 shape: RoundedRectangleBorder(
@@ -370,7 +478,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
           ),
           const SizedBox(height: 10),
           GestureDetector(
-            onTap: () {},
+            onTap: _goToNextExercise,
             child: Text(
               context.tr('exercises_skip_exercise'),
               style: const TextStyle(

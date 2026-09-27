@@ -18,7 +18,7 @@ class _DietPreferencesScreenState extends State<DietPreferencesScreen> {
   String _eatingStyle = 'standard';
   List<String> _considerations = [];
   List<String> _likedIngredients = [];
-  String _eatingHabit = 'balanced';
+  String _eatingHabit = 'cook_at_home';
   int _mealsPerDay = 3;
 
   void _nextPage() {
@@ -119,7 +119,14 @@ class _DietPreferencesScreenState extends State<DietPreferencesScreen> {
                     setState(() => _mealsPerDay = count);
                     _nextPage();
                   }),
-                  AllSetStep(onFinish: _finishOnboarding),
+                  AllSetStep(
+                    allergies: _allergies,
+                    eatingStyle: _eatingStyle,
+                    considerations: _considerations,
+                    eatingHabit: _eatingHabit,
+                    mealsPerDay: _mealsPerDay,
+                    onFinish: _finishOnboarding,
+                  ),
                 ],
               ),
             ),

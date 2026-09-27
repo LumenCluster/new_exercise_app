@@ -33,7 +33,7 @@ class IntroStep extends StatelessWidget {
                     bottomRight: Radius.circular(30),
                   ),
                   child: Image.asset(
-                    'assets/plan.png', // Replace with your exact asset path
+                    'assets/onee.png', // Replace with your exact asset path
                     height: 320,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -81,7 +81,7 @@ class AboutYouIntroStep extends StatelessWidget {
               const Spacer(),
               Center(
                 child: Image.asset(
-                  'assets/about.png', // Replace with your exact asset path
+                  'assets/twoo.png', // Replace with your exact asset path
                   height: 300,
                   width: double.infinity,
                   fit: BoxFit.contain,
@@ -116,132 +116,158 @@ class _NameGenderStepState extends State<NameGenderStep> {
   final _nameController = TextEditingController();
   Gender? _gender;
 
+  void _submit() {
+    final name = _nameController.text.trim();
+    final String? errorKey = name.isEmpty
+        ? 'onboarding_name_required'
+        : _gender == null
+            ? 'onboarding_gender_required'
+            : null;
+
+    if (errorKey != null) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(content: Text(context.tr(errorKey)), behavior: SnackBarBehavior.floating),
+        );
+      return;
+    }
+
+    FocusScope.of(context).unfocus();
+    widget.onNext(name, _gender!);
+  }
+
   @override
   Widget build(BuildContext context) {
-    bool isEnabled = _nameController.text.trim().isNotEmpty && _gender != null;
-
     return Scaffold(
       backgroundColor: const Color(0xFFF9F8F3),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              StepHeader(
-                title: context.tr('onboarding_name_gender_title'),
-                subtitle: context.tr('onboarding_name_gender_subtitle'),
-              ),
-              const SizedBox(height: 28),
-              Text(
-                context.tr('onboarding_what_should_we_call_you'),
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _nameController,
-                onChanged: (_) => setState(() {}),
-                decoration: InputDecoration(
-                  hintText: context.tr('onboarding_enter_name_hint'),
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 16,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 28),
-              Text(
-                context.tr('onboarding_select_gender'),
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: SelectableCard(
-                      title: context.tr('onboarding_female_title'),
-                      subtitle: context.tr('onboarding_female_subtitle'),
-                      isSelected: _gender == Gender.female,
-                      onTap: () => setState(() => _gender = Gender.female),
-                      icon: Stack(
-                        alignment: Alignment.topRight,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.asset(
-                              'assets/female.png', // Replace with your female asset path
-                              height: 120,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          if (_gender == Gender.female)
-                            const Padding(
-                              padding: EdgeInsets.all(6.0),
-                              child: CircleAvatar(
-                                radius: 10,
-                                backgroundColor: AppColors.accentGreen,
-                                child: Icon(Icons.check, size: 12, color: Colors.white),
-                              ),
-                            ),
-                        ],
+        child: CustomScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          slivers: [
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    StepHeader(
+                      title: context.tr('onboarding_name_gender_title'),
+                      subtitle: context.tr('onboarding_name_gender_subtitle'),
+                    ),
+                    const SizedBox(height: 28),
+                    Text(
+                      context.tr('onboarding_what_should_we_call_you'),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _nameController,
+                      decoration: InputDecoration(
+                        hintText: context.tr('onboarding_enter_name_hint'),
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: SelectableCard(
-                      title: context.tr('onboarding_male_title'),
-                      subtitle: context.tr('onboarding_male_subtitle'),
-                      isSelected: _gender == Gender.male,
-                      onTap: () => setState(() => _gender = Gender.male),
-                      icon: Stack(
-                        alignment: Alignment.topRight,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.asset(
-                              'assets/male.png', // Replace with your male asset path
-                              height: 120,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
+                    const SizedBox(height: 28),
+                    Text(
+                      context.tr('onboarding_select_gender'),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: SelectableCard(
+                            title: context.tr('onboarding_female_title'),
+                            subtitle: context.tr('onboarding_female_subtitle'),
+                            isSelected: _gender == Gender.female,
+                            onTap: () => setState(() => _gender = Gender.female),
+                            icon: Stack(
+                              alignment: Alignment.topRight,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.asset(
+                                    'assets/female.png', // Replace with your female asset path
+                                    height: 120,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                if (_gender == Gender.female)
+                                  const Padding(
+                                    padding: EdgeInsets.all(6.0),
+                                    child: CircleAvatar(
+                                      radius: 10,
+                                      backgroundColor: AppColors.accentGreen,
+                                      child: Icon(Icons.check, size: 12, color: Colors.white),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
-                          if (_gender == Gender.male)
-                            const Padding(
-                              padding: EdgeInsets.all(6.0),
-                              child: CircleAvatar(
-                                radius: 10,
-                                backgroundColor: AppColors.accentGreen,
-                                child: Icon(Icons.check, size: 12, color: Colors.white),
-                              ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: SelectableCard(
+                            title: context.tr('onboarding_male_title'),
+                            subtitle: context.tr('onboarding_male_subtitle'),
+                            isSelected: _gender == Gender.male,
+                            onTap: () => setState(() => _gender = Gender.male),
+                            icon: Stack(
+                              alignment: Alignment.topRight,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.asset(
+                                    'assets/male.png', // Replace with your male asset path
+                                    height: 120,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                if (_gender == Gender.male)
+                                  const Padding(
+                                    padding: EdgeInsets.all(6.0),
+                                    child: CircleAvatar(
+                                      radius: 10,
+                                      backgroundColor: AppColors.accentGreen,
+                                      child: Icon(Icons.check, size: 12, color: Colors.white),
+                                    ),
+                                  ),
+                              ],
                             ),
-                        ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    OnboardingButton(
+                      text: context.tr('common_next'),
+                      onPressed: _submit,
+                    ),
+                    const SizedBox(height: 12),
+                    Center(
+                      child: Text(
+                        context.tr('onboarding_info_safe_never_shared'),
+                        style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              OnboardingButton(
-                text: context.tr('common_next'),
-                onPressed: isEnabled ? () => widget.onNext(_nameController.text, _gender!) : null,
-              ),
-              const SizedBox(height: 12),
-              Center(
-                child: Text(
-                  context.tr('onboarding_info_safe_never_shared'),
-                  style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -451,7 +477,9 @@ class _AgeStepState extends State<AgeStep> {
 class HeightStep extends StatefulWidget {
   final Function(double height) onNext;
 
-  const HeightStep({super.key, required this.onNext});
+  final Gender gender;
+
+  const HeightStep({super.key, required this.onNext, required this.gender});
 
   @override
   State<HeightStep> createState() => _HeightStepState();
@@ -590,98 +618,109 @@ class _HeightStepState extends State<HeightStep> {
 
               // Interactive Ruler + Image Area
               Expanded(
-                child: Stack(
+                child: Row(
                   children: [
-                    Row(
-                      children: [
-                        // Model Asset Image
-                        Expanded(
-                          flex: 5,
-                          child: Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Image.asset(
-                              'assets/girl.png', // Register in pubspec.yaml
-                              fit: BoxFit.contain,
-                            ),
+                    // Model Asset Image
+                    Expanded(
+                      flex: 5,
+                      child: Padding(
+                        // Gap between the image and the (left-shifted) ruler
+                        padding: const EdgeInsets.only(right: 36),
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Image.asset(
+                            widget.gender == Gender.male ? 'assets/boy.png' : 'assets/girl.png',
+                            fit: BoxFit.contain,
                           ),
                         ),
-
-                        // Movable Interactive Vertical Ruler
-                        Expanded(
-                          flex: 4,
-                          child: GestureDetector(
-                            onVerticalDragUpdate: (details) {
-                              setState(() {
-                                // Drag up increases height, drag down decreases height
-                                _heightInInches -= details.delta.dy * 0.15;
-                                _heightInInches = _heightInInches.clamp(42.0, 90.0); // 3.5 ft to 7.5 ft
-                              });
-                            },
-                            child: CustomPaint(
-                              size: Size.infinite,
-                              painter: RulerPainter(
-                                heightInInches: _heightInInches,
-                                isCm: _isCm,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
 
-                    // Tips for Accuracy Floating Card
-                    Positioned(
-                      right: 0,
-                      bottom: 12,
-                      child: Container(
-                        width: 150,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF7CB342),
-                                shape: BoxShape.circle,
+                    // Movable Interactive Vertical Ruler + Tips card beside it
+                    Expanded(
+                      flex: 4,
+                      child: Stack(
+                        clipBehavior: Clip.none, // pointer line extends into the image area
+                        children: [
+                          // Ruler keeps full height, shifted left to leave room for the card
+                          Positioned.fill(
+                            child: Transform.translate(
+                              offset: const Offset(-20, 0),
+                              child: GestureDetector(
+                                onVerticalDragUpdate: (details) {
+                                  setState(() {
+                                    // Drag up increases height, drag down decreases height
+                                    _heightInInches -= details.delta.dy * 0.15;
+                                    _heightInInches = _heightInInches.clamp(42.0, 90.0); // 3.5 ft to 7.5 ft
+                                  });
+                                },
+                                child: CustomPaint(
+                                  size: Size.infinite,
+                                  painter: RulerPainter(
+                                    heightInInches: _heightInInches,
+                                    isCm: _isCm,
+                                  ),
+                                ),
                               ),
-                              child: const Icon(
-                                Icons.lightbulb_outline,
+                            ),
+                          ),
+
+                          // Tips for Accuracy Card
+                          Positioned(
+                            right: 0,
+                            bottom: 12,
+                            child: Container(
+                              width: 84,
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                              decoration: BoxDecoration(
                                 color: Colors.white,
-                                size: 16,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.04),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF7CB342),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.lightbulb_outline,
+                                      color: Colors.white,
+                                      size: 12,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    context.tr('onboarding_tips_for_accuracy'),
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    context.tr('onboarding_height_tip_body'),
+                                    style: const TextStyle(
+                                      fontSize: 8.5,
+                                      color: AppColors.textSecondary,
+                                      height: 1.3,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              context.tr('onboarding_tips_for_accuracy'),
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              context.tr('onboarding_height_tip_body'),
-                              style: const TextStyle(
-                                fontSize: 9,
-                                color: AppColors.textSecondary,
-                                height: 1.3,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -730,6 +769,9 @@ class RulerPainter extends CustomPainter {
 
   RulerPainter({required this.heightInInches, required this.isCm});
 
+  static const double minInches = 42.0; // 3.5 ft
+  static const double maxInches = 90.0; // 7.5 ft
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -740,9 +782,6 @@ class RulerPainter extends CustomPainter {
     final dashedPaint = Paint()
       ..color = const Color(0xFF2E4D38)
       ..strokeWidth = 2;
-
-    const double minInches = 42.0; // 3.5 ft
-    const double maxInches = 90.0; // 7.5 ft
 
     // Height ratio mapping
     double norm = (heightInInches - minInches) / (maxInches - minInches);
@@ -763,20 +802,30 @@ class RulerPainter extends CustomPainter {
     canvas.drawCircle(Offset(-20, indicatorY), 4, paint);
     canvas.drawLine(Offset(0, indicatorY), Offset(35, indicatorY), paint);
 
+    // Scale definition in the selected unit:
+    // ft/in -> tick every inch, medium every 6 in, labelled every foot
+    // cm    -> tick every 2 cm, medium every 10 cm, labelled every 20 cm
+    final double unitsPerInch = isCm ? 2.54 : 1.0;
+    final int step = isCm ? 2 : 1;
+    final int mediumEvery = isCm ? 10 : 6;
+    final int majorEvery = isCm ? 20 : 12;
+
+    final double minValue = minInches * unitsPerInch;
+    final double maxValue = maxInches * unitsPerInch;
+
     // Draw Vertical Ruler Scale Marks
-    int totalTicks = 40;
-    for (int i = 0; i <= totalTicks; i++) {
-      double y = size.height * (1 - (i / totalTicks));
-      double tickLength = (i % 10 == 0) ? 28 : (i % 5 == 0 ? 18 : 10);
+    for (int v = (minValue / step).ceil() * step; v <= maxValue; v += step) {
+      double y = size.height * (1 - (v - minValue) / (maxValue - minValue));
+      bool isMajor = v % majorEvery == 0;
+      double tickLength = isMajor ? 28 : (v % mediumEvery == 0 ? 18 : 10);
 
       canvas.drawLine(Offset(0, y), Offset(tickLength, y), paint);
 
-      // Major Unit Labels (e.g., 4, 5, 6, 7 feet)
-      if (i % 10 == 0) {
-        int feetValue = 4 + (i ~/ 10);
+      // Major Unit Labels (e.g., 4, 5, 6, 7 feet or 120, 140 ... cm)
+      if (isMajor) {
         final textPainter = TextPainter(
           text: TextSpan(
-            text: "$feetValue",
+            text: isCm ? "$v" : "${v ~/ 12}",
             style: const TextStyle(
               color: Color(0xFF2E4D38),
               fontSize: 16,
@@ -786,7 +835,7 @@ class RulerPainter extends CustomPainter {
           textDirection: TextDirection.ltr,
         )..layout();
 
-        textPainter.paint(canvas, Offset( tickLength + 8, y - 10));
+        textPainter.paint(canvas, Offset(tickLength + 8, y - textPainter.height / 2));
       }
     }
   }
@@ -796,9 +845,6 @@ class RulerPainter extends CustomPainter {
     return oldDelegate.heightInInches != heightInInches || oldDelegate.isCm != isCm;
   }
 }
-
-
-
 
 class WeightStep extends StatefulWidget {
   final double userHeightCm; // Pass user height to calculate BMI accurately
@@ -815,10 +861,31 @@ class WeightStep extends StatefulWidget {
 }
 
 class _WeightStepState extends State<WeightStep> {
+  static const double _kgPerLb = 0.45359237;
+  static const double _minKg = 30.0;
+  static const double _maxKg = 200.0;
+
+  // Pixels per displayed unit (1 kg or 1 lb) on the horizontal ruler
+  static const double _rulerSpacing = 10.0;
+
+  // BMI category colors
+  static const Color _underColor = Color(0xFF3B82F6);
+  static const Color _normalColor = Color(0xFF0E9F8A);
+  static const Color _overColor = Color(0xFFF59E0B);
+  static const Color _obeseColor = Color(0xFFEF4444);
+
   bool _isKg = true;
   double _weightKg = 65.5;
 
-  double get _weightLbs => _weightKg * 2.20462;
+  double get _displayValue => _isKg ? _weightKg : _weightKg / _kgPerLb;
+
+  // Changes the weight by [delta] in the currently displayed unit
+  void _changeBy(double delta) {
+    setState(() {
+      final deltaKg = _isKg ? delta : delta * _kgPerLb;
+      _weightKg = (_weightKg + deltaKg).clamp(_minKg, _maxKg);
+    });
+  }
 
   // Calculate BMI: weight (kg) / (height (m))^2
   double get _bmi {
@@ -828,246 +895,387 @@ class _WeightStepState extends State<WeightStep> {
   }
 
   // Determine BMI Status & Color
-  Map<String, dynamic> _bmiCategory(BuildContext context) {
+  ({String label, Color color}) _bmiCategory(BuildContext context) {
     final bmi = _bmi;
     if (bmi < 18.5) {
-      return {'label': context.tr('onboarding_bmi_underweight'), 'color': Colors.orange};
+      return (label: context.tr('onboarding_bmi_underweight'), color: _underColor);
     } else if (bmi < 25.0) {
-      return {'label': context.tr('onboarding_bmi_normal'), 'color': const Color(0xFF4CAF50)};
+      return (label: context.tr('onboarding_bmi_normal'), color: _normalColor);
     } else if (bmi < 30.0) {
-      return {'label': context.tr('onboarding_bmi_overweight'), 'color': Colors.amber.shade700};
+      return (label: context.tr('onboarding_bmi_overweight'), color: _overColor);
     } else {
-      return {'label': context.tr('onboarding_bmi_obese'), 'color': Colors.redAccent};
+      return (label: context.tr('onboarding_bmi_obese'), color: _obeseColor);
     }
+  }
+
+  // Position (0..1) of the BMI marker on the 4 equal-width category segments
+  double get _bmiBarPosition {
+    const bounds = [15.0, 18.5, 25.0, 30.0, 40.0];
+    final bmi = _bmi.clamp(bounds.first, bounds.last);
+    for (int i = 0; i < 4; i++) {
+      if (bmi <= bounds[i + 1]) {
+        final t = (bmi - bounds[i]) / (bounds[i + 1] - bounds[i]);
+        return (i + t) / 4;
+      }
+    }
+    return 1.0;
   }
 
   @override
   Widget build(BuildContext context) {
-    final category = _bmiCategory(context);
-
     return Scaffold(
       backgroundColor: const Color(0xFFF9F8F3),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: Column(
-            children: [
-              StepHeader(
-                title: context.tr('onboarding_weight_title'),
-                subtitle: context.tr('onboarding_weight_subtitle'),
-              ),
-              const SizedBox(height: 16),
-
-              // Unit Toggle (kg / lbs)
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: const EdgeInsets.all(3),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+        child: CustomScrollView(
+          slivers: [
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                child: Column(
                   children: [
-                    _buildUnitTab("kg", _isKg, () => setState(() => _isKg = true)),
-                    _buildUnitTab("lbs", !_isKg, () => setState(() => _isKg = false)),
+                    StepHeader(
+                      title: context.tr('onboarding_weight_title'),
+                      subtitle: context.tr('onboarding_weight_subtitle'),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Unit Toggle (kg / lbs)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      padding: const EdgeInsets.all(3),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildUnitTab("kg", _isKg, () => setState(() => _isKg = true)),
+                          _buildUnitTab("lbs", !_isKg, () => setState(() => _isKg = false)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    _buildWeightCard(),
+                    const SizedBox(height: 16),
+                    _buildBmiCard(context),
+
+                    const Spacer(),
+                    const SizedBox(height: 16),
+                    OnboardingButton(
+                      text: context.tr('common_next'),
+                      onPressed: () => widget.onNext(double.parse(_weightKg.toStringAsFixed(1))),
+                    ),
+                    const SizedBox(height: 12),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-              // Dynamic Weight Display
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
+  // Weight value, +/- buttons and the draggable ruler
+  Widget _buildWeightCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+      decoration: _cardDecoration(),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      _displayValue.toStringAsFixed(1),
+                      style: const TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      _isKg ? "kg" : "lbs",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(width: 1, height: 40, color: Colors.black12),
+              const SizedBox(width: 16),
+              _buildStepButton(Icons.add, () => _changeBy(0.1)),
+              const SizedBox(width: 10),
+              _buildStepButton(Icons.remove, () => _changeBy(-0.1)),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Interactive Horizontal Weight Ruler (ticks scroll under a fixed center thumb)
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onHorizontalDragUpdate: (details) {
+              // Drag left increases weight, right decreases
+              _changeBy(-details.delta.dx / _rulerSpacing);
+            },
+            child: CustomPaint(
+              size: const Size(double.infinity, 90),
+              painter: HorizontalRulerPainter(
+                value: _displayValue,
+                spacing: _rulerSpacing,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBmiCard(BuildContext context) {
+    final category = _bmiCategory(context);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: _cardDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.tr('onboarding_your_bmi'),
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppColors.selection,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.accessibility_new, color: AppColors.primary, size: 28),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _isKg
-                        ? _weightKg.toStringAsFixed(1)
-                        : _weightLbs.toStringAsFixed(1),
+                    _bmi.toStringAsFixed(1),
                     style: const TextStyle(
-                      fontSize: 48,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(width: 6),
-                  Text(
-                    _isKg ? "kg" : "lbs",
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: category.color.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      category.label,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: category.color,
+                      ),
                     ),
                   ),
                 ],
               ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  context.tr('onboarding_bmi_disclaimer'),
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: AppColors.textSecondary,
+                    height: 1.3,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildBmiScale(context, category.color),
+        ],
+      ),
+    );
+  }
 
-              const SizedBox(height: 16),
+  // 4-segment BMI scale with a marker at the current BMI
+  Widget _buildBmiScale(BuildContext context, Color markerColor) {
+    final segments = [
+      (label: context.tr('onboarding_bmi_underweight'), range: '<18.5', color: _underColor),
+      (label: context.tr('onboarding_bmi_normal_short'), range: '18.5 - 24.9', color: _normalColor),
+      (label: context.tr('onboarding_bmi_overweight'), range: '25 - 29.9', color: _overColor),
+      (label: context.tr('onboarding_bmi_obese'), range: '≥30', color: _obeseColor),
+    ];
 
-              // Interactive Horizontal Weight Ruler
-              SizedBox(
-                height: 80,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Center Pointer Line
-                    Container(
-                      width: 3,
-                      height: 50,
+    // Note: no LayoutBuilder here — this screen sits in SliverFillRemaining,
+    // which needs intrinsic sizes, and LayoutBuilder can't provide them.
+    final markerFraction = _bmiBarPosition.clamp(0.03, 0.97);
+    const labelWidth = 40.0;
+
+    return SizedBox(
+      height: 70,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Category labels
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Row(
+              children: [
+                for (final s in segments)
+                  Expanded(
+                    child: Text(
+                      s.label,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: s.color),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          // Colored bar
+          Positioned(
+            top: 20,
+            left: 0,
+            right: 0,
+            child: Row(
+              children: [
+                for (int i = 0; i < segments.length; i++)
+                  Expanded(
+                    child: Container(
+                      height: 4,
+                      margin: EdgeInsets.only(right: i < segments.length - 1 ? 2 : 0),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2E4D38),
+                        color: segments[i].color,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
-
-                    // Drag Gesture Detector for Horizontal Scroll
-                    GestureDetector(
-                      onHorizontalDragUpdate: (details) {
-                        setState(() {
-                          // Drag left increases weight, right decreases
-                          _weightKg -= details.delta.dx * 0.1;
-                          _weightKg = _weightKg.clamp(30.0, 200.0);
-                        });
-                      },
-                      child: CustomPaint(
-                        size: const Size(double.infinity, 80),
-                        painter: HorizontalRulerPainter(
-                          value: _isKg ? _weightKg : _weightLbs,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Real-time BMI Card
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.02),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: (category['color'] as Color).withValues(alpha: 0.12),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.monitor_weight_outlined,
-                        color: category['color'] as Color,
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                context.tr('onboarding_estimated_bmi_label'),
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                              Text(
-                                _bmi.toStringAsFixed(1),
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: (category['color'] as Color).withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              category['label'] as String,
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: category['color'] as Color,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const Spacer(),
-
-              // Tips Card
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF7CB342),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.lightbulb_outline,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        context.tr('onboarding_weight_tip_body'),
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 16),
-              OnboardingButton(
-                text: context.tr('common_next'),
-                onPressed: () => widget.onNext(_weightKg),
-              ),
-              const SizedBox(height: 12),
-            ],
+                  ),
+              ],
+            ),
           ),
+          // Range labels
+          Positioned(
+            top: 30,
+            left: 0,
+            right: 0,
+            child: Row(
+              children: [
+                for (final s in segments)
+                  Expanded(
+                    child: Text(
+                      s.range,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 9, color: s.color),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          // Marker: dot on the bar, line down, and BMI value.
+          // The box spans 0..markerFraction of the width; the marker is centered on its right edge.
+          Positioned(
+            top: 16,
+            left: 0,
+            right: 0,
+            height: 54,
+            child: FractionallySizedBox(
+              alignment: Alignment.centerLeft,
+              widthFactor: markerFraction,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned(
+                    top: 0,
+                    right: -labelWidth / 2,
+                    width: labelWidth,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 12,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: markerColor, width: 3),
+                          ),
+                        ),
+                        Container(width: 2, height: 22, color: markerColor),
+                        const SizedBox(height: 2),
+                        Text(
+                          _bmi.toStringAsFixed(1),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: markerColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  BoxDecoration _cardDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.03),
+          blurRadius: 8,
+          offset: const Offset(0, 2),
         ),
+      ],
+    );
+  }
+
+  Widget _buildStepButton(IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 32,
+        height: 32,
+        decoration: const BoxDecoration(
+          color: AppColors.accentGreen,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: Colors.white, size: 18),
       ),
     );
   }
@@ -1094,64 +1302,100 @@ class _WeightStepState extends State<WeightStep> {
   }
 }
 
-// Custom Painter for Horizontal Ruler Scale
+// Custom Painter for Horizontal Ruler Scale: ticks scroll under a fixed center
+// thumb with a value bubble above it.
 class HorizontalRulerPainter extends CustomPainter {
   final double value;
+  final double spacing;
 
-  HorizontalRulerPainter({required this.value});
+  HorizontalRulerPainter({required this.value, this.spacing = 10.0});
+
+  static const Color _dark = Color(0xFF1E3A2B);
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF2E4D38).withValues(alpha: 0.4)
-      ..strokeWidth = 2
+    final tickPaint = Paint()
+      ..color = _dark.withValues(alpha: 0.45)
+      ..strokeWidth = 1.5
       ..strokeCap = StrokeCap.round;
 
     final double centerX = size.width / 2;
-    const double spacing = 12.0;
+    const double baseY = 58; // bottom line of the ticks
+    const double labelY = 66;
 
-    // Draw ticks left and right from center
-    for (int i = -20; i <= 20; i++) {
-      double x = centerX + (i * spacing) - ((value % 1) * spacing);
-      double tickHeight = (i % 10 == 0) ? 32 : (i % 5 == 0 ? 22 : 12);
+    // Base line
+    canvas.drawLine(Offset(0, baseY), Offset(size.width, baseY), tickPaint);
 
-      canvas.drawLine(
-        Offset(x, size.height / 2 - tickHeight / 2),
-        Offset(x, size.height / 2 + tickHeight / 2),
-        paint,
-      );
+    // Ticks at every whole unit, positioned by their real value
+    final int halfCount = (centerX / spacing).ceil() + 1;
+    final int first = value.floor() - halfCount;
+    final int last = value.ceil() + halfCount;
 
-      // Unit values below main ticks
-      if (i % 10 == 0) {
-        int displayVal = (value.floor() + i);
-        if (displayVal > 0) {
-          final textPainter = TextPainter(
-            text: TextSpan(
-              text: "$displayVal",
-              style: const TextStyle(
-                color: Color(0xFF2E4D38),
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-              ),
+    for (int v = first; v <= last; v++) {
+      if (v <= 0) continue;
+      final double x = centerX + (v - value) * spacing;
+      if (x < 0 || x > size.width) continue;
+
+      final bool isMajor = v % 10 == 0;
+      final double tickHeight = isMajor ? 20 : (v % 5 == 0 ? 14 : 8);
+      canvas.drawLine(Offset(x, baseY - tickHeight), Offset(x, baseY), tickPaint);
+
+      if (isMajor) {
+        final textPainter = TextPainter(
+          text: TextSpan(
+            text: "$v",
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
             ),
-            textDirection: TextDirection.ltr,
-          )..layout();
-
-          textPainter.paint(
-            canvas,
-            Offset(x - (textPainter.width / 2), size.height / 2 + 20),
-          );
-        }
+          ),
+          textDirection: TextDirection.ltr,
+        )..layout();
+        textPainter.paint(canvas, Offset(x - textPainter.width / 2, labelY));
       }
     }
+
+    // Center thumb: stem + dot
+    final thumbPaint = Paint()..color = _dark;
+    canvas.drawRect(Rect.fromLTWH(centerX - 1.5, 26, 3, baseY - 26), thumbPaint);
+    canvas.drawCircle(Offset(centerX, baseY), 6, thumbPaint);
+    canvas.drawCircle(Offset(centerX, baseY), 2.5, Paint()..color = AppColors.accentGreen);
+
+    // Value bubble above the thumb
+    final bubbleText = TextPainter(
+      text: TextSpan(
+        text: value.toStringAsFixed(1),
+        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    final bubbleRect = RRect.fromRectAndRadius(
+      Rect.fromCenter(
+        center: Offset(centerX, 12),
+        width: bubbleText.width + 16,
+        height: 22,
+      ),
+      const Radius.circular(6),
+    );
+    canvas.drawRRect(bubbleRect, thumbPaint);
+    final arrow = Path()
+      ..moveTo(centerX - 5, 23)
+      ..lineTo(centerX + 5, 23)
+      ..lineTo(centerX, 28)
+      ..close();
+    canvas.drawPath(arrow, thumbPaint);
+    bubbleText.paint(
+      canvas,
+      Offset(centerX - bubbleText.width / 2, 12 - bubbleText.height / 2),
+    );
   }
 
   @override
   bool shouldRepaint(covariant HorizontalRulerPainter oldDelegate) {
-    return oldDelegate.value != value;
+    return oldDelegate.value != value || oldDelegate.spacing != spacing;
   }
 }
-
 
 class BodyShapeData {
   final String id;
@@ -1175,46 +1419,69 @@ class BodyShapeData {
 
 class BodyShapeStep extends StatefulWidget {
   final Function(String shape, String fatRange) onNext;
+  final Gender gender;
 
-  const BodyShapeStep({super.key, required this.onNext});
+  // Lets the same screen serve both "current" and "target" body shape
+  final String titleKey;
+
+  const BodyShapeStep({
+    super.key,
+    required this.onNext,
+    required this.gender,
+    this.titleKey = 'onboarding_body_shape_title',
+  });
 
   @override
   State<BodyShapeStep> createState() => _BodyShapeStepState();
 }
 
 class _BodyShapeStepState extends State<BodyShapeStep> {
-  int _selectedIndex = 1; // Default selected: Heavy
+  int _selectedIndex = 2; // Default selected: Average
   late PageController _pageController;
 
-  final List<BodyShapeData> _shapes = [
-    BodyShapeData(
-      id: 'curvy',
-      title: 'Curvy',
-      subtitle: 'Noticeable Body Fat, Curves More Pronounced',
-      imagePath: 'assets/about.png',
-      fatLevel: 'Lower',
-      fatRange: '20% - 27%',
-      feedbackText: 'Great base! Lean muscle focus will shape your curves.',
-    ),
-    BodyShapeData(
-      id: 'heavy',
-      title: 'Heavy',
-      subtitle: 'High Body Fat, Fuller Figure',
-      imagePath: 'assets/about.png',
-      fatLevel: 'Moderate',
-      fatRange: '28% - 35%',
-      feedbackText: "You're right on track! Small changes can lead to big results.",
-    ),
-    BodyShapeData(
-      id: 'obese',
-      title: 'Obese',
-      subtitle: 'Very High Body Fat, Significant Overweight',
-      imagePath: 'assets/about.png',
-      fatLevel: 'Higher',
-      fatRange: '36%+',
-      feedbackText: 'Starting your journey now will yield incredible health benefits.',
-    ),
+  // Shape ids in order from leanest to heaviest. Images are
+  // assets/{girl|boy}_{id}.png and texts use onboarding_body_shape_{id}_*.
+  static const List<String> _shapeIds = [
+    'lean', 'fit', 'avg', 'soft', 'curvy', 'heavy', 'obese',
   ];
+
+  static const Map<String, String> _englishTitles = {
+    'lean': 'Lean', 'fit': 'Fit', 'avg': 'Average', 'soft': 'Soft',
+    'curvy': 'Curvy', 'heavy': 'Heavy', 'obese': 'Obese',
+  };
+
+  // Estimated body fat ranges differ between women and men
+  static const Map<String, String> _femaleFatRanges = {
+    'lean': '14% - 17%', 'fit': '18% - 21%', 'avg': '22% - 25%', 'soft': '26% - 29%',
+    'curvy': '30% - 33%', 'heavy': '34% - 39%', 'obese': '40%+',
+  };
+
+  static const Map<String, String> _maleFatRanges = {
+    'lean': '6% - 10%', 'fit': '11% - 14%', 'avg': '15% - 19%', 'soft': '20% - 24%',
+    'curvy': '25% - 29%', 'heavy': '30% - 34%', 'obese': '35%+',
+  };
+
+  // Rebuilt from the current gender so going back and changing it updates the images
+  List<BodyShapeData> get _shapes => _buildShapes();
+
+  List<BodyShapeData> _buildShapes() {
+    final isMale = widget.gender == Gender.male;
+    final prefix = isMale ? 'boy' : 'girl';
+    final ranges = isMale ? _maleFatRanges : _femaleFatRanges;
+
+    return [
+      for (int i = 0; i < _shapeIds.length; i++)
+        BodyShapeData(
+          id: _shapeIds[i],
+          title: _englishTitles[_shapeIds[i]]!,
+          subtitle: '',
+          imagePath: 'assets/${prefix}_${_shapeIds[i]}.png',
+          fatLevel: i <= 1 ? 'Lower' : (i <= 4 ? 'Moderate' : 'Higher'),
+          fatRange: ranges[_shapeIds[i]]!,
+          feedbackText: '',
+        ),
+    ];
+  }
 
   @override
   void initState() {
@@ -1231,41 +1498,14 @@ class _BodyShapeStepState extends State<BodyShapeStep> {
     super.dispose();
   }
 
-  String _shapeTitle(BuildContext context, String id) {
-    switch (id) {
-      case 'curvy':
-        return context.tr('onboarding_body_shape_curvy_title');
-      case 'heavy':
-        return context.tr('onboarding_body_shape_heavy_title');
-      case 'obese':
-        return context.tr('onboarding_body_shape_obese_title');
-    }
-    return id;
-  }
+  String _shapeTitle(BuildContext context, String id) =>
+      context.tr('onboarding_body_shape_${id}_title');
 
-  String _shapeSubtitle(BuildContext context, String id) {
-    switch (id) {
-      case 'curvy':
-        return context.tr('onboarding_body_shape_curvy_subtitle');
-      case 'heavy':
-        return context.tr('onboarding_body_shape_heavy_subtitle');
-      case 'obese':
-        return context.tr('onboarding_body_shape_obese_subtitle');
-    }
-    return id;
-  }
+  String _shapeSubtitle(BuildContext context, String id) =>
+      context.tr('onboarding_body_shape_${id}_subtitle');
 
-  String _shapeFeedback(BuildContext context, String id) {
-    switch (id) {
-      case 'curvy':
-        return context.tr('onboarding_body_shape_curvy_feedback');
-      case 'heavy':
-        return context.tr('onboarding_body_shape_heavy_feedback');
-      case 'obese':
-        return context.tr('onboarding_body_shape_obese_feedback');
-    }
-    return id;
-  }
+  String _shapeFeedback(BuildContext context, String id) =>
+      context.tr('onboarding_body_shape_${id}_feedback');
 
   @override
   Widget build(BuildContext context) {
@@ -1284,7 +1524,7 @@ class _BodyShapeStepState extends State<BodyShapeStep> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: StepHeader(
-                    title: context.tr('onboarding_body_shape_title'),
+                    title: context.tr(widget.titleKey),
                     subtitle: context.tr('onboarding_body_shape_subtitle'),
                   ),
                 ),
@@ -1436,11 +1676,11 @@ class _BodyShapeStepState extends State<BodyShapeStep> {
                           // Position Pointer Ring
                           AnimatedAlign(
                             duration: const Duration(milliseconds: 250),
-                            alignment: currentShape.fatLevel == 'Lower'
-                                ? Alignment.centerLeft
-                                : currentShape.fatLevel == 'Moderate'
-                                ? Alignment.center
-                                : Alignment.centerRight,
+                            // Leanest shape at the far left, heaviest at the far right
+                            alignment: Alignment(
+                              -1 + 2 * _selectedIndex / (_shapes.length - 1),
+                              0,
+                            ),
                             child: Container(
                               width: 18,
                               height: 18,
@@ -1586,6 +1826,21 @@ class ActivityLevelStep extends StatefulWidget {
 class _ActivityLevelStepState extends State<ActivityLevelStep> {
   ActivityLevel? _selectedLevel;
 
+  void _submit() {
+    if (_selectedLevel == null) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(context.tr('onboarding_activity_required')),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      return;
+    }
+    widget.onNext(_selectedLevel!);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1640,7 +1895,7 @@ class _ActivityLevelStepState extends State<ActivityLevelStep> {
               const SizedBox(height: 12),
               OnboardingButton(
                 text: context.tr('common_next'),
-                onPressed: _selectedLevel != null ? () => widget.onNext(_selectedLevel!) : null,
+                onPressed: _submit,
               ),
               const SizedBox(height: 12),
             ],

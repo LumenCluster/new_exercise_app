@@ -2,8 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../profile/domain/entities/user_profile.dart';
-import '../../domain/entities/exercise.dart';
-import '../../domain/repositories/exercise_repository.dart';
 import '../../../meal_plan/domain/entities/meal.dart';
 import '../../../meal_plan/presentation/providers/meal_plan_provider.dart' show LoadState;
 import '../../../meal_plan/presentation/providers/weekly_meal_plan_provider.dart';
@@ -11,14 +9,9 @@ import '../../../meal_plan/presentation/pages/shopping_list_screen.dart';
 import '../../../coach/presentation/pages/coach_chat_screen.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../../core/localization/app_localizations.dart';
-import 'exercise_detail_screen.dart';
-
-class _WorkoutCard {
-  final String name;
-  final String subtitle;
-  final Exercise? exercise;
-  const _WorkoutCard(this.name, this.subtitle, {this.exercise});
-}
+import '../../data/datasources/goal_video_remote_data_source.dart';
+import '../../domain/entities/workout_video.dart';
+import '../active_workout_screen.dart';
 
 class _PlanColors {
   static const background = Color(0xFFF9F8F3);
@@ -34,12 +27,10 @@ class _PlanColors {
 /// Full-screen view of "Your Plan" matching the design layout.
 class WorkoutPlanScreen extends StatefulWidget {
   final UserProfile? profile;
-  final ExerciseRepository repository;
 
   const WorkoutPlanScreen({
     super.key,
     required this.profile,
-    required this.repository,
   });
 
   @override
@@ -61,7 +52,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
   late final List<DateTime> _planDays;
   int _selectedDayIndex = 0; // Default selected day: today
 
-  List<Exercise> _exercises = [];
+  List<WorkoutVideo> _videos = [];
   bool _loading = true;
   String? _error;
 
@@ -70,7 +61,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
     super.initState();
     final today = DateTime.now();
     _planDays = List.generate(5, (i) => DateTime(today.year, today.month, today.day + i));
-    _loadExercises();
+    _loadVideos();
     _ensureMealsForSelectedDay();
   }
 
@@ -87,21 +78,18 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
 
   String _formatDate(DateTime date) => '${_monthLabels[date.month - 1]} ${date.day}';
 
-  Future<void> _loadExercises() async {
-    final profile = widget.profile;
-    if (profile == null) {
-      setState(() => _loading = false);
-      return;
-    }
+  /// Loads the exercise videos for the user's onboarding goal from Firebase
+  /// Storage (the same workout the dashboard shows).
+  Future<void> _loadVideos() async {
     setState(() {
       _loading = true;
       _error = null;
     });
     try {
-      final exercises = await widget.repository.recommendedForProfile(profile);
+      final videos = await GoalVideoRemoteDataSource.fetch(widget.profile?.primaryGoal);
       if (!mounted) return;
       setState(() {
-        _exercises = exercises;
+        _videos = videos;
         _loading = false;
       });
     } catch (e) {
@@ -111,6 +99,20 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
         _loading = false;
       });
     }
+  }
+
+  /// Opens the active workout with every goal video, starting at [index].
+  void _startWorkout(int index) {
+    if (_videos.isEmpty) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ActiveWorkoutScreen(
+          videos: _videos,
+          startIndex: index,
+          title: context.tr(GoalVideoRemoteDataSource.labelKeyFor(widget.profile?.primaryGoal)),
+        ),
+      ),
+    );
   }
 
   @override
@@ -758,7 +760,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: _PlanColors.textPrimary),
             ),
             GestureDetector(
-              onTap: () {},
+              onTap: () => _startWorkout(0),
               child: Text(
                 context.tr('exercises_view_full_plan'),
                 style: const TextStyle(fontSize: 11, color: _PlanColors.textSecondary),
@@ -791,38 +793,38 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
                 style: const TextStyle(fontSize: 11, color: _PlanColors.textSecondary),
               ),
               const SizedBox(height: 8),
-              TextButton(onPressed: _loadExercises, child: Text(context.tr('common_retry'))),
+              TextButton(onPressed: _loadVideos, child: Text(context.tr('common_retry'))),
             ],
           ),
         ),
       );
     }
+    if (_videos.isEmpty) {
+      return SizedBox(
+        height: 60,
+        child: Center(
+          child: Text(
+            context.tr('dashboard_exercise_videos_empty'),
+            style: const TextStyle(fontSize: 12, color: _PlanColors.textSecondary),
+          ),
+        ),
+      );
+    }
 
-    // Default mock cards if repository returned empty
-    final workoutList = _exercises.isNotEmpty
-        ? _exercises.map((e) => _WorkoutCard(e.name, e.prescriptionLabel, exercise: e)).toList()
-        : [
-      _WorkoutCard(context.tr('dashboard_program_name'), '25 ${context.tr('common_minutes')}'),
-      _WorkoutCard(context.tr('exercises_workout_core_abs_blast'), '15 ${context.tr('common_minutes')}'),
-      _WorkoutCard(context.tr('exercises_workout_full_body_burn'), '20 ${context.tr('common_minutes')}'),
-    ];
+    final subtitle = '${ActiveWorkoutScreen.setsPerExercise} ${context.tr('common_sets')}';
 
     return SizedBox(
       height: 160,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
-        itemCount: workoutList.length,
+        itemCount: _videos.length,
         itemBuilder: (context, index) {
-          final workout = workoutList[index];
+          final workout = _videos[index];
           final isActive = index < 2;
 
           return GestureDetector(
-            onTap: workout.exercise == null
-                ? null
-                : () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => ExerciseDetailScreen(exercise: workout.exercise!)),
-                    ),
+            onTap: () => _startWorkout(index),
             child: Container(
             width: 125,
             margin: const EdgeInsets.only(right: 10),
@@ -865,7 +867,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
                 const Icon(Icons.fitness_center_outlined, size: 40, color: _PlanColors.primaryDark),
                 const Spacer(),
                 Text(
-                  workout.subtitle,
+                  subtitle,
                   style: const TextStyle(fontSize: 9, color: _PlanColors.textSecondary),
                 ),
               ],

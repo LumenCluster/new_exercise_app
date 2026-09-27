@@ -105,43 +105,83 @@ class DietIntroStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+
     return Scaffold(
       backgroundColor: MealColors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
+              const SizedBox(height: 8),
+
+              // PART 2 badge
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: MealColors.primaryDark,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  context.tr('onboarding_part2_badge'),
+                  style: const TextStyle(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    context.tr('onboarding_part2_badge'),
-                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
               const SizedBox(height: 12),
-              MealStepHeader(
-                title: context.tr('onboarding_diet_intro_title'),
-                subtitle: context.tr('onboarding_diet_intro_subtitle'),
+
+              // Left-aligned title & subtitle
+              Text(
+                context.tr('onboarding_diet_intro_title'),
+                style: const TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: MealColors.textPrimary,
+                  height: 1.15,
+                ),
               ),
-              const Spacer(),
-              Image.asset(
-                'assets/one.png',
-                height: 260,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) =>
-                const Icon(Icons.restaurant, size: 140, color: MealColors.activeGreen),
+              const SizedBox(height: 8),
+              Text(
+                context.tr('onboarding_diet_intro_subtitle'),
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: MealColors.textSecondary,
+                  height: 1.4,
+                ),
               ),
-              const Spacer(),
+
+              // Illustration on the right, running off the right edge of the screen
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Transform.translate(
+                    // 24 = page padding, plus a little extra so the image bleeds off-screen
+                    offset: Offset(24 + screenWidth * 0.06, 0),
+                    child: Image.asset(
+                      'assets/one.png',
+                      width: screenWidth * 0.88,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.restaurant, size: 140, color: MealColors.activeGreen),
+                    ),
+                  ),
+                ),
+              ),
+
               MealActionButton(text: context.tr('common_continue'), onPressed: onNext),
               const SizedBox(height: 12),
+              Center(
+                child: Text(
+                  context.tr('onboarding_about_2_minutes'),
+                  style: const TextStyle(fontSize: 11, color: MealColors.textSecondary),
+                ),
+              ),
+              const SizedBox(height: 4),
             ],
           ),
         ),
@@ -258,15 +298,15 @@ class _FoodAllergiesStepState extends State<FoodAllergiesStep> {
                   },
                 ),
               ),
-              OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 44),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-                ),
-                onPressed: () {},
-                icon: const Icon(Icons.add, size: 16),
-                label: Text(context.tr('onboarding_add_custom_food')),
-              ),
+              // OutlinedButton.icon(
+              //   style: OutlinedButton.styleFrom(
+              //     minimumSize: const Size(double.infinity, 44),
+              //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+              //   ),
+              //   onPressed: () {},
+              //   icon: const Icon(Icons.add, size: 16),
+              //   label: Text(context.tr('onboarding_add_custom_food')),
+              // ),
               const SizedBox(height: 8),
               TextButton(
                 onPressed: () => widget.onNext([]),
@@ -437,76 +477,128 @@ class _DietaryConsiderationsStepState extends State<DietaryConsiderationsStep> {
                 title: context.tr('onboarding_considerations_title'),
                 subtitle: context.tr('onboarding_considerations_subtitle'),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               Expanded(
-                child: GridView.builder(
+                child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    childAspectRatio: 1.1,
-                  ),
-                  itemCount: _items.length,
-                  itemBuilder: (context, index) {
-                    final item = _items[index];
-                    final itemId = item['id']!;
-                    final itemLabel = context.tr(item['labelKey']!);
-                    final itemImage = item['image']!;
-                    final isSelected = _selected.contains(itemId);
-
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          if (isSelected) {
-                            _selected.remove(itemId);
-                          } else {
-                            _selected.add(itemId);
-                          }
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: isSelected ? MealColors.activeBgGreen : Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: isSelected ? MealColors.activeGreen : Colors.transparent,
-                            width: 1.5,
-                          ),
+                  child: Column(
+                    children: [
+                      // 2x2 grid of large emoji cards
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 14,
+                          crossAxisSpacing: 14,
+                          childAspectRatio: 1.0,
                         ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              itemImage,
-                              height: 40,
-                              width: 40,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) =>
-                              const Icon(Icons.health_and_safety, size: 36, color: MealColors.textSecondary),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              itemLabel,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: MealColors.textPrimary,
+                        itemCount: _items.length,
+                        itemBuilder: (context, index) {
+                          final item = _items[index];
+                          final itemId = item['id']!;
+                          final itemLabel = context.tr(item['labelKey']!);
+                          final itemImage = item['image']!;
+                          final isSelected = _selected.contains(itemId);
+
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                if (isSelected) {
+                                  _selected.remove(itemId);
+                                } else {
+                                  _selected.add(itemId);
+                                }
+                              });
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: isSelected ? MealColors.activeBgGreen : Colors.white,
+                                borderRadius: BorderRadius.circular(18),
+                                border: Border.all(
+                                  color: isSelected ? MealColors.activeGreen : Colors.transparent,
+                                  width: 1.5,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.03),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    itemImage,
+                                    height: 60,
+                                    width: 60,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (context, error, stackTrace) =>
+                                    const Icon(Icons.health_and_safety, size: 52, color: MealColors.textSecondary),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    itemLabel,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: MealColors.textPrimary,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // "none of these" pill
+                      GestureDetector(
+                        onTap: () => widget.onNext([]),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.03),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.block, size: 18, color: MealColors.textPrimary),
+                              const SizedBox(width: 10),
+                              Text(
+                                context.tr('onboarding_none_of_these'),
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: MealColors.textPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    );
-                  },
+                    ],
+                  ),
                 ),
               ),
-              TextButton(
-                onPressed: () => widget.onNext([]),
-                child: Text(context.tr('onboarding_none_of_these'), style: const TextStyle(color: MealColors.textSecondary)),
-              ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
               MealActionButton(text: context.tr('common_continue'), onPressed: () => widget.onNext(_selected.toList())),
               const SizedBox(height: 12),
             ],
@@ -657,11 +749,26 @@ class _EatingHabitsStepState extends State<EatingHabitsStep> {
   String? _selectedHabit;
 
   static const List<Map<String, String>> _habits = [
-    {'id': 'balanced', 'labelKey': 'onboarding_habit_balanced'},
-    {'id': 'high_protein', 'labelKey': 'onboarding_habit_high_protein'},
-    {'id': 'low_cal', 'labelKey': 'onboarding_habit_low_cal'},
-    {'id': 'quick', 'labelKey': 'onboarding_habit_quick'},
+    {'id': 'cook_at_home', 'labelKey': 'onboarding_habit_cook_at_home'},
+    {'id': 'eat_out_sometimes', 'labelKey': 'onboarding_habit_eat_out_sometimes'},
+    {'id': 'eat_out_often', 'labelKey': 'onboarding_habit_eat_out_often'},
+    {'id': 'quick', 'labelKey': 'onboarding_habit_quick_easy'},
   ];
+
+  void _submit() {
+    if (_selectedHabit == null) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(context.tr('onboarding_habit_required')),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      return;
+    }
+    widget.onNext(_selectedHabit!);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -676,9 +783,10 @@ class _EatingHabitsStepState extends State<EatingHabitsStep> {
                 title: context.tr('onboarding_habits_title'),
                 subtitle: context.tr('onboarding_habits_subtitle'),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
               Expanded(
                 child: ListView.builder(
+                  physics: const BouncingScrollPhysics(),
                   itemCount: _habits.length,
                   itemBuilder: (context, index) {
                     final item = _habits[index];
@@ -687,33 +795,44 @@ class _EatingHabitsStepState extends State<EatingHabitsStep> {
                     final isSelected = _selectedHabit == itemId;
 
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0),
+                      padding: const EdgeInsets.only(bottom: 14.0),
                       child: GestureDetector(
                         onTap: () => setState(() => _selectedHabit = itemId),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                           decoration: BoxDecoration(
                             color: isSelected ? MealColors.activeBgGreen : Colors.white,
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(14),
                             border: Border.all(
                               color: isSelected ? MealColors.activeGreen : Colors.transparent,
                               width: 1.5,
                             ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.03),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                itemLabel,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: MealColors.textPrimary,
+                              Expanded(
+                                child: Text(
+                                  itemLabel,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                    color: MealColors.textPrimary,
+                                  ),
                                 ),
                               ),
+                              const SizedBox(width: 12),
+                              // Radio: outlined circle, or green circle with a check when selected
                               Container(
-                                width: 20,
-                                height: 20,
+                                width: 22,
+                                height: 22,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: isSelected ? MealColors.activeGreen : Colors.white,
@@ -722,7 +841,7 @@ class _EatingHabitsStepState extends State<EatingHabitsStep> {
                                       : Border.all(color: Colors.black26, width: 1.5),
                                 ),
                                 child: isSelected
-                                    ? const Icon(Icons.check, size: 12, color: Colors.white)
+                                    ? const Icon(Icons.check, size: 14, color: Colors.white)
                                     : null,
                               ),
                             ],
@@ -735,7 +854,7 @@ class _EatingHabitsStepState extends State<EatingHabitsStep> {
               ),
               MealActionButton(
                 text: context.tr('common_continue'),
-                onPressed: _selectedHabit != null ? () => widget.onNext(_selectedHabit!) : null,
+                onPressed: _submit,
               ),
               const SizedBox(height: 12),
             ],
@@ -850,10 +969,44 @@ class _MealsPerDayStepState extends State<MealsPerDayStep> {
 class AllSetStep extends StatelessWidget {
   final VoidCallback onFinish;
 
-  const AllSetStep({super.key, required this.onFinish});
+  // The user's answers from the previous Part 2 steps
+  final List<String> allergies;
+  final String? eatingStyle;
+  final List<String> considerations;
+  final String? eatingHabit;
+  final int mealsPerDay;
+
+  const AllSetStep({
+    super.key,
+    required this.onFinish,
+    this.allergies = const [],
+    this.eatingStyle,
+    this.considerations = const [],
+    this.eatingHabit,
+    this.mealsPerDay = 3,
+  });
+
+  static const Map<String, String> _habitKeys = {
+    'cook_at_home': 'onboarding_habit_cook_at_home',
+    'eat_out_sometimes': 'onboarding_habit_eat_out_sometimes',
+    'eat_out_often': 'onboarding_habit_eat_out_often',
+    'quick': 'onboarding_habit_quick_easy',
+  };
+
+  String _allergyLabel(BuildContext context, String id) =>
+      context.tr(id == 'seafood' ? 'onboarding_allergy_shellfish' : 'onboarding_allergy_$id');
+
+  // Joins translated labels, or "None" when nothing was selected
+  String _joinOrNone(BuildContext context, List<String> labels) =>
+      labels.isEmpty ? context.tr('onboarding_summary_none') : labels.join(', ');
 
   @override
   Widget build(BuildContext context) {
+    final style = eatingStyle ?? 'standard';
+    final habitKey = eatingHabit == null
+        ? null
+        : (_habitKeys[eatingHabit] ?? 'onboarding_habit_$eatingHabit');
+
     return Scaffold(
       backgroundColor: MealColors.background,
       body: SafeArea(
@@ -861,32 +1014,262 @@ class AllSetStep extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             children: [
-              const Spacer(),
-              Text(
-                context.tr('onboarding_all_set_title'),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: MealColors.textPrimary,
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    children: [
+                      MealStepHeader(
+                        title: context.tr('onboarding_diet_summary_title'),
+                        subtitle: context.tr('onboarding_diet_summary_subtitle'),
+                      ),
+                      const SizedBox(height: 20),
+                      _buildStyleBanner(context, style),
+                      const SizedBox(height: 16),
+                      _buildAnswersCard(context, [
+                        (
+                          icon: Icons.no_food_outlined,
+                          label: context.tr('onboarding_summary_allergies'),
+                          value: _joinOrNone(
+                            context,
+                            [for (final a in allergies) _allergyLabel(context, a)],
+                          ),
+                        ),
+                        (
+                          icon: Icons.health_and_safety_outlined,
+                          label: context.tr('onboarding_summary_dietary_needs'),
+                          value: _joinOrNone(
+                            context,
+                            [for (final c in considerations) context.tr('onboarding_consideration_$c')],
+                          ),
+                        ),
+                        (
+                          icon: Icons.restaurant_outlined,
+                          label: context.tr('onboarding_summary_eating_habits'),
+                          value: habitKey == null
+                              ? context.tr('onboarding_summary_none')
+                              : context.tr(habitKey),
+                        ),
+                        (
+                          icon: Icons.schedule_outlined,
+                          label: context.tr('onboarding_summary_meals_per_day'),
+                          value: context.tr('onboarding_meals_count', {'count': '$mealsPerDay'}),
+                        ),
+                      ]),
+                      const SizedBox(height: 16),
+                      _buildGreatChoiceCard(context),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 12),
-              Text(
-                context.tr('onboarding_all_set_body'),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: MealColors.textSecondary,
-                  height: 1.4,
-                ),
-              ),
-              const Spacer(),
               MealActionButton(text: context.tr('onboarding_get_goals_button'), onPressed: onFinish),
               const SizedBox(height: 12),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // Dark banner with the chosen eating style and the food bowl on the right
+  Widget _buildStyleBanner(BuildContext context, String style) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        height: 140,
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [MealColors.primaryDark, Color(0xFF2E4D38)],
+          ),
+        ),
+        child: Stack(
+          children: [
+            // Bowl illustration; anchored low so the icon arc at the top of the image is cropped
+            Positioned(
+              right: -30,
+              bottom: -40,
+              height: 220,
+              child: Image.asset(
+                'assets/one.png',
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(18),
+              child: SizedBox(
+                width: 170,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      context.tr('onboarding_summary_eating_style'),
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.8,
+                        color: Colors.white.withValues(alpha: 0.7),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      context.tr('onboarding_style_$style'),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        height: 1.1,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: MealColors.activeGreen,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        context.tr('onboarding_style_tag_$style'),
+                        style: const TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // White card listing each answer with an icon, label, value and a check
+  Widget _buildAnswersCard(
+    BuildContext context,
+    List<({IconData icon, String label, String value})> rows,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          for (int i = 0; i < rows.length; i++) ...[
+            if (i > 0) const Divider(height: 1, color: Color(0xFFEFEDE6)),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Row(
+                children: [
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: const BoxDecoration(
+                      color: MealColors.activeBgGreen,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(rows[i].icon, size: 18, color: MealColors.primaryDark),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          rows[i].label,
+                          style: const TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.6,
+                            color: MealColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          rows[i].value,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: MealColors.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.check_circle, size: 20, color: MealColors.activeGreen),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGreatChoiceCard(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: MealColors.activeBgGreen,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: const BoxDecoration(
+              color: MealColors.activeGreen,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.eco, size: 18, color: Colors.white),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.tr('onboarding_great_choice_title'),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: MealColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  context.tr('onboarding_great_choice_body'),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: MealColors.textSecondary,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

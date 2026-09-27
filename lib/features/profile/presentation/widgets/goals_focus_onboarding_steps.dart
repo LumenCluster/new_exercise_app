@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/localization/app_localizations.dart';
+import '../../domain/entities/user_profile.dart';
+import 'onboarding_steps.dart' show BodyShapeStep;
 
 // --- Shared Theme Colors ---
 class GoalsColors {
@@ -105,46 +107,86 @@ class GoalsIntroStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+
     return Scaffold(
       backgroundColor: GoalsColors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
+              const SizedBox(height: 8),
+
+              // PART 3 badge
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: GoalsColors.primaryDark,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  context.tr('onboarding_part3_badge'),
+                  style: const TextStyle(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    context.tr('onboarding_part3_badge'),
-                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
               const SizedBox(height: 12),
-              GoalsStepHeader(
-                title: context.tr('onboarding_goals_intro_title'),
-                subtitle: context.tr('onboarding_goals_intro_subtitle'),
-              ),
-              const Spacer(),
-              Image.asset(
-                'assets/two.png',
-                height: 280,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => const Icon(
-                  Icons.fitness_center,
-                  size: 140,
-                  color: GoalsColors.activeGreen,
+
+              // Left-aligned title & subtitle
+              Text(
+                context.tr('onboarding_goals_intro_title'),
+                style: const TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: GoalsColors.textPrimary,
+                  height: 1.15,
                 ),
               ),
-              const Spacer(),
+              const SizedBox(height: 8),
+              Text(
+                context.tr('onboarding_goals_intro_subtitle'),
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: GoalsColors.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+
+              // Illustration on the right, running off the right edge of the screen
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Transform.translate(
+                    // 24 = page padding, plus a little extra so the image bleeds off-screen
+                    offset: Offset(24 + screenWidth * 0.06, 0),
+                    child: Image.asset(
+                      'assets/two.png',
+                      width: screenWidth * 0.92,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.fitness_center,
+                        size: 140,
+                        color: GoalsColors.activeGreen,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
               GoalsActionButton(text: context.tr('common_continue'), onPressed: onNext),
               const SizedBox(height: 12),
+              Center(
+                child: Text(
+                  context.tr('onboarding_about_2_minutes'),
+                  style: const TextStyle(fontSize: 11, color: GoalsColors.textSecondary),
+                ),
+              ),
+              const SizedBox(height: 4),
             ],
           ),
         ),
@@ -310,7 +352,9 @@ class _PrimaryGoalStepState extends State<PrimaryGoalStep> {
 class TargetFocusStep extends StatefulWidget {
   final Function(List<String> areas) onNext;
 
-  const TargetFocusStep({super.key, required this.onNext});
+  final Gender gender;
+
+  const TargetFocusStep({super.key, required this.onNext, this.gender = Gender.female});
 
   @override
   State<TargetFocusStep> createState() => _TargetFocusStepState();
@@ -351,7 +395,7 @@ class _TargetFocusStepState extends State<TargetFocusStep> {
                       flex: 4,
                       child: Center(
                         child: Image.asset(
-                          'assets/body.png',
+                          widget.gender == Gender.male ? 'assets/male_body.png' : 'assets/body.png',
                           fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) =>
                           const Icon(Icons.accessibility_new, size: 160, color: GoalsColors.primaryDark),
@@ -599,175 +643,34 @@ class _ImproveGoalStepState extends State<ImproveGoalStep> {
 // ==========================================
 // 5. TARGET BODY SHAPE STEP
 // ==========================================
-class TargetBodyShapeStep extends StatefulWidget {
+// Same carousel, fat-level bar and body fat card as the "current body shape"
+// step, with gender-specific images, but asking for the target shape.
+class TargetBodyShapeStep extends StatelessWidget {
   final Function(String bodyShape, double fatPercentage) onNext;
+  final Gender gender;
 
-  const TargetBodyShapeStep({super.key, required this.onNext});
+  const TargetBodyShapeStep({
+    super.key,
+    required this.onNext,
+    this.gender = Gender.female,
+  });
 
-  @override
-  State<TargetBodyShapeStep> createState() => _TargetBodyShapeStepState();
-}
-
-class _TargetBodyShapeStepState extends State<TargetBodyShapeStep> {
-  String? _selectedShape;
-  double _sliderValue = 24.0; // 20% - 25% range middle value
-
-  static const List<Map<String, String>> _shapes = [
-    {'id': 'curve', 'labelKey': 'onboarding_shape_curve', 'image': 'assets/curvy.png'},
-    {'id': 'glass', 'labelKey': 'onboarding_shape_hourglass', 'image': 'assets/heavy.png'},
-    {'id': 'sheer', 'labelKey': 'onboarding_shape_sheer', 'image': 'assets/obese.png'},
-  ];
+  // "22% - 25%" -> 23.5, "40%+" -> 40
+  static double _fatMidpoint(String range) {
+    final values = RegExp(r'\d+(\.\d+)?')
+        .allMatches(range)
+        .map((m) => double.parse(m.group(0)!))
+        .toList();
+    if (values.isEmpty) return 0;
+    return values.reduce((a, b) => a + b) / values.length;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: GoalsColors.background,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: Column(
-            children: [
-              GoalsStepHeader(
-                title: context.tr('onboarding_body_shape_title'),
-                subtitle: context.tr('onboarding_body_shape_subtitle'),
-              ),
-              const SizedBox(height: 20),
-
-              // Body Shape Selector
-              SizedBox(
-                height: 170,
-                child: Row(
-                  children: _shapes.map((item) {
-                    final itemId = item['id']!;
-                    final isSelected = _selectedShape == itemId;
-
-                    return Expanded(
-                      child: GestureDetector(
-                        onTap: () => setState(() => _selectedShape = itemId),
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          decoration: BoxDecoration(
-                            color: isSelected ? GoalsColors.activeBgGreen : Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: isSelected ? GoalsColors.activeGreen : Colors.transparent,
-                              width: 1.5,
-                            ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Image.asset(
-                                    item['image']!,
-                                    fit: BoxFit.contain,
-                                    errorBuilder: (_, _, _) =>
-                                    const Icon(Icons.person, size: 60, color: GoalsColors.primaryDark),
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                context.tr(item['labelKey']!),
-                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 8),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Slider section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(context.tr('onboarding_bodyfat_clear'), style: const TextStyle(fontSize: 10, color: GoalsColors.textSecondary)),
-                  Text(context.tr('onboarding_bodyfat_moderate'), style: const TextStyle(fontSize: 10, color: GoalsColors.textSecondary)),
-                  Text(context.tr('onboarding_bodyfat_higher'), style: const TextStyle(fontSize: 10, color: GoalsColors.textSecondary)),
-                ],
-              ),
-              SliderTheme(
-                data: SliderThemeData(
-                  activeTrackColor: const Color(0xFFF3D58C),
-                  inactiveTrackColor: Colors.grey.shade300,
-                  thumbColor: GoalsColors.primaryDark,
-                ),
-                child: Slider(
-                  value: _sliderValue,
-                  min: 15.0,
-                  max: 35.0,
-                  onChanged: (val) => setState(() => _sliderValue = val),
-                ),
-              ),
-
-              const Spacer(),
-
-              // Estimated Body Fat Card
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: const BoxDecoration(
-                        color: GoalsColors.activeBgGreen,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.pie_chart, color: GoalsColors.primaryDark),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            context.tr('onboarding_estimated_bodyfat_label'),
-                            style: const TextStyle(fontSize: 11, color: GoalsColors.textSecondary),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            context.tr('onboarding_estimated_bodyfat_value'),
-                            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: GoalsColors.textPrimary),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            context.tr('onboarding_estimated_bodyfat_message'),
-                            style: const TextStyle(fontSize: 10, color: GoalsColors.textSecondary),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const Spacer(),
-
-              GoalsActionButton(
-                text: context.tr('common_next'),
-                onPressed: _selectedShape != null
-                  ? () {
-                      widget.onNext(_selectedShape!, _sliderValue);
-                    }
-                  : null,
-              ),
-              const SizedBox(height: 12),
-            ],
-          ),
-        ),
-      ),
+    return BodyShapeStep(
+      gender: gender,
+      titleKey: 'onboarding_target_body_shape_title',
+      onNext: (shape, fatRange) => onNext(shape, _fatMidpoint(fatRange)),
     );
   }
 }
