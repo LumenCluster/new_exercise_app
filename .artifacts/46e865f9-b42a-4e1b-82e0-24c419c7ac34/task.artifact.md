@@ -1,0 +1,8 @@
+- `[x]` Setup directories and move assets
+- `[x]` Migrate Core components (Constants, Utils)
+- `[x]` Migrate Profile feature
+- `[x]` Migrate Meal Plan feature (Domain -> Data -> Presentation)
+- `[x]` Migrate Exercises feature (Domain -> Data -> Presentation)
+- `[x]` Update `pubspec.yaml` and `main.dart`
+- `[x]` Cleanup old files (Migrated, ready for manual deletion)
+- `[x]` Verify build

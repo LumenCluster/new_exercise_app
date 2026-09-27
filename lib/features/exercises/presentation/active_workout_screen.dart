@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:untitled/core/localization/app_localizations.dart';
+import '../../tracking/presentation/providers/workout_progress_provider.dart';
 import '../domain/entities/workout_video.dart';
 import 'widgets/exercise_video_player.dart';
 
@@ -55,11 +57,19 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
   Duration _elapsed = Duration.zero;
   Timer? _timer;
 
+  // Session bookkeeping for the Report screen's workout history.
+  late final WorkoutProgressProvider _progress;
+  final DateTime _startedAt = DateTime.now();
+  String _sessionTitle = '';
+  int _setsThisSession = 0;
+  bool _sessionRecorded = false;
+
   WorkoutVideo get _current => _playlist[_index];
 
   @override
   void initState() {
     super.initState();
+    _progress = context.read<WorkoutProgressProvider>();
     final start = widget.startIndex.clamp(0, widget.videos.length - 1);
     _playlist = [
       ...widget.videos.sublist(start),
@@ -71,14 +81,40 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _sessionTitle = widget.title ?? context.tr('dashboard_program_name');
+  }
+
+  @override
   void dispose() {
     _timer?.cancel();
+    _recordSession(); // user left mid-workout
     super.dispose();
+  }
+
+  void _playedSet() {
+    _setsThisSession++;
+    _progress.addSetPlayed();
+  }
+
+  /// Saves this visit as a workout session (once, and only if a set was
+  /// played).
+  void _recordSession() {
+    if (_sessionRecorded) return;
+    _sessionRecorded = true;
+    _progress.recordSession(
+      title: _sessionTitle,
+      startedAt: _startedAt,
+      durationSeconds: _elapsed.inSeconds,
+      sets: _setsThisSession,
+    );
   }
 
   /// Called by the player each time the video ends. Returns whether the
   /// video should play again (i.e. there are sets left for this exercise).
   bool _onVideoCompleted() {
+    _playedSet();
     if (_currentSet < _sets) {
       setState(() => _currentSet++);
       return true;
@@ -88,6 +124,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
   }
 
   void _completeSet() {
+    _playedSet();
     if (_currentSet < _sets) {
       setState(() => _currentSet++);
       _playerKey.currentState?.restart();
@@ -108,6 +145,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
     } else {
       _finished = true;
       _timer?.cancel();
+      _recordSession();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const WorkoutCompleteScreen()),

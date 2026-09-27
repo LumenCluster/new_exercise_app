@@ -1,0 +1,3 @@
+- [x] Update `stretching_exercises.json` with sample GIF URLs
+- [x] Verify `exercise_library_screen.dart` UI logic
+- [x] Run `flutter analyze` to ensure no issues

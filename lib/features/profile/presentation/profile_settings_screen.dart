@@ -5,6 +5,8 @@ import '../../../core/database/firestore_service.dart';
 import '../../../core/localization/app_language.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/localization/locale_provider.dart';
+import '../../../core/notifications/notification_service.dart';
+import '../../../core/notifications/reminder_preferences.dart';
 import '../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../meal_plan/presentation/providers/meal_plan_provider.dart';
 import '../../tracking/presentation/providers/water_intake_provider.dart';
@@ -115,10 +117,16 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                         subtitle: context.tr('settings_reminders_subtitle'),
                         trailingText: _remindersEnabled ? context.tr('settings_on') : context.tr('settings_off'),
                         trailingTextColor: _remindersEnabled ? activeGreen : textSecondary,
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const RemindersScreen()),
-                        ),
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => RemindersScreen(profile: widget.profile)),
+                          );
+                          // Reflect the master switch the user may have changed.
+                          final enabled = await FirestoreService().getCacheValue('settings_reminders_enabled');
+                          if (!mounted) return;
+                          setState(() => _remindersEnabled = enabled != null ? enabled == 'true' : true);
+                        },
                       ),
                       _SettingsItem(
                         icon: Icons.volume_up_outlined,
@@ -325,6 +333,8 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                 await _persist('settings_sound_enabled', sound.toString());
                 await _persist('settings_voice_enabled', voice.toString());
                 await _persist('settings_volume', volume.toString());
+                // Scheduled reminders pick up the new sound preference.
+                if (mounted) await ReminderScheduler.refresh(this.context);
                 if (context.mounted) Navigator.pop(context);
               },
               child: Text(context.tr('common_save')),
@@ -466,6 +476,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
     setState(() => _busy = true);
     try {
       await FirestoreService().clearAllData();
+      await NotificationService().cancelAll();
       if (!mounted) return;
       await waterProvider.load();
       await weightProvider.load();

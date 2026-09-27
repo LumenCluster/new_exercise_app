@@ -17,14 +17,17 @@ import 'features/coach/data/repositories/coach_repository_impl.dart';
 import 'features/coach/domain/repositories/coach_repository.dart';
 import 'features/tracking/presentation/providers/water_intake_provider.dart';
 import 'features/tracking/presentation/providers/weight_log_provider.dart';
+import 'features/tracking/presentation/providers/workout_progress_provider.dart';
 import 'core/constants/app_colors.dart';
 import 'core/localization/app_localizations.dart';
 import 'core/localization/locale_provider.dart';
+import 'core/notifications/notification_service.dart';
 import 'app_launcher.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await NotificationService().init();
 
   final client = http.Client();
 
@@ -58,6 +61,9 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => WeightLogProvider()..load(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => WorkoutProgressProvider()..load(),
         ),
         ChangeNotifierProvider(
           create: (_) => LocaleProvider()..load(),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../exercises/data/datasources/goal_video_remote_data_source.dart';
 import '../../../exercises/domain/entities/workout_video.dart';
 import '../../../exercises/presentation/active_workout_screen.dart';
+import '../../../tracking/presentation/providers/workout_progress_provider.dart';
 
 const _primaryDark = Color(0xFF1B2A26);
 const _heroDark = Color(0xFF14231C);
@@ -78,6 +80,11 @@ class _StorageVideosSectionState extends State<StorageVideosSection> {
     _loadVideos();
   }
 
+  /// Feeds the workout size to the Active Program card (time and progress).
+  void _reportExerciseCount() {
+    context.read<WorkoutProgressProvider>().setExerciseCount(_videos.length);
+  }
+
   Future<void> _loadVideos() async {
     final folder = _folder;
     final cached = _cache[folder];
@@ -87,6 +94,7 @@ class _StorageVideosSectionState extends State<StorageVideosSection> {
         _loading = false;
         _failed = false;
       });
+      _reportExerciseCount();
       return;
     }
     setState(() {
@@ -101,6 +109,7 @@ class _StorageVideosSectionState extends State<StorageVideosSection> {
         _videos = videos;
         _loading = false;
       });
+      _reportExerciseCount();
     } catch (_) {
       if (!mounted || folder != _folder) return; // stale load for a previous category
       setState(() {
@@ -113,15 +122,52 @@ class _StorageVideosSectionState extends State<StorageVideosSection> {
   /// Starts a workout with every video in the selected category, beginning
   /// at the tapped one.
   void _openVideo(int index) {
+    _pushWorkout(_videos, index, context.tr(_category.labelKey));
+  }
+
+  void _pushWorkout(List<WorkoutVideo> videos, int startIndex, String title) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => ActiveWorkoutScreen(
-          videos: _videos,
-          startIndex: index,
-          title: context.tr(_category.labelKey),
+          videos: videos,
+          startIndex: startIndex,
+          title: title,
         ),
       ),
     );
+  }
+
+  bool _openingGoal = false;
+
+  /// Opens the workout for the user's onboarding goal (the banner), listing
+  /// that goal's own Storage folder rather than the selected chip's.
+  Future<void> _openGoalWorkout() async {
+    if (_openingGoal) return;
+    final goal = widget.primaryGoal;
+    final folder = GoalVideoRemoteDataSource.folderFor(goal);
+    var videos = _cache[folder];
+    if (videos == null) {
+      setState(() => _openingGoal = true);
+      try {
+        videos = await GoalVideoRemoteDataSource.fetch(goal);
+        _cache[folder] = videos;
+      } catch (_) {
+        videos = null;
+      }
+      if (!mounted) return;
+      setState(() => _openingGoal = false);
+    }
+    if (videos == null || videos.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.tr(
+            videos == null ? 'dashboard_exercise_videos_load_error' : 'dashboard_exercise_videos_empty',
+          )),
+        ),
+      );
+      return;
+    }
+    _pushWorkout(videos, 0, context.tr(widget.goalLabelKey));
   }
 
   @override
@@ -154,7 +200,7 @@ class _StorageVideosSectionState extends State<StorageVideosSection> {
     final goal = context.tr(widget.goalLabelKey);
 
     return GestureDetector(
-      onTap: _videos.isEmpty ? null : () => _openVideo(0),
+      onTap: _openGoalWorkout,
       child: Container(
         height: 190,
         width: double.infinity,
@@ -178,6 +224,21 @@ class _StorageVideosSectionState extends State<StorageVideosSection> {
                 color: Colors.white.withValues(alpha: 0.07),
               ),
             ),
+            Positioned(
+              right: 14,
+              bottom: 14,
+              child: CircleAvatar(
+                radius: 20,
+                backgroundColor: _activeGreen,
+                child: _openingGoal
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      )
+                    : const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 26),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(14),
               child: Column(
@@ -190,23 +251,34 @@ class _StorageVideosSectionState extends State<StorageVideosSection> {
                       const SizedBox(width: 8),
                       _heroPill(
                         icon: Icons.access_time_rounded,
-                        label: context.tr('dashboard_program_duration'),
+                        label: context.tr('dashboard_minutes_short', {
+                          'n': '${context.watch<WorkoutProgressProvider>().durationMinutes}',
+                        }),
                       ),
                     ],
                   ),
                   const Spacer(),
-                  Text(
-                    goal,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    context.tr('dashboard_personalized_for_your_goals'),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 11, color: Colors.white70),
+                  // Right inset keeps the text clear of the play badge.
+                  Padding(
+                    padding: const EdgeInsets.only(right: 52),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          goal,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          context.tr('dashboard_personalized_for_your_goals'),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 11, color: Colors.white70),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

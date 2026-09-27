@@ -5,7 +5,9 @@ import '../../../core/database/firestore_service.dart';
 import '../../profile/domain/entities/user_profile.dart';
 import '../../meal_plan/domain/entities/meal.dart';
 import '../../meal_plan/presentation/providers/meal_plan_provider.dart';
+import '../../meal_plan/presentation/pages/meal_detail_screen.dart';
 import '../../tracking/presentation/providers/water_intake_provider.dart';
+import '../../tracking/presentation/providers/workout_progress_provider.dart';
 import '../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../exercises/presentation/pages/workout_plan_screen.dart';
 import '../../../core/localization/app_localizations.dart';
@@ -82,7 +84,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 16),
 
                   // --- Active Program Banner ---
-                  _buildActiveProgramCard(),
+                  _buildActiveProgramCard(mealPlanProvider),
                   const SizedBox(height: 20),
 
                   // --- Today's Workout Section (goal videos from Firebase Storage) ---
@@ -96,7 +98,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         onTap: _openWorkoutPlan,
                         child: Text(
                           context.tr('dashboard_adjust_plan'),
-                          style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: DashboardColors.textSecondary,
+                          ),
                         ),
                       ),
                     ),
@@ -163,25 +168,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ],
         ),
-        Row(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.black12),
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.notifications_none_outlined, size: 20),
-                onPressed: () {},
-              ),
-            ),
-            const SizedBox(width: 8),
-            const CircleAvatar(
-              radius: 20,
-              backgroundImage: AssetImage('assets/user_avatar.png'),
-            ),
-          ],
+        CircleAvatar(
+          radius: 20,
+          backgroundColor: Colors.white,
+          backgroundImage: AssetImage(
+            _profile?.gender == Gender.female
+                ? 'assets/girl.png'
+                : 'assets/boy.png',
+          ),
         ),
       ],
     );
@@ -203,7 +197,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               color: DashboardColors.primaryDark,
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.local_fire_department, color: Colors.white, size: 20),
+            child: const Icon(
+              Icons.local_fire_department,
+              color: Colors.white,
+              size: 20,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -212,17 +210,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 Text(
                   context.tr('dashboard_current_streak'),
-                  style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: DashboardColors.textSecondary),
+                  style: const TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                    color: DashboardColors.textSecondary,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   context.tr('dashboard_streak_progress'),
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: DashboardColors.textPrimary),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: DashboardColors.textPrimary,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   context.tr('dashboard_streak_days_left'),
-                  style: const TextStyle(fontSize: 10, color: DashboardColors.textSecondary),
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: DashboardColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -235,7 +244,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             child: Text(
               context.tr('dashboard_keep_it_up'),
-              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: DashboardColors.primaryDark),
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: DashboardColors.primaryDark,
+              ),
             ),
           ),
         ],
@@ -243,8 +256,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // Active Program Widget
-  Widget _buildActiveProgramCard() {
+  // Active Program Widget — kcal is the total of today's meals below, time is
+  // every exercise video × 12 sets × 10 s, and progress is the share of
+  // those sets the user has played today.
+  Widget _buildActiveProgramCard(MealPlanProvider mealPlanProvider) {
+    final workout = context.watch<WorkoutProgressProvider>();
+    final mealKcal = mealPlanProvider.meals.fold<int>(
+      0,
+      (sum, meal) => sum + meal.calories,
+    );
+    final percent = (workout.progress * 100).round();
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -259,14 +281,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  context.tr('dashboard_day_of'),
-                  style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: DashboardColors.primaryDark),
+                  context.tr('dashboard_day_of', {
+                    'day': '${workout.programDay}',
+                    'total': '${WorkoutProgressProvider.programDays}',
+                  }),
+                  style: const TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                    color: DashboardColors.primaryDark,
+                  ),
                 ),
               ),
               Text(
@@ -283,26 +315,67 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   context.tr('dashboard_program_name'),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: const TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
-              const Icon(Icons.access_time_rounded, size: 14, color: DashboardColors.activeGreen),
+              const Icon(
+                Icons.access_time_rounded,
+                size: 14,
+                color: DashboardColors.activeGreen,
+              ),
               const SizedBox(width: 4),
               Text(
-                context.tr('dashboard_program_duration'),
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: DashboardColors.activeGreen),
+                context.tr('dashboard_minutes_short', {
+                  'n': '${workout.durationMinutes}',
+                }),
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: DashboardColors.activeGreen,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(Icons.local_fire_department_outlined, size: 14, color: DashboardColors.activeGreen),
+              const Icon(
+                Icons.local_fire_department_outlined,
+                size: 14,
+                color: DashboardColors.activeGreen,
+              ),
               const SizedBox(width: 4),
               Text(
-                context.tr('dashboard_program_kcal'),
-                style: const TextStyle(fontSize: 11, color: DashboardColors.activeGreen),
+                context.tr('dashboard_kcal_value', {'kcal': '$mealKcal'}),
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: DashboardColors.activeGreen,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Icon(
+                Icons.repeat_rounded,
+                size: 14,
+                color: DashboardColors.activeGreen,
+              ),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  context.tr('dashboard_sets_played', {
+                    'done': '${workout.setsPlayed.clamp(0, workout.totalSets)}',
+                    'total': '${workout.totalSets}',
+                  }),
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: DashboardColors.activeGreen,
+                  ),
+                ),
               ),
             ],
           ),
@@ -310,18 +383,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(context.tr('dashboard_program_progress'), style: const TextStyle(fontSize: 10, color: Colors.white70)),
-              const Text("40%", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
+              Text(
+                context.tr('dashboard_program_progress'),
+                style: const TextStyle(fontSize: 10, color: Colors.white70),
+              ),
+              Text(
+                "$percent%",
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 6),
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
-            child: const LinearProgressIndicator(
-              value: 0.40,
+            child: LinearProgressIndicator(
+              value: workout.progress,
               minHeight: 5,
               backgroundColor: Colors.white24,
-              valueColor: AlwaysStoppedAnimation<Color>(DashboardColors.activeGreen),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                DashboardColors.activeGreen,
+              ),
             ),
           ),
         ],
@@ -330,18 +415,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   static const List<String> _weekdayKeys = [
-    'weekday_mon', 'weekday_tue', 'weekday_wed', 'weekday_thu', 'weekday_fri', 'weekday_sat', 'weekday_sun',
+    'weekday_mon',
+    'weekday_tue',
+    'weekday_wed',
+    'weekday_thu',
+    'weekday_fri',
+    'weekday_sat',
+    'weekday_sun',
   ];
 
   String _weekdayLabel(int weekday) => context.tr(_weekdayKeys[weekday - 1]);
 
   void _openWorkoutPlan() {
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => WorkoutPlanScreen(
-          profile: _profile,
-        ),
-      ),
+      MaterialPageRoute(builder: (_) => WorkoutPlanScreen(profile: _profile)),
     );
   }
 
@@ -354,13 +441,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             Text(
               context.tr('dashboard_todays_meals'),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: DashboardColors.textPrimary),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: DashboardColors.textPrimary,
+              ),
             ),
             GestureDetector(
               onTap: () {},
               child: Text(
                 context.tr('dashboard_track_meal'),
-                style: const TextStyle(fontSize: 12, color: DashboardColors.textSecondary),
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: DashboardColors.textSecondary,
+                ),
               ),
             ),
           ],
@@ -379,11 +473,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Center(
             child: Column(
               children: [
-                const CircularProgressIndicator(color: DashboardColors.primaryDark),
+                const CircularProgressIndicator(
+                  color: DashboardColors.primaryDark,
+                ),
                 const SizedBox(height: 12),
                 Text(
                   context.tr('dashboard_designing_meals'),
-                  style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: DashboardColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -395,9 +494,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             children: [
               Text(
-                provider.errorMessage ?? context.tr('dashboard_meals_generate_error'),
+                provider.errorMessage ??
+                    context.tr('dashboard_meals_generate_error'),
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: DashboardColors.textSecondary,
+                ),
               ),
               const SizedBox(height: 8),
               TextButton(
@@ -417,7 +520,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Text(
               context.tr('dashboard_no_meals_generated'),
-              style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+              style: const TextStyle(
+                fontSize: 11,
+                color: DashboardColors.textSecondary,
+              ),
             ),
           );
         }
@@ -426,17 +532,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: provider.meals.length,
           separatorBuilder: (_, _) => const SizedBox(height: 8),
-          itemBuilder: (context, index) => _DashboardMealTile(
-            meal: provider.meals[index],
-            index: index,
-          ),
+          itemBuilder: (context, index) =>
+              _DashboardMealTile(meal: provider.meals[index], index: index),
         );
       case LoadState.idle:
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Text(
             context.tr('dashboard_no_meal_plan_yet'),
-            style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+            style: const TextStyle(
+              fontSize: 11,
+              color: DashboardColors.textSecondary,
+            ),
           ),
         );
     }
@@ -472,7 +579,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   Text(
-                    context.tr('dashboard_glasses_count', {'glasses': '$glasses', 'target': '$target'}),
+                    context.tr('dashboard_glasses_count', {
+                      'glasses': '$glasses',
+                      'target': '$target',
+                    }),
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
@@ -496,7 +606,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         margin: const EdgeInsets.symmetric(horizontal: 3),
                         height: 30,
                         decoration: BoxDecoration(
-                          color: isFilled ? DashboardColors.waterBlue : DashboardColors.emptyGrey,
+                          color: isFilled
+                              ? DashboardColors.waterBlue
+                              : DashboardColors.emptyGrey,
                           borderRadius: BorderRadius.circular(15),
                         ),
                       ),
@@ -511,8 +623,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    context.tr('dashboard_ml_consumed', {'ml': '${glasses * 250}'}),
-                    style: const TextStyle(fontSize: 11, color: DashboardColors.textSecondary),
+                    context.tr('dashboard_ml_consumed', {
+                      'ml': '${glasses * 250}',
+                    }),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: DashboardColors.textSecondary,
+                    ),
                   ),
                   GestureDetector(
                     onTap: water.addGlass,
@@ -559,12 +676,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           Text(
             context.tr('dashboard_weekly_activity'),
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: DashboardColors.textPrimary),
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: DashboardColors.textPrimary,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             context.tr('dashboard_avg_kcal_burn'),
-            style: const TextStyle(fontSize: 10, color: DashboardColors.textSecondary),
+            style: const TextStyle(
+              fontSize: 10,
+              color: DashboardColors.textSecondary,
+            ),
           ),
           const SizedBox(height: 20),
           SizedBox(
@@ -581,7 +705,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       width: 10,
                       height: (item['height'] as double),
                       decoration: BoxDecoration(
-                        color: isHighlight ? DashboardColors.activeGreen : DashboardColors.barIdle,
+                        color: isHighlight
+                            ? DashboardColors.activeGreen
+                            : DashboardColors.barIdle,
                         borderRadius: BorderRadius.circular(5),
                       ),
                     ),
@@ -590,8 +716,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       item['day'].toString(),
                       style: TextStyle(
                         fontSize: 10,
-                        fontWeight: isHighlight ? FontWeight.bold : FontWeight.normal,
-                        color: isHighlight ? DashboardColors.textPrimary : DashboardColors.textSecondary,
+                        fontWeight: isHighlight
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                        color: isHighlight
+                            ? DashboardColors.textPrimary
+                            : DashboardColors.textSecondary,
                       ),
                     ),
                   ],
@@ -626,17 +756,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           const SizedBox(height: 12),
           _buildSummaryItem(context.tr('label_age'), "${_profile!.age} years"),
-          _buildSummaryItem(context.tr('label_height'), "${_profile!.heightCm} cm"),
-          _buildSummaryItem(context.tr('label_weight'), "${_profile!.currentWeightKg} kg"),
-          _buildSummaryItem(context.tr('label_activity'), _profile!.activityLevel.name.toUpperCase()),
+          _buildSummaryItem(
+            context.tr('label_height'),
+            "${_profile!.heightCm} cm",
+          ),
+          _buildSummaryItem(
+            context.tr('label_weight'),
+            "${_profile!.currentWeightKg} kg",
+          ),
+          _buildSummaryItem(
+            context.tr('label_activity'),
+            _profile!.activityLevel.name.toUpperCase(),
+          ),
           if (_profile!.fitnessLevel != null)
-            _buildSummaryItem(context.tr('label_fitness_level'), _profile!.fitnessLevel!),
+            _buildSummaryItem(
+              context.tr('label_fitness_level'),
+              _profile!.fitnessLevel!,
+            ),
           if (_profile!.primaryGoal != null)
-            _buildSummaryItem(context.tr('label_primary_goal'), _profile!.primaryGoal!.replaceAll('_', ' ').toUpperCase()),
+            _buildSummaryItem(
+              context.tr('label_primary_goal'),
+              _profile!.primaryGoal!.replaceAll('_', ' ').toUpperCase(),
+            ),
           if (_profile!.allergies.isNotEmpty)
-            _buildSummaryItem(context.tr('label_allergies'), _profile!.allergies.join(', ')),
+            _buildSummaryItem(
+              context.tr('label_allergies'),
+              _profile!.allergies.join(', '),
+            ),
           if (_profile!.considerations.isNotEmpty)
-            _buildSummaryItem(context.tr('label_considerations'), _profile!.considerations.join(', ')),
+            _buildSummaryItem(
+              context.tr('label_considerations'),
+              _profile!.considerations.join(', '),
+            ),
         ],
       ),
     );
@@ -702,57 +853,87 @@ class _DashboardMealTileState extends State<_DashboardMealTile> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<MealPlanProvider>();
-    final imageState = provider.imageStates[widget.meal.cacheKey] ?? LoadState.idle;
+    final imageState =
+        provider.imageStates[widget.meal.cacheKey] ?? LoadState.idle;
 
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: DashboardColors.cardWhite,
-        borderRadius: BorderRadius.circular(18),
+    return GestureDetector(
+      onTap: _openRecipe,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: DashboardColors.cardWhite,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: SizedBox(
+                width: 52,
+                height: 52,
+                child: _buildImage(context, imageState),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _dashboardMealCategoryLabel(context, widget.index),
+                    style: const TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                      color: DashboardColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    widget.meal.name,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: DashboardColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    "${widget.meal.calories} kcal",
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: DashboardColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              onPressed: _openRecipe,
+              style: IconButton.styleFrom(
+                backgroundColor: DashboardColors.background,
+                side: const BorderSide(color: Colors.black12),
+                minimumSize: const Size(32, 32),
+                padding: EdgeInsets.zero,
+              ),
+              icon: const Icon(
+                Icons.chevron_right_rounded,
+                color: DashboardColors.primaryDark,
+                size: 20,
+              ),
+            ),
+          ],
+        ),
       ),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(14),
-            child: SizedBox(
-              width: 52,
-              height: 52,
-              child: _buildImage(context, imageState),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _dashboardMealCategoryLabel(context, widget.index),
-                  style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: DashboardColors.textSecondary),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  widget.meal.name,
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: DashboardColors.textPrimary),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  "${widget.meal.calories} kcal",
-                  style: const TextStyle(fontSize: 10, color: DashboardColors.textSecondary),
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            onPressed: () {},
-            style: IconButton.styleFrom(
-              backgroundColor: DashboardColors.background,
-              side: const BorderSide(color: Colors.black12),
-              minimumSize: const Size(32, 32),
-              padding: EdgeInsets.zero,
-            ),
-            icon: const Icon(Icons.chevron_right_rounded, color: DashboardColors.primaryDark, size: 20),
-          ),
-        ],
+    );
+  }
+
+  void _openRecipe() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MealDetailScreen(
+          meal: widget.meal,
+          categoryLabel: _dashboardMealCategoryLabel(context, widget.index),
+        ),
       ),
     );
   }
@@ -763,10 +944,15 @@ class _DashboardMealTileState extends State<_DashboardMealTile> {
     }
     if (state == LoadState.error) {
       return GestureDetector(
-        onTap: () => context.read<MealPlanProvider>().ensureImageForMeal(widget.meal),
+        onTap: () =>
+            context.read<MealPlanProvider>().ensureImageForMeal(widget.meal),
         child: Container(
           color: DashboardColors.background,
-          child: const Icon(Icons.refresh, size: 18, color: DashboardColors.textSecondary),
+          child: const Icon(
+            Icons.refresh,
+            size: 18,
+            color: DashboardColors.textSecondary,
+          ),
         ),
       );
     }

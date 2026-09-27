@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
+import '../../../core/localization/app_localizations.dart';
+import '../../../core/notifications/notification_service.dart';
+import '../../../core/notifications/reminder_preferences.dart';
+import '../../../core/widgets/app_bottom_nav_bar.dart';
+import '../domain/entities/user_profile.dart';
 
+/// Workout and meal reminders: a master switch plus a time and weekdays per
+/// reminder. Every change is saved and re-scheduled as local notifications.
 class RemindersScreen extends StatefulWidget {
-  const RemindersScreen({super.key});
+  final UserProfile? profile;
+
+  const RemindersScreen({super.key, this.profile});
 
   @override
   State<RemindersScreen> createState() => _RemindersScreenState();
 }
 
 class _RemindersScreenState extends State<RemindersScreen> {
-  bool _enableNotifications = true;
-  int _selectedBottomNavIndex = 4; // Profile tab selected
-
   // Color Palette
   static const backgroundColor = Color(0xFFF9F8F3);
   static const primaryDark = Color(0xFF13221E);
@@ -30,42 +36,166 @@ class _RemindersScreenState extends State<RemindersScreen> {
   static const orangeTimeBg = Color(0xFFFCE4EC);
   static const orangeTimeText = Color(0xFFE65100);
 
+  static const _dayKeys = [
+    'reminders_day_mon', 'reminders_day_tue', 'reminders_day_wed', 'reminders_day_thu',
+    'reminders_day_fri', 'reminders_day_sat', 'reminders_day_sun',
+  ];
+
+  ReminderPreferences? _prefs;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final prefs = await ReminderPreferences.load();
+    if (!mounted) return;
+    setState(() => _prefs = prefs);
+  }
+
+  void _toast(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+    );
+  }
+
+  /// Saves the current preferences and re-schedules notifications.
+  Future<void> _saveAndSchedule() async {
+    final prefs = _prefs!;
+    await prefs.save();
+    if (!mounted) return;
+    await ReminderScheduler.apply(context, prefs);
+  }
+
+  Future<void> _toggleEnabled(bool value) async {
+    final prefs = _prefs!;
+    if (value) {
+      final granted = await NotificationService().requestPermission();
+      if (!mounted) return;
+      if (!granted && NotificationService().isSupported) {
+        _toast(context.tr('reminders_permission_denied'));
+        return;
+      }
+    }
+    setState(() => prefs.enabled = value);
+    await _saveAndSchedule();
+    if (!mounted) return;
+
+    if (value) {
+      final sound = await ReminderPreferences.soundEnabled();
+      if (!mounted) return;
+      await NotificationService().showNow(
+        title: context.tr('reminders_enabled_notif_title'),
+        body: context.tr('reminders_enabled_notif_body'),
+        sound: sound,
+      );
+    } else {
+      _toast(context.tr('reminders_disabled_toast'));
+    }
+  }
+
+  Future<void> _pickTime(ReminderDefinition def) async {
+    final schedule = _prefs!.schedules[def.id]!;
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: schedule.time,
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: Theme.of(context).colorScheme.copyWith(primary: primaryDark),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked == null || picked == schedule.time) return;
+    setState(() => schedule.time = picked);
+    await _saveAndSchedule();
+    if (!mounted) return;
+    _toast(context.tr('reminders_time_saved_toast', {
+      'name': context.tr(def.titleKey),
+      'time': picked.format(context),
+    }));
+  }
+
+  Future<void> _toggleDay(ReminderDefinition def, int dayIndex) async {
+    final schedule = _prefs!.schedules[def.id]!;
+    setState(() => schedule.days[dayIndex] = !schedule.days[dayIndex]);
+    await _saveAndSchedule();
+  }
+
+  /// Shows this reminder's notification now so the user can preview it.
+  Future<void> _preview(ReminderDefinition def) async {
+    final granted = await NotificationService().requestPermission();
+    if (!mounted) return;
+    if (!granted) {
+      _toast(context.tr(NotificationService().isSupported ? 'reminders_permission_denied' : 'reminders_unsupported'));
+      return;
+    }
+    final sound = await ReminderPreferences.soundEnabled();
+    if (!mounted) return;
+    await NotificationService().showNow(
+      title: context.tr(def.notificationTitleKey),
+      body: context.tr(def.notificationBodyKey),
+      sound: sound,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final prefs = _prefs;
+
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SafeArea(
         child: Stack(
           children: [
-            SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.only(left: 18, right: 18, top: 12, bottom: 90),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(),
-                  const SizedBox(height: 16),
-                  _buildEnableNotificationsTile(),
-                  const SizedBox(height: 20),
-                  _buildSectionTitle("WORKOUT REMINDERS"),
-                  const SizedBox(height: 10),
-                  _buildWorkoutRemindersCard(),
-                  const SizedBox(height: 8),
-                  _buildFooterNote("Staying consistent with workouts builds a sustainable healthy habit."),
-                  const SizedBox(height: 20),
-                  _buildSectionTitle("MEAL & HYDRATION REMINDERS"),
-                  const SizedBox(height: 10),
-                  _buildMealRemindersCard(),
-                  const SizedBox(height: 8),
-                  _buildFooterNote("Paced, mindful meal cycles keep your overall energy levels stable throughout the day."),
-                ],
+            if (prefs == null)
+              const Center(child: CircularProgressIndicator(color: primaryDark))
+            else
+              SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.only(left: 18, right: 18, top: 12, bottom: 90),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeader(),
+                    const SizedBox(height: 16),
+                    _buildEnableNotificationsTile(prefs),
+                    const SizedBox(height: 20),
+                    // Reminder cards are inert while notifications are off.
+                    AnimatedOpacity(
+                      duration: const Duration(milliseconds: 200),
+                      opacity: prefs.enabled ? 1 : 0.45,
+                      child: IgnorePointer(
+                        ignoring: !prefs.enabled,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionTitle(context.tr('reminders_section_workout')),
+                            const SizedBox(height: 10),
+                            _buildRemindersCard(prefs, ReminderSection.workout),
+                            const SizedBox(height: 8),
+                            _buildFooterNote(context.tr('reminders_workout_footer')),
+                            const SizedBox(height: 20),
+                            _buildSectionTitle(context.tr('reminders_section_meal')),
+                            const SizedBox(height: 10),
+                            _buildRemindersCard(prefs, ReminderSection.meal),
+                            const SizedBox(height: 8),
+                            _buildFooterNote(context.tr('reminders_meal_footer')),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
             Positioned(
               left: 18,
               right: 18,
               bottom: 16,
-              child: _buildBottomNavigationBar(),
+              child: AppBottomNavBar(currentTab: AppTab.profile, profile: widget.profile),
             ),
           ],
         ),
@@ -84,9 +214,9 @@ class _RemindersScreenState extends State<RemindersScreen> {
           child: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: textPrimary),
         ),
         const SizedBox(width: 12),
-        const Text(
-          "Reminders",
-          style: TextStyle(
+        Text(
+          context.tr('settings_reminders_title'),
+          style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: textPrimary,
@@ -97,7 +227,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
   }
 
   // Enable Notifications Card
-  Widget _buildEnableNotificationsTile() {
+  Widget _buildEnableNotificationsTile(ReminderPreferences prefs) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -116,35 +246,33 @@ class _RemindersScreenState extends State<RemindersScreen> {
             child: const Icon(Icons.notifications_none_rounded, size: 20, color: greenIconColor),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Enable Notifications",
-                  style: TextStyle(
+                  context.tr('reminders_enable_title'),
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: textPrimary,
                   ),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
-                  "Allow fitness & diet nudges",
-                  style: TextStyle(fontSize: 11, color: textSecondary),
+                  context.tr('reminders_enable_subtitle'),
+                  style: const TextStyle(fontSize: 11, color: textSecondary),
                 ),
               ],
             ),
           ),
           Switch(
-            value: _enableNotifications,
+            value: prefs.enabled,
             activeThumbColor: Colors.white,
             activeTrackColor: primaryDark,
             inactiveThumbColor: Colors.white,
             inactiveTrackColor: Colors.black12,
-            onChanged: (val) {
-              setState(() => _enableNotifications = val);
-            },
+            onChanged: _toggleEnabled,
           ),
         ],
       ),
@@ -163,46 +291,10 @@ class _RemindersScreenState extends State<RemindersScreen> {
     );
   }
 
-  // Workout Section Card
-  Widget _buildWorkoutRemindersCard() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cardWhite,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Column(
-        children: [
-          _buildReminderItem(
-            icon: Icons.wb_sunny_outlined,
-            iconBg: greenIconBg,
-            iconColor: greenIconColor,
-            title: "Morning Workout",
-            subtitle: "Nudge to start your day strong",
-            time: "07:30 AM",
-            timeBg: greenTimeBg,
-            timeTextColor: greenTimeText,
-            activeDays: const [true, true, true, true, true, false, false],
-          ),
-          const Divider(height: 24, thickness: 1, color: Color(0xFFF2F2EC)),
-          _buildReminderItem(
-            icon: Icons.nightlight_round_outlined,
-            iconBg: greenIconBg,
-            iconColor: greenIconColor,
-            title: "Evening Stretch & Yoga",
-            subtitle: "Relaxing prompt before bedtime",
-            time: "08:30 PM",
-            timeBg: greenTimeBg,
-            timeTextColor: greenTimeText,
-            activeDays: const [false, false, true, false, false, true, true],
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _buildRemindersCard(ReminderPreferences prefs, ReminderSection section) {
+    final defs = kReminderDefinitions.where((d) => d.section == section).toList();
+    final isWorkout = section == ReminderSection.workout;
 
-  // Meal & Hydration Section Card
-  Widget _buildMealRemindersCard() {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -211,41 +303,17 @@ class _RemindersScreenState extends State<RemindersScreen> {
       ),
       child: Column(
         children: [
-          _buildReminderItem(
-            icon: Icons.free_breakfast_outlined,
-            iconBg: orangeIconBg,
-            iconColor: orangeIconColor,
-            title: "Breakfast Nudge",
-            subtitle: "Refuel with a balanced breakfast",
-            time: "08:00 AM",
-            timeBg: orangeTimeBg,
-            timeTextColor: orangeTimeText,
-            activeDays: const [true, true, true, true, true, true, true],
-          ),
-          const Divider(height: 24, thickness: 1, color: Color(0xFFF2F2EC)),
-          _buildReminderItem(
-            icon: Icons.restaurant_outlined,
-            iconBg: orangeIconBg,
-            iconColor: orangeIconColor,
-            title: "Lunch Reminder",
-            subtitle: "Keep metabolism active & nourished",
-            time: "01:15 PM",
-            timeBg: orangeTimeBg,
-            timeTextColor: orangeTimeText,
-            activeDays: const [true, true, true, true, true, false, false],
-          ),
-          const Divider(height: 24, thickness: 1, color: Color(0xFFF2F2EC)),
-          _buildReminderItem(
-            icon: Icons.soup_kitchen_outlined,
-            iconBg: orangeIconBg,
-            iconColor: orangeIconColor,
-            title: "Light Dinner",
-            subtitle: "Avoid heavy meals close to bed",
-            time: "07:00 PM",
-            timeBg: orangeTimeBg,
-            timeTextColor: orangeTimeText,
-            activeDays: const [true, true, true, true, true, true, true],
-          ),
+          for (var i = 0; i < defs.length; i++) ...[
+            if (i > 0) const Divider(height: 24, thickness: 1, color: Color(0xFFF2F2EC)),
+            _buildReminderItem(
+              def: defs[i],
+              schedule: prefs.schedules[defs[i].id]!,
+              iconBg: isWorkout ? greenIconBg : orangeIconBg,
+              iconColor: isWorkout ? greenIconColor : orangeIconColor,
+              timeBg: isWorkout ? greenTimeBg : orangeTimeBg,
+              timeTextColor: isWorkout ? greenTimeText : orangeTimeText,
+            ),
+          ],
         ],
       ),
     );
@@ -253,65 +321,75 @@ class _RemindersScreenState extends State<RemindersScreen> {
 
   // Single Item Widget
   Widget _buildReminderItem({
-    required IconData icon,
+    required ReminderDefinition def,
+    required ReminderSchedule schedule,
     required Color iconBg,
     required Color iconColor,
-    required String title,
-    required String subtitle,
-    required String time,
     required Color timeBg,
     required Color timeTextColor,
-    required List<bool> activeDays,
   }) {
-    const days = ["M", "T", "W", "T", "F", "S", "S"];
-
     return Column(
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: iconBg,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 18, color: iconColor),
-            ),
-            const SizedBox(width: 12),
+            // Tapping the icon or text previews the notification.
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: textPrimary,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => _preview(def),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: iconBg,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(def.icon, size: 18, color: iconColor),
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(fontSize: 10, color: textSecondary),
-                  ),
-                ],
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            context.tr(def.titleKey),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            context.tr(def.subtitleKey),
+                            style: const TextStyle(fontSize: 10, color: textSecondary),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: timeBg,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                time,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: timeTextColor,
+            GestureDetector(
+              onTap: () => _pickTime(def),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: timeBg,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  schedule.time.format(context),
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: timeTextColor,
+                  ),
                 ),
               ),
             ),
@@ -321,26 +399,30 @@ class _RemindersScreenState extends State<RemindersScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: List.generate(7, (index) {
-            final isActive = activeDays[index];
+            final isActive = schedule.days[index];
             return Padding(
               padding: const EdgeInsets.only(right: 6.0),
-              child: Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isActive ? activeGreen : Colors.transparent,
-                  border: Border.all(
-                    color: isActive ? activeGreen : Colors.black12,
+              child: GestureDetector(
+                onTap: () => _toggleDay(def, index),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isActive ? activeGreen : Colors.transparent,
+                    border: Border.all(
+                      color: isActive ? activeGreen : Colors.black12,
+                    ),
                   ),
-                ),
-                child: Center(
-                  child: Text(
-                    days[index],
-                    style: TextStyle(
-                      fontSize: 9,
-                      fontWeight: FontWeight.bold,
-                      color: isActive ? Colors.white : textSecondary,
+                  child: Center(
+                    child: Text(
+                      context.tr(_dayKeys[index]),
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        color: isActive ? Colors.white : textSecondary,
+                      ),
                     ),
                   ),
                 ),
@@ -361,66 +443,6 @@ class _RemindersScreenState extends State<RemindersScreen> {
           fontSize: 9,
           color: textSecondary,
           height: 1.3,
-        ),
-      ),
-    );
-  }
-
-  // Floating Bottom Navigation Bar
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      height: 56,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-        color: cardWhite,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem(0, Icons.home_filled, "Home"),
-          _buildNavItem(1, Icons.explore_outlined, "Discover"),
-          _buildNavItem(2, Icons.fitness_center_outlined, "Plan"),
-          _buildNavItem(3, Icons.bar_chart_rounded, "Report"),
-          _buildNavItem(4, Icons.person_outline, "Profile"),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem(int index, IconData icon, String label) {
-    final isSelected = _selectedBottomNavIndex == index;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedBottomNavIndex = index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? primaryDark : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 18, color: isSelected ? Colors.white : textSecondary),
-            if (isSelected) ...[
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ],
         ),
       ),
     );

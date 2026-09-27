@@ -1,0 +1,3 @@
+- `[x]` Update `ProfileInputScreen.dart` imports
+- `[x]` Update `_submit()` navigation to `DashboardScreen`
+- `[x]` Verify navigation flow

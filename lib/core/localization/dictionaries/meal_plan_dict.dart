@@ -5,6 +5,15 @@ const Map<String, Map<String, String>> mealPlanDict = {
   'meal_plan_ingredients_title': {'en': 'Ingredients', 'es': 'Ingredientes', 'fr': 'Ingrédients', 'de': 'Zutaten', 'hi': 'सामग्री'},
   'meal_plan_instructions_title': {'en': 'Instructions', 'es': 'Instrucciones', 'fr': 'Instructions', 'de': 'Anleitung', 'hi': 'निर्देश'},
 
+  'meal_detail_macros': {'en': 'MACRO NUTRIENTS', 'es': 'MACRONUTRIENTES', 'fr': 'MACRONUTRIMENTS', 'de': 'MAKRONÄHRSTOFFE', 'hi': 'मैक्रो पोषक तत्व'},
+  'meal_detail_protein': {'en': 'Protein {g}g', 'es': 'Proteína {g}g', 'fr': 'Protéines {g}g', 'de': 'Protein {g}g', 'hi': 'प्रोटीन {g}g'},
+  'meal_detail_carbs': {'en': 'Carbs {g}g', 'es': 'Carbos {g}g', 'fr': 'Glucides {g}g', 'de': 'Kohlenhydrate {g}g', 'hi': 'कार्ब्स {g}g'},
+  'meal_detail_fat': {'en': 'Fat {g}g', 'es': 'Grasa {g}g', 'fr': 'Lipides {g}g', 'de': 'Fett {g}g', 'hi': 'वसा {g}g'},
+  'meal_detail_items': {'en': '{n} items', 'es': '{n} artículos', 'fr': '{n} éléments', 'de': '{n} Zutaten', 'hi': '{n} सामग्री'},
+  'meal_detail_quick_instructions': {'en': 'Quick Instructions', 'es': 'Instrucciones Rápidas', 'fr': 'Instructions Rapides', 'de': 'Kurzanleitung', 'hi': 'त्वरित निर्देश'},
+  'meal_detail_log_meal': {'en': 'Log This Meal', 'es': 'Registrar Esta Comida', 'fr': 'Enregistrer ce Repas', 'de': 'Mahlzeit Erfassen', 'hi': 'यह भोजन दर्ज करें'},
+  'meal_detail_logged': {'en': 'Meal Logged', 'es': 'Comida Registrada', 'fr': 'Repas Enregistré', 'de': 'Mahlzeit Erfasst', 'hi': 'भोजन दर्ज हुआ'},
+
   'meal_plan_today_title': {'en': "Today's Meal Plan", 'es': 'Plan de Comidas de Hoy', 'fr': 'Plan de Repas du Jour', 'de': 'Heutiger Essensplan', 'hi': 'आज की भोजन योजना'},
   'meal_plan_daily_target': {'en': 'Daily target: {kcal} kcal  •  P {p}g  •  C {c}g  •  F {f}g', 'es': 'Objetivo diario: {kcal} kcal  •  P {p}g  •  C {c}g  •  G {f}g', 'fr': 'Objectif quotidien : {kcal} kcal  •  P {p}g  •  G {c}g  •  L {f}g', 'de': 'Tagesziel: {kcal} kcal  •  P {p}g  •  K {c}g  •  F {f}g', 'hi': 'दैनिक लक्ष्य: {kcal} kcal  •  P {p}g  •  C {c}g  •  F {f}g'},
   'meal_plan_image_failed': {'en': 'Image failed to generate', 'es': 'No se pudo generar la imagen', 'fr': "Échec de la génération de l'image", 'de': 'Bild konnte nicht erstellt werden', 'hi': 'छवि तैयार नहीं हो सकी'},
