@@ -1,5 +1,7 @@
-/// Gemini key for local dev. Override at build time with:
-///   flutter run --dart-define=GEMINI_API_KEY=<key>
+/// Gemini key, supplied at build time — never hardcode it here. Either:
+///   flutter run --dart-define-from-file=dart_defines.json
+/// with a git-ignored `dart_defines.json` of `{"GEMINI_API_KEY": "..."}`, or
+///   flutter run --dart-define=GEMINI_API_KEY=`key`
 /// Get one at https://aistudio.google.com/apikey
 class ApiConfig {
   static const String geminiApiKey = String.fromEnvironment(
