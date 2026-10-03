@@ -1,0 +1,15 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Exercise demo videos, grouped by goal folder (e.g. "weight loss/",
+    // "muscle gain/"): static content we manage, read-only from the app.
+    // The `=**` wildcard is required (not just `{fileName}`) so `listAll()`
+    // on the folder itself is allowed, not only `getDownloadURL()` on a
+    // single file inside it.
+    match /{goalFolder}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+  }
+}

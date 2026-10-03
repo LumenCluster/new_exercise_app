@@ -1,0 +1,61 @@
+/// Shared strings reused across several screens: nav labels, generic
+/// buttons, and common dialog actions.
+const Map<String, Map<String, String>> commonDict = {
+  'nav_home': {'en': 'Home', 'es': 'Inicio', 'fr': 'Accueil', 'de': 'Start', 'hi': 'होम'},
+  'nav_discover': {'en': 'Discover', 'es': 'Descubrir', 'fr': 'Découvrir', 'de': 'Entdecken', 'hi': 'खोजें'},
+  'nav_plan': {'en': 'Plan', 'es': 'Plan', 'fr': 'Plan', 'de': 'Plan', 'hi': 'योजना'},
+  'nav_report': {'en': 'Report', 'es': 'Informe', 'fr': 'Rapport', 'de': 'Bericht', 'hi': 'रिपोर्ट'},
+  'nav_profile': {'en': 'Profile', 'es': 'Perfil', 'fr': 'Profil', 'de': 'Profil', 'hi': 'प्रोफ़ाइल'},
+
+  'common_cancel': {'en': 'Cancel', 'es': 'Cancelar', 'fr': 'Annuler', 'de': 'Abbrechen', 'hi': 'रद्द करें'},
+  'common_save': {'en': 'Save', 'es': 'Guardar', 'fr': 'Enregistrer', 'de': 'Speichern', 'hi': 'सेव करें'},
+  'common_close': {'en': 'Close', 'es': 'Cerrar', 'fr': 'Fermer', 'de': 'Schließen', 'hi': 'बंद करें'},
+  'common_continue': {'en': 'Continue', 'es': 'Continuar', 'fr': 'Continuer', 'de': 'Weiter', 'hi': 'जारी रखें'},
+  'common_next': {'en': 'Next', 'es': 'Siguiente', 'fr': 'Suivant', 'de': 'Weiter', 'hi': 'अगला'},
+  'common_back': {'en': 'Back', 'es': 'Atrás', 'fr': 'Retour', 'de': 'Zurück', 'hi': 'वापस'},
+  'common_done': {'en': 'Done', 'es': 'Hecho', 'fr': 'Terminé', 'de': 'Fertig', 'hi': 'पूर्ण'},
+  'common_submit': {'en': 'Submit', 'es': 'Enviar', 'fr': 'Envoyer', 'de': 'Absenden', 'hi': 'जमा करें'},
+  'common_retry': {'en': 'Retry', 'es': 'Reintentar', 'fr': 'Réessayer', 'de': 'Wiederholen', 'hi': 'पुनः प्रयास करें'},
+  'common_loading': {'en': 'Loading...', 'es': 'Cargando...', 'fr': 'Chargement...', 'de': 'Lädt...', 'hi': 'लोड हो रहा है...'},
+  'common_error': {'en': 'Something went wrong', 'es': 'Algo salió mal', 'fr': "Une erreur s'est produite", 'de': 'Etwas ist schiefgelaufen', 'hi': 'कुछ गलत हो गया'},
+  'common_delete': {'en': 'Delete', 'es': 'Eliminar', 'fr': 'Supprimer', 'de': 'Löschen', 'hi': 'हटाएं'},
+  'common_edit': {'en': 'Edit', 'es': 'Editar', 'fr': 'Modifier', 'de': 'Bearbeiten', 'hi': 'संपादित करें'},
+  'common_add': {'en': 'Add', 'es': 'Añadir', 'fr': 'Ajouter', 'de': 'Hinzufügen', 'hi': 'जोड़ें'},
+  'common_ok': {'en': 'OK', 'es': 'Aceptar', 'fr': 'OK', 'de': 'OK', 'hi': 'ठीक है'},
+  'common_yes': {'en': 'Yes', 'es': 'Sí', 'fr': 'Oui', 'de': 'Ja', 'hi': 'हाँ'},
+  'common_no': {'en': 'No', 'es': 'No', 'fr': 'Non', 'de': 'Nein', 'hi': 'नहीं'},
+  'common_sets': {'en': 'sets', 'es': 'series', 'fr': 'séries', 'de': 'Sätze', 'hi': 'सेट'},
+  'common_reps': {'en': 'reps', 'es': 'repeticiones', 'fr': 'répétitions', 'de': 'Wiederholungen', 'hi': 'रेप्स'},
+  'common_minutes': {'en': 'minutes', 'es': 'minutos', 'fr': 'minutes', 'de': 'Minuten', 'hi': 'मिनट'},
+  'app_title': {'en': 'AI Meal Planner', 'es': 'Planificador de Comidas IA', 'fr': "Planificateur de Repas IA", 'de': 'KI-Essensplaner', 'hi': 'एआई भोजन योजनाकार'},
+
+  // Shared profile-summary field labels (Dashboard, Profile, Report).
+  'label_age': {'en': 'Age', 'es': 'Edad', 'fr': 'Âge', 'de': 'Alter', 'hi': 'आयु'},
+  'label_height': {'en': 'Height', 'es': 'Altura', 'fr': 'Taille', 'de': 'Größe', 'hi': 'ऊंचाई'},
+  'label_weight': {'en': 'Weight', 'es': 'Peso', 'fr': 'Poids', 'de': 'Gewicht', 'hi': 'वज़न'},
+  'label_target_weight': {'en': 'Target Weight', 'es': 'Peso Objetivo', 'fr': 'Poids Cible', 'de': 'Zielgewicht', 'hi': 'लक्ष्य वजन'},
+  'label_activity': {'en': 'Activity', 'es': 'Actividad', 'fr': 'Activité', 'de': 'Aktivität', 'hi': 'गतिविधि'},
+  'label_goal': {'en': 'Goal', 'es': 'Objetivo', 'fr': 'Objectif', 'de': 'Ziel', 'hi': 'लक्ष्य'},
+  'label_fitness_level': {'en': 'Fitness Level', 'es': 'Nivel de Condición', 'fr': 'Niveau de Forme', 'de': 'Fitnesslevel', 'hi': 'फिटनेस स्तर'},
+  'label_workout_days_per_week': {'en': 'Workout Days/Week', 'es': 'Días de Entreno/Semana', 'fr': "Jours d'Entraînement/Semaine", 'de': 'Trainingstage/Woche', 'hi': 'सप्ताह में वर्कआउट दिन'},
+  'label_eating_preference': {'en': 'Eating Preference', 'es': 'Preferencia Alimentaria', 'fr': 'Préférence Alimentaire', 'de': 'Ernährungspräferenz', 'hi': 'भोजन प्राथमिकता'},
+  'label_meals_per_day': {'en': 'Meals/Day', 'es': 'Comidas/Día', 'fr': 'Repas/Jour', 'de': 'Mahlzeiten/Tag', 'hi': 'भोजन/दिन'},
+  'label_primary_goal': {'en': 'Primary Goal', 'es': 'Objetivo Principal', 'fr': 'Objectif Principal', 'de': 'Hauptziel', 'hi': 'मुख्य लक्ष्य'},
+  'label_allergies': {'en': 'Allergies', 'es': 'Alergias', 'fr': 'Allergies', 'de': 'Allergien', 'hi': 'एलर्जी'},
+  'label_considerations': {'en': 'Considerations', 'es': 'Consideraciones', 'fr': 'Considérations', 'de': 'Hinweise', 'hi': 'ध्यान देने योग्य बातें'},
+
+  // Weekday abbreviations, used by the workout/activity charts.
+  'weekday_mon': {'en': 'Mon', 'es': 'Lun', 'fr': 'Lun', 'de': 'Mo', 'hi': 'सोम'},
+  'weekday_tue': {'en': 'Tue', 'es': 'Mar', 'fr': 'Mar', 'de': 'Di', 'hi': 'मंगल'},
+  'weekday_wed': {'en': 'Wed', 'es': 'Mié', 'fr': 'Mer', 'de': 'Mi', 'hi': 'बुध'},
+  'weekday_thu': {'en': 'Thu', 'es': 'Jue', 'fr': 'Jeu', 'de': 'Do', 'hi': 'गुरु'},
+  'weekday_fri': {'en': 'Fri', 'es': 'Vie', 'fr': 'Ven', 'de': 'Fr', 'hi': 'शुक्र'},
+  'weekday_sat': {'en': 'Sat', 'es': 'Sáb', 'fr': 'Sam', 'de': 'Sa', 'hi': 'शनि'},
+  'weekday_sun': {'en': 'Sun', 'es': 'Dom', 'fr': 'Dim', 'de': 'So', 'hi': 'रवि'},
+
+  // Meal categories, used by the Dashboard and meal-plan screens.
+  'meal_breakfast': {'en': 'BREAKFAST', 'es': 'DESAYUNO', 'fr': 'PETIT-DÉJEUNER', 'de': 'FRÜHSTÜCK', 'hi': 'नाश्ता'},
+  'meal_lunch': {'en': 'LUNCH', 'es': 'ALMUERZO', 'fr': 'DÉJEUNER', 'de': 'MITTAGESSEN', 'hi': 'दोपहर का भोजन'},
+  'meal_dinner': {'en': 'DINNER', 'es': 'CENA', 'fr': 'DÎNER', 'de': 'ABENDESSEN', 'hi': 'रात का भोजन'},
+  'meal_snack_n': {'en': 'SNACK {n}', 'es': 'MERIENDA {n}', 'fr': 'COLLATION {n}', 'de': 'SNACK {n}', 'hi': 'नाश्ता {n}'},
+};

@@ -1,0 +1,858 @@
+[
+{
+"id": "standing_quad_stretch",
+"name": "Standing Quad Stretch",
+"description": "A standing hold that loosens the quads after leg-focused strength sessions.",
+"instructions": [
+"Stand tall, holding onto a wall or chair for balance if needed.",
+"Bend one knee and grab your ankle behind you, pulling your heel toward your glutes.",
+"Keep your knees close together and hold, then switch sides."
+],
+"targetGoals": [
+"gainWeight"
+],
+"muscleGroups": [
+"Quadriceps",
+"Hip Flexors"
+],
+"difficulty": "beginner",
+"category": "staticCooldown",
+"durationSeconds": 30,
+"sets": 1,
+"reps": null,
+"holdSeconds": 30,
+"perSide": true,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/standing_quad_stretch.gif"
+},
+{
+"id": "hip_flexor_lunge_stretch",
+"name": "Hip Flexor Lunge Stretch",
+"description": "A kneeling lunge stretch that opens tight hip flexors from squatting and deadlifting.",
+"instructions": [
+"Step into a half-kneeling lunge with your back knee on the floor.",
+"Tuck your pelvis under and shift your hips forward until you feel a stretch at the front of the back hip.",
+"Hold, keeping your torso upright, then switch legs."
+],
+"targetGoals": [
+"gainWeight"
+],
+"muscleGroups": [
+"Hip Flexors",
+"Glutes"
+],
+"difficulty": "beginner",
+"category": "mobility",
+"durationSeconds": 30,
+"sets": 1,
+"reps": null,
+"holdSeconds": 30,
+"perSide": true,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/hip_flexor_lunge_stretch.gif"
+},
+{
+"id": "chest_opener_doorway_stretch",
+"name": "Chest Opener (Doorway Stretch)",
+"description": "Uses a doorway to counteract tight pecs from heavy pressing work.",
+"instructions": [
+"Stand in a doorway and place your forearms on the frame at shoulder height.",
+"Step one foot forward and gently lean through the doorway.",
+"Hold the stretch across your chest and front shoulders."
+],
+"targetGoals": [
+"gainWeight"
+],
+"muscleGroups": [
+"Chest",
+"Shoulders"
+],
+"difficulty": "beginner",
+"category": "staticCooldown",
+"durationSeconds": 30,
+"sets": 2,
+"reps": null,
+"holdSeconds": 30,
+"perSide": false,
+"equipmentNeeded": true,
+"imageAsset": null,
+"gifAsset": "assets/gifs/chest_opener_doorway_stretch.gif"
+},
+{
+"id": "shoulder_cross_body_stretch",
+"name": "Shoulder Cross-Body Stretch",
+"description": "A simple cross-body pull that relieves shoulder tightness after pressing or pulling days.",
+"instructions": [
+"Bring one arm straight across your chest.",
+"Use your other arm to gently pull it closer to your body.",
+"Hold, keeping the shoulder relaxed away from your ear, then switch arms."
+],
+"targetGoals": [
+"gainWeight"
+],
+"muscleGroups": [
+"Shoulders",
+"Upper Back"
+],
+"difficulty": "beginner",
+"category": "staticCooldown",
+"durationSeconds": 20,
+"sets": 1,
+"reps": null,
+"holdSeconds": 20,
+"perSide": true,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/shoulder_cross_body_stretch.gif"
+},
+{
+"id": "seated_forward_fold",
+"name": "Seated Forward Fold",
+"description": "A seated fold that lengthens the hamstrings and lower back after deadlifts or squats.",
+"instructions": [
+"Sit on the floor with legs extended straight in front of you.",
+"Hinge at the hips and reach toward your toes, keeping your back long.",
+"Hold at your comfortable end range without forcing the stretch."
+],
+"targetGoals": [
+"gainWeight"
+],
+"muscleGroups": [
+"Hamstrings",
+"Lower Back"
+],
+"difficulty": "beginner",
+"category": "staticCooldown",
+"durationSeconds": 30,
+"sets": 1,
+"reps": null,
+"holdSeconds": 30,
+"perSide": false,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/seated_forward_fold.gif"
+},
+{
+"id": "cat_cow_spinal_stretch",
+"name": "Cat-Cow Spinal Stretch",
+"description": "A flowing spinal movement that restores mobility after loaded barbell work.",
+"instructions": [
+"Start on hands and knees in a tabletop position.",
+"Inhale, drop your belly and lift your chest and tailbone (cow).",
+"Exhale, round your spine and tuck your chin and tailbone (cat). Repeat smoothly."
+],
+"targetGoals": [
+"gainWeight"
+],
+"muscleGroups": [
+"Spine",
+"Core"
+],
+"difficulty": "beginner",
+"category": "mobility",
+"durationSeconds": 0,
+"sets": 2,
+"reps": 10,
+"holdSeconds": null,
+"perSide": false,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/cat_cow_spinal_stretch.gif"
+},
+{
+"id": "lat_stretch_overhead_side_reach",
+"name": "Lat Stretch (Overhead Side Reach)",
+"description": "An overhead side reach that opens the lats after pull-ups or rows.",
+"instructions": [
+"Stand tall and raise one arm straight overhead.",
+"Lean your torso to the opposite side, reaching over.",
+"Hold the stretch along your side and lat, then switch."
+],
+"targetGoals": [
+"gainWeight"
+],
+"muscleGroups": [
+"Lats",
+"Obliques"
+],
+"difficulty": "beginner",
+"category": "staticCooldown",
+"durationSeconds": 20,
+"sets": 1,
+"reps": null,
+"holdSeconds": 20,
+"perSide": true,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/lat_stretch_overhead_side_reach.gif"
+},
+{
+"id": "glute_figure_4_stretch",
+"name": "Glute Figure-4 Stretch",
+"description": "A figure-4 hold that releases the glutes after squats and lunges.",
+"instructions": [
+"Lie on your back with knees bent, feet flat on the floor.",
+"Cross one ankle over the opposite knee, forming a figure-4 shape.",
+"Pull the uncrossed thigh toward your chest until you feel a stretch in the crossed hip, then switch."
+],
+"targetGoals": [
+"gainWeight"
+],
+"muscleGroups": [
+"Glutes",
+"Piriformis"
+],
+"difficulty": "beginner",
+"category": "recovery",
+"durationSeconds": 30,
+"sets": 1,
+"reps": null,
+"holdSeconds": 30,
+"perSide": true,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/glute_figure_4_stretch.gif"
+},
+{
+"id": "standing_toe_touch",
+"name": "Standing Toe Touch",
+"description": "A standing fold that lengthens the posterior chain after cardio sessions.",
+"instructions": [
+"Stand with feet hip-width apart.",
+"Hinge forward from the hips and reach toward your toes, letting your knees soften.",
+"Hold, relaxing your neck and shoulders."
+],
+"targetGoals": [
+"loseWeight"
+],
+"muscleGroups": [
+"Hamstrings",
+"Lower Back"
+],
+"difficulty": "beginner",
+"category": "staticCooldown",
+"durationSeconds": 20,
+"sets": 1,
+"reps": null,
+"holdSeconds": 20,
+"perSide": false,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/standing_toe_touch.gif"
+},
+{
+"id": "dynamic_leg_swings",
+"name": "Dynamic Leg Swings",
+"description": "Controlled front-to-back swings that raise heart rate and open the hips before cardio.",
+"instructions": [
+"Hold onto a wall or chair for balance.",
+"Swing one leg forward and backward in a controlled motion.",
+"Keep your core engaged and repeat for the set number of swings, then switch legs."
+],
+"targetGoals": [
+"loseWeight"
+],
+"muscleGroups": [
+"Hips",
+"Hamstrings"
+],
+"difficulty": "beginner",
+"category": "dynamicWarmUp",
+"durationSeconds": 0,
+"sets": 1,
+"reps": 12,
+"holdSeconds": null,
+"perSide": true,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/dynamic_leg_swings.gif"
+},
+{
+"id": "walking_lunge_with_twist",
+"name": "Walking Lunge with Twist",
+"description": "A moving lunge with a torso twist that warms the legs and core together.",
+"instructions": [
+"Step forward into a lunge, lowering your back knee toward the floor.",
+"Rotate your torso toward your front leg, reaching your arms with the twist.",
+"Return to center, step through, and repeat on the other side."
+],
+"targetGoals": [
+"loseWeight"
+],
+"muscleGroups": [
+"Legs",
+"Core",
+"Obliques"
+],
+"difficulty": "intermediate",
+"category": "dynamicWarmUp",
+"durationSeconds": 0,
+"sets": 1,
+"reps": 10,
+"holdSeconds": null,
+"perSide": true,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/walking_lunge_with_twist.gif"
+},
+{
+"id": "standing_side_bend",
+"name": "Standing Side Bend",
+"description": "A lateral bend that mobilizes the sides of the torso between cardio intervals.",
+"instructions": [
+"Stand with feet shoulder-width apart, one arm reaching overhead.",
+"Bend your torso to the opposite side, keeping hips stacked.",
+"Hold the stretch along your side, then switch."
+],
+"targetGoals": [
+"loseWeight"
+],
+"muscleGroups": [
+"Obliques",
+"Lats"
+],
+"difficulty": "beginner",
+"category": "mobility",
+"durationSeconds": 15,
+"sets": 1,
+"reps": null,
+"holdSeconds": 15,
+"perSide": true,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/standing_side_bend.gif"
+},
+{
+"id": "butterfly_stretch",
+"name": "Butterfly Stretch",
+"description": "A seated inner-thigh stretch that cools down the hips after high-rep leg work.",
+"instructions": [
+"Sit with the soles of your feet together, knees falling out to the sides.",
+"Hold your feet and gently press your knees toward the floor.",
+"Sit tall and hold, breathing steadily."
+],
+"targetGoals": [
+"loseWeight"
+],
+"muscleGroups": [
+"Inner Thighs",
+"Hips"
+],
+"difficulty": "beginner",
+"category": "staticCooldown",
+"durationSeconds": 30,
+"sets": 1,
+"reps": null,
+"holdSeconds": 30,
+"perSide": false,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/butterfly_stretch.gif"
+},
+{
+"id": "downward_dog_stretch",
+"name": "Downward Dog Stretch",
+"description": "A full-body inverted-V stretch that lengthens the hamstrings, calves, and shoulders.",
+"instructions": [
+"Start on hands and knees, then lift your hips up and back.",
+"Straighten your legs as much as comfortable, pressing your heels toward the floor.",
+"Keep your spine long and hold."
+],
+"targetGoals": [
+"loseWeight"
+],
+"muscleGroups": [
+"Hamstrings",
+"Calves",
+"Shoulders"
+],
+"difficulty": "beginner",
+"category": "staticCooldown",
+"durationSeconds": 30,
+"sets": 2,
+"reps": null,
+"holdSeconds": 30,
+"perSide": false,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/downward_dog_stretch.gif"
+},
+{
+"id": "calf_stretch_against_wall",
+"name": "Calf Stretch Against Wall",
+"description": "A wall-assisted stretch that eases calf tightness after running or jump-based cardio.",
+"instructions": [
+"Place both hands on a wall, one foot back with the heel flat on the floor.",
+"Keep the back leg straight and lean forward slightly toward the wall.",
+"Hold the stretch in the calf, then switch legs."
+],
+"targetGoals": [
+"loseWeight"
+],
+"muscleGroups": [
+"Calves"
+],
+"difficulty": "beginner",
+"category": "staticCooldown",
+"durationSeconds": 30,
+"sets": 1,
+"reps": null,
+"holdSeconds": 30,
+"perSide": true,
+"equipmentNeeded": true,
+"imageAsset": null,
+"gifAsset": "assets/gifs/calf_stretch_against_wall.gif"
+},
+{
+"id": "seated_spinal_twist",
+"name": "Seated Spinal Twist",
+"description": "A seated rotation that mobilizes the spine and obliques after cardio work.",
+"instructions": [
+"Sit with legs extended, then cross one foot over the opposite knee.",
+"Twist your torso toward the bent knee, using your arm for leverage.",
+"Hold the twist, keeping your spine tall, then switch sides."
+],
+"targetGoals": [
+"loseWeight"
+],
+"muscleGroups": [
+"Spine",
+"Obliques"
+],
+"difficulty": "beginner",
+"category": "mobility",
+"durationSeconds": 20,
+"sets": 1,
+"reps": null,
+"holdSeconds": 20,
+"perSide": true,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/seated_spinal_twist.gif"
+},
+{
+"id": "neck_tilt_stretch",
+"name": "Neck Tilt Stretch",
+"description": "A gentle side tilt that releases everyday neck tension.",
+"instructions": [
+"Sit or stand tall with shoulders relaxed.",
+"Tilt your head toward one shoulder, letting the opposite shoulder stay down.",
+"Hold gently, then switch sides."
+],
+"targetGoals": [
+"maintainWeight"
+],
+"muscleGroups": [
+"Neck"
+],
+"difficulty": "beginner",
+"category": "mobility",
+"durationSeconds": 15,
+"sets": 1,
+"reps": null,
+"holdSeconds": 15,
+"perSide": true,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/neck_tilt_stretch.gif"
+},
+{
+"id": "shoulder_rolls",
+"name": "Shoulder Rolls",
+"description": "A light mobility drill to loosen the shoulders during a maintenance routine.",
+"instructions": [
+"Stand or sit tall with arms relaxed at your sides.",
+"Roll both shoulders up, back, and down in a smooth circle.",
+"Repeat for the set number of rolls, then reverse direction."
+],
+"targetGoals": [
+"maintainWeight"
+],
+"muscleGroups": [
+"Shoulders"
+],
+"difficulty": "beginner",
+"category": "mobility",
+"durationSeconds": 0,
+"sets": 1,
+"reps": 10,
+"holdSeconds": null,
+"perSide": false,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/shoulder_rolls.gif"
+},
+{
+"id": "standing_hamstring_stretch",
+"name": "Standing Hamstring Stretch",
+"description": "A simple standing stretch to keep the hamstrings supple.",
+"instructions": [
+"Place one heel on a low step or the floor in front of you, leg straight.",
+"Hinge forward from the hips, keeping your back flat.",
+"Hold, then switch legs."
+],
+"targetGoals": [
+"maintainWeight"
+],
+"muscleGroups": [
+"Hamstrings"
+],
+"difficulty": "beginner",
+"category": "staticCooldown",
+"durationSeconds": 30,
+"sets": 1,
+"reps": null,
+"holdSeconds": 30,
+"perSide": true,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/standing_hamstring_stretch.gif"
+},
+{
+"id": "torso_rotation_stretch",
+"name": "Torso Rotation Stretch",
+"description": "A standing rotation that keeps the core and spine mobile.",
+"instructions": [
+"Stand with feet hip-width apart, arms relaxed or crossed over your chest.",
+"Rotate your torso gently to one side, then the other.",
+"Keep the movement controlled and repeat for the set number of reps."
+],
+"targetGoals": [
+"maintainWeight"
+],
+"muscleGroups": [
+"Core",
+"Obliques"
+],
+"difficulty": "beginner",
+"category": "mobility",
+"durationSeconds": 0,
+"sets": 1,
+"reps": 10,
+"holdSeconds": null,
+"perSide": true,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/torso_rotation_stretch.gif"
+},
+{
+"id": "childs_pose",
+"name": "Child's Pose",
+"description": "A resting pose that decompresses the lower back and calms the body.",
+"instructions": [
+"Kneel on the floor and sit back onto your heels.",
+"Fold forward, extending your arms in front of you and resting your forehead down.",
+"Breathe deeply and hold."
+],
+"targetGoals": [
+"maintainWeight"
+],
+"muscleGroups": [
+"Lower Back",
+"Hips"
+],
+"difficulty": "beginner",
+"category": "recovery",
+"durationSeconds": 45,
+"sets": 1,
+"reps": null,
+"holdSeconds": 45,
+"perSide": false,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/childs_pose.gif"
+},
+{
+"id": "ankle_circles",
+"name": "Ankle Circles",
+"description": "A small joint-mobility drill that keeps the ankles healthy.",
+"instructions": [
+"Sit or stand, lifting one foot slightly off the floor.",
+"Rotate your ankle in slow circles in one direction, then reverse.",
+"Repeat for the set number of circles, then switch feet."
+],
+"targetGoals": [
+"maintainWeight"
+],
+"muscleGroups": [
+"Ankles"
+],
+"difficulty": "beginner",
+"category": "mobility",
+"durationSeconds": 0,
+"sets": 1,
+"reps": 10,
+"holdSeconds": null,
+"perSide": true,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/ankle_circles.gif"
+},
+{
+"id": "cobra_stretch",
+"name": "Cobra Stretch",
+"description": "A gentle backbend that keeps the front of the body and spine supple.",
+"instructions": [
+"Lie face down with hands under your shoulders.",
+"Press through your hands to lift your chest, keeping hips on the floor.",
+"Hold, then lower back down."
+],
+"targetGoals": [
+"maintainWeight"
+],
+"muscleGroups": [
+"Abs",
+"Lower Back"
+],
+"difficulty": "beginner",
+"category": "staticCooldown",
+"durationSeconds": 20,
+"sets": 2,
+"reps": null,
+"holdSeconds": 20,
+"perSide": false,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/cobra_stretch.gif"
+},
+{
+"id": "cross_leg_seated_twist",
+"name": "Cross-Leg Seated Twist",
+"description": "A seated twist that maintains everyday spinal rotation.",
+"instructions": [
+"Sit cross-legged on the floor.",
+"Place one hand behind you and the other on the opposite knee, then twist toward the back hand.",
+"Hold, then switch directions."
+],
+"targetGoals": [
+"maintainWeight"
+],
+"muscleGroups": [
+"Spine",
+"Glutes"
+],
+"difficulty": "beginner",
+"category": "mobility",
+"durationSeconds": 20,
+"sets": 1,
+"reps": null,
+"holdSeconds": 20,
+"perSide": true,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/cross_leg_seated_twist.gif"
+},
+{
+"id": "bicep_wall_stretch",
+"name": "Bicep Wall Stretch",
+"description": "A wall-assisted stretch that targets the biceps after pulling or curling work.",
+"instructions": [
+"Stand next to a wall and place your palm flat against it, arm straight, fingers pointing back.",
+"Slowly rotate your body away from the wall until you feel a stretch in the bicep.",
+"Hold, then switch arms."
+],
+"targetGoals": [
+"gainMuscle"
+],
+"muscleGroups": [
+"Biceps"
+],
+"difficulty": "beginner",
+"category": "staticCooldown",
+"durationSeconds": 20,
+"sets": 1,
+"reps": null,
+"holdSeconds": 20,
+"perSide": true,
+"equipmentNeeded": true,
+"imageAsset": null,
+"gifAsset": "assets/gifs/bicep_wall_stretch.gif"
+},
+{
+"id": "tricep_overhead_stretch",
+"name": "Tricep Overhead Stretch",
+"description": "An overhead reach that lengthens the triceps after pressing work.",
+"instructions": [
+"Raise one arm overhead and bend the elbow, dropping your hand behind your head.",
+"Use your other hand to gently press on the bent elbow.",
+"Hold, then switch arms."
+],
+"targetGoals": [
+"gainMuscle"
+],
+"muscleGroups": [
+"Triceps"
+],
+"difficulty": "beginner",
+"category": "staticCooldown",
+"durationSeconds": 20,
+"sets": 1,
+"reps": null,
+"holdSeconds": 20,
+"perSide": true,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/tricep_overhead_stretch.gif"
+},
+{
+"id": "pec_doorway_stretch",
+"name": "Pec Doorway Stretch",
+"description": "A doorway stretch that targets the chest after heavy pressing sessions.",
+"instructions": [
+"Stand in a doorway with your forearm on the frame, elbow at shoulder height.",
+"Step forward through the doorway until you feel a stretch across your chest.",
+"Hold, then repeat facing the other arm forward."
+],
+"targetGoals": [
+"gainMuscle"
+],
+"muscleGroups": [
+"Chest"
+],
+"difficulty": "beginner",
+"category": "staticCooldown",
+"durationSeconds": 30,
+"sets": 2,
+"reps": null,
+"holdSeconds": 30,
+"perSide": false,
+"equipmentNeeded": true,
+"imageAsset": null,
+"gifAsset": "assets/gifs/pec_doorway_stretch.gif"
+},
+{
+"id": "hamstring_floor_reach",
+"name": "Hamstring Floor Reach",
+"description": "A floor-based reach that lengthens the hamstrings after leg day.",
+"instructions": [
+"Sit on the floor with legs extended straight ahead.",
+"Reach forward along your legs toward your feet, keeping your back long.",
+"Hold at your end range."
+],
+"targetGoals": [
+"gainMuscle"
+],
+"muscleGroups": [
+"Hamstrings"
+],
+"difficulty": "beginner",
+"category": "staticCooldown",
+"durationSeconds": 30,
+"sets": 1,
+"reps": null,
+"holdSeconds": 30,
+"perSide": false,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/hamstring_floor_reach.gif"
+},
+{
+"id": "quad_standing_pull_stretch",
+"name": "Quad Standing Pull Stretch",
+"description": "A standing pull that stretches the quads after squats or lunges.",
+"instructions": [
+"Stand tall, holding a wall for balance if needed.",
+"Bend one knee and pull your heel toward your glutes, keeping knees together.",
+"Hold, then switch legs."
+],
+"targetGoals": [
+"gainMuscle"
+],
+"muscleGroups": [
+"Quadriceps"
+],
+"difficulty": "beginner",
+"category": "staticCooldown",
+"durationSeconds": 30,
+"sets": 1,
+"reps": null,
+"holdSeconds": 30,
+"perSide": true,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/quad_standing_pull_stretch.gif"
+},
+{
+"id": "piriformis_stretch_seated_figure_4",
+"name": "Piriformis Stretch (Seated Figure-4)",
+"description": "A seated figure-4 hold that releases the glutes after heavy lower-body training.",
+"instructions": [
+"Sit tall in a chair and cross one ankle over the opposite knee.",
+"Hinge forward from the hips, keeping your back flat.",
+"Hold the stretch in the hip, then switch sides."
+],
+"targetGoals": [
+"gainMuscle"
+],
+"muscleGroups": [
+"Glutes",
+"Piriformis"
+],
+"difficulty": "beginner",
+"category": "recovery",
+"durationSeconds": 30,
+"sets": 1,
+"reps": null,
+"holdSeconds": 30,
+"perSide": true,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/piriformis_stretch_seated_figure_4.gif"
+},
+{
+"id": "upper_back_stretch",
+"name": "Upper Back Stretch",
+"description": "A rounded reach that stretches the upper back after rowing or pulling work.",
+"instructions": [
+"Clasp your hands together in front of you at shoulder height.",
+"Round your upper back and push your hands away, tucking your chin slightly.",
+"Hold, feeling the stretch between your shoulder blades."
+],
+"targetGoals": [
+"gainMuscle"
+],
+"muscleGroups": [
+"Upper Back",
+"Rhomboids"
+],
+"difficulty": "beginner",
+"category": "mobility",
+"durationSeconds": 20,
+"sets": 2,
+"reps": null,
+"holdSeconds": 20,
+"perSide": false,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/upper_back_stretch.gif"
+},
+{
+"id": "wrist_flexor_extensor_stretch",
+"name": "Wrist Flexor/Extensor Stretch",
+"description": "A two-way wrist stretch that eases forearm tightness after heavy gripping work.",
+"instructions": [
+"Extend one arm in front of you, palm up, and gently pull the fingers back with your other hand.",
+"Hold, then flip the palm down and gently press the hand down for the extensor stretch.",
+"Switch arms and repeat both directions."
+],
+"targetGoals": [
+"gainMuscle"
+],
+"muscleGroups": [
+"Forearms",
+"Wrists"
+],
+"difficulty": "beginner",
+"category": "staticCooldown",
+"durationSeconds": 15,
+"sets": 1,
+"reps": null,
+"holdSeconds": 15,
+"perSide": true,
+"equipmentNeeded": false,
+"imageAsset": null,
+"gifAsset": "assets/gifs/wrist_flexor_extensor_stretch.gif"
+}
+]

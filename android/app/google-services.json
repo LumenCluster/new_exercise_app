@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "454000855210",
+    "project_id": "noorish-hub-and-exercise",
+    "storage_bucket": "noorish-hub-and-exercise.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:454000855210:android:5aee9c643b77d30fbee8d3",
+        "android_client_info": {
+          "package_name": "com.lumencluster.noorishhub"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9uDHtLWoKHWovvNY6EU_ekpdULt1q-6M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
