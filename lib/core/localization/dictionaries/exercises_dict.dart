@@ -93,4 +93,8 @@ const Map<String, Map<String, String>> exercisesDict = {
   'exercises_meals_followed_label': {'en': 'Meals Followed', 'es': 'Comidas Seguidas', 'fr': 'Repas Suivis', 'de': 'Befolgte Mahlzeiten', 'hi': 'अनुसरण किए गए भोजन'},
   'exercises_active_streak_label': {'en': 'Active Streak', 'es': 'Racha Activa', 'fr': 'Série Active', 'de': 'Aktive Serie', 'hi': 'सक्रिय स्ट्रीक'},
   'exercises_days_count': {'en': '{n} Days', 'es': '{n} Días', 'fr': '{n} Jours', 'de': '{n} Tage', 'hi': '{n} दिन'},
+  'exercises_time_this_week': {'en': 'of {target} this week', 'es': 'de {target} esta semana', 'fr': 'sur {target} cette semaine', 'de': 'von {target} diese Woche', 'hi': 'इस सप्ताह {target} में से'},
+  'exercises_today_time_label': {'en': 'Time Today', 'es': 'Tiempo Hoy', 'fr': "Temps Aujourd'hui", 'de': 'Zeit Heute', 'hi': 'आज का समय'},
+  'exercises_live': {'en': 'Live', 'es': 'En vivo', 'fr': 'En direct', 'de': 'Live', 'hi': 'लाइव'},
+  'exercises_day_count_one': {'en': '{n} Day', 'es': '{n} Día', 'fr': '{n} Jour', 'de': '{n} Tag', 'hi': '{n} दिन'},
 };

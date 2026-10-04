@@ -70,23 +70,67 @@ class MealPlanProvider extends ChangeNotifier {
   }
 
   Future<void> ensureImageForMeal(Meal meal) async {
-    if (meal.imagePath != null) return;
-    if (imageStates[meal.cacheKey] == LoadState.loading) return;
+    if (meal.imagePath != null) {
+      debugPrint('[MealImage] ${meal.cacheKey}: already has path ${meal.imagePath}');
+      return;
+    }
+    if (imageStates[meal.cacheKey] == LoadState.loading) {
+      debugPrint('[MealImage] ${meal.cacheKey}: already loading, skipped');
+      return;
+    }
 
+    debugPrint('[MealImage] ${meal.cacheKey}: requesting image');
     imageStates[meal.cacheKey] = LoadState.loading;
     imageErrors.remove(meal.cacheKey);
     notifyListeners();
 
     try {
       final path = await repository.getOrGenerateImage(meal);
+      final file = File(path);
+      debugPrint(
+        '[MealImage] ${meal.cacheKey}: got $path '
+        '(exists=${file.existsSync()}, '
+        'bytes=${file.existsSync() ? file.lengthSync() : 0})',
+      );
       meal.imagePath = path;
+      // The meal list may have been reloaded while the image was generating,
+      // so also apply the path to the current instance of this meal.
+      for (final m in meals) {
+        if (m.cacheKey == meal.cacheKey) m.imagePath = path;
+      }
       imageStates[meal.cacheKey] = LoadState.success;
       await _persistMealsCache();
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[MealImage] ${meal.cacheKey}: FAILED $e\n$st');
       imageStates[meal.cacheKey] = LoadState.error;
       imageErrors[meal.cacheKey] = e.toString();
     }
     notifyListeners();
+  }
+
+  /// Returns the provider's current instance of [meal] (matched by cacheKey),
+  /// so widgets holding an older object still see the latest imagePath.
+  Meal currentMeal(Meal meal) {
+    for (final m in meals) {
+      if (m.cacheKey == meal.cacheKey) return m;
+    }
+    return meal;
+  }
+
+  /// Discards an image file that failed to decode and generates it again.
+  Future<void> retryImage(Meal meal) async {
+    final path = meal.imagePath;
+    if (path != null) {
+      try {
+        await File(path).delete();
+      } catch (_) {}
+    }
+    for (final m in meals) {
+      if (m.cacheKey == meal.cacheKey) m.imagePath = null;
+    }
+    meal.imagePath = null;
+    imageStates.remove(meal.cacheKey);
+    await ensureImageForMeal(currentMeal(meal));
   }
 
   void reset() {

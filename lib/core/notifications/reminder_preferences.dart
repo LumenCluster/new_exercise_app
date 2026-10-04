@@ -172,7 +172,10 @@ class ReminderPreferences {
 /// Turns saved preferences into scheduled OS notifications, with texts in
 /// the app's current language.
 class ReminderScheduler {
-  static Future<void> apply(BuildContext context, ReminderPreferences prefs) async {
+  static Future<void> apply(BuildContext context, ReminderPreferences prefs) =>
+      _apply(AppLocalizations.of(context), prefs);
+
+  static Future<void> _apply(AppLocalizations l10n, ReminderPreferences prefs) async {
     final service = NotificationService();
     if (!prefs.enabled) {
       await service.cancelAll();
@@ -183,8 +186,8 @@ class ReminderScheduler {
       for (final def in kReminderDefinitions)
         ScheduledReminder(
           slot: def.slot,
-          title: context.tr(def.notificationTitleKey),
-          body: context.tr(def.notificationBodyKey),
+          title: l10n.t(def.notificationTitleKey),
+          body: l10n.t(def.notificationBodyKey),
           hour: prefs.schedules[def.id]!.time.hour,
           minute: prefs.schedules[def.id]!.time.minute,
           days: prefs.schedules[def.id]!.days,
@@ -192,6 +195,26 @@ class ReminderScheduler {
     ];
     final sound = await ReminderPreferences.soundEnabled();
     await service.scheduleReminders(reminders, sound: sound);
+  }
+
+  static bool _startupDone = false;
+
+  /// Called once per launch from the Dashboard (new and returning users):
+  /// asks for notification permission (if reminders are on) and schedules the
+  /// saved reminders, so every user gets them without having to open the
+  /// Reminders screen first. Texts are resolved up front, so [context] may be
+  /// gone by the time the permission dialog closes.
+  static Future<void> scheduleOnStartup(BuildContext context) async {
+    if (_startupDone) return;
+    _startupDone = true;
+    final l10n = AppLocalizations.of(context);
+    try {
+      final prefs = await ReminderPreferences.load();
+      if (prefs.enabled) await NotificationService().requestPermission();
+      await _apply(l10n, prefs);
+    } catch (e) {
+      debugPrint('Reminder scheduling failed: $e');
+    }
   }
 
   /// Re-applies the saved preferences, e.g. after the sound setting changes.

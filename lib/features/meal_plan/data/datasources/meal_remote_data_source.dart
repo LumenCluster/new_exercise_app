@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:untitled/features/meal_plan/domain/entities/meal.dart';
@@ -70,7 +71,7 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
     final cachedPath = await _cachedImagePath(meal.cacheKey);
     final file = File(cachedPath);
 
-    if (await file.exists()) {
+    if (await file.exists() && await file.length() > 0) {
       return cachedPath;
     }
 
@@ -85,7 +86,10 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
     if (!await imagesDir.exists()) {
       await imagesDir.create(recursive: true);
     }
-    return '${imagesDir.path}/$cacheKey.png';
+    // Meal names can contain characters like "/" or ":" that are invalid in
+    // file names, so keep only safe characters.
+    final safeName = cacheKey.replaceAll(RegExp(r'[^a-z0-9_\-]'), '_');
+    return '${imagesDir.path}/$safeName.png';
   }
 
   Future<List<int>> _generateImageBytes(Meal meal) async {
@@ -118,6 +122,10 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
         body: body,
       );
 
+      debugPrint(
+        '[MealImage] ${meal.cacheKey}: API attempt $attempt -> '
+        '${response.statusCode} (${response.body.length} chars)',
+      );
       if (response.statusCode == 200) break;
 
       final isRetryable = response.statusCode == 503 || response.statusCode == 429;

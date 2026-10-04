@@ -76,7 +76,10 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
       ...widget.videos.sublist(0, start),
     ];
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!_paused && mounted) setState(() => _elapsed += const Duration(seconds: 1));
+      if (!_paused && mounted) {
+        setState(() => _elapsed += const Duration(seconds: 1));
+        _progress.updateLiveSession(_startedAt, _elapsed.inSeconds);
+      }
     });
   }
 

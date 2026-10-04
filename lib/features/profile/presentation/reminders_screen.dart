@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/notifications/background_activity.dart';
 import '../../../core/notifications/notification_service.dart';
 import '../../../core/notifications/reminder_preferences.dart';
 import '../../../core/widgets/app_bottom_nav_bar.dart';
@@ -42,6 +43,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
   ];
 
   ReminderPreferences? _prefs;
+  bool _showBackgroundTip = false;
 
   @override
   void initState() {
@@ -53,6 +55,9 @@ class _RemindersScreenState extends State<RemindersScreen> {
     final prefs = await ReminderPreferences.load();
     if (!mounted) return;
     setState(() => _prefs = prefs);
+    final showTip = await BackgroundActivity.isRecommended();
+    if (!mounted) return;
+    setState(() => _showBackgroundTip = showTip);
   }
 
   void _toast(String message) {
@@ -163,6 +168,10 @@ class _RemindersScreenState extends State<RemindersScreen> {
                     _buildHeader(),
                     const SizedBox(height: 16),
                     _buildEnableNotificationsTile(prefs),
+                    if (_showBackgroundTip && prefs.enabled) ...[
+                      const SizedBox(height: 12),
+                      _buildBackgroundTip(),
+                    ],
                     const SizedBox(height: 20),
                     // Reminder cards are inert while notifications are off.
                     AnimatedOpacity(
@@ -227,6 +236,45 @@ class _RemindersScreenState extends State<RemindersScreen> {
   }
 
   // Enable Notifications Card
+  /// Shortcut to the phone's background-activity settings for users who
+  /// skipped the one-time prompt and find reminders not arriving.
+  Widget _buildBackgroundTip() {
+    return Material(
+      color: orangeIconBg,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: BackgroundActivity.openSettings,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              const Icon(Icons.battery_alert_rounded, size: 22, color: orangeIconColor),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      context.tr('reminders_background_tip_title'),
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: textPrimary),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      context.tr('reminders_background_tip_subtitle'),
+                      style: const TextStyle(fontSize: 11, color: textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right_rounded, color: orangeIconColor),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildEnableNotificationsTile(ReminderPreferences prefs) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

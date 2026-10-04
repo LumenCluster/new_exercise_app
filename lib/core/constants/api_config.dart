@@ -23,7 +23,8 @@ class ApiConfig {
   static Map<String, String> get geminiHeaders {
     if (geminiApiKey.isEmpty) {
       throw StateError(
-        'GEMINI_API_KEY is not set. Run with --dart-define=GEMINI_API_KEY=<your key>.',
+        'GEMINI_API_KEY is not set. Run with '
+        '--dart-define-from-file=dart_defines.json (or the main.dart run config).',
       );
     }
     return {

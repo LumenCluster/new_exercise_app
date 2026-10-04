@@ -5,6 +5,7 @@ import '../../../profile/domain/entities/user_profile.dart';
 import '../../../meal_plan/domain/entities/meal.dart';
 import '../../../meal_plan/presentation/providers/meal_plan_provider.dart' show LoadState;
 import '../../../meal_plan/presentation/providers/weekly_meal_plan_provider.dart';
+import '../../../tracking/presentation/providers/workout_progress_provider.dart';
 import '../../../meal_plan/presentation/pages/shopping_list_screen.dart';
 import '../../../coach/presentation/pages/coach_chat_screen.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
@@ -261,6 +262,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
     required Color accentColor,
     required String systemPrompt,
     required String greeting,
+    List<String> suggestions = const [],
   }) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -271,6 +273,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
           accentColor: accentColor,
           systemPrompt: systemPrompt,
           greeting: greeting,
+          suggestions: suggestions,
         ),
       ),
     );
@@ -279,7 +282,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
   // Coach Cards (Fitness Coach & AI Nutrition Coach)
   Widget _buildCoachCards() {
     return SizedBox(
-      height: 140,
+      height: 150,
       child: ListView(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
@@ -287,7 +290,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
           _buildCoachCard(
             title: context.tr('exercises_fitness_coach_title'),
             description: context.tr('exercises_fitness_coach_description'),
-            imageAsset: "assets/fitness_coach.png",
+            imageAsset: "assets/coach.png",
             bgColor: const Color(0xFFE8F2E2),
             onChatTap: () => _openCoachChat(
               title: context.tr('exercises_fitness_coach_title'),
@@ -296,14 +299,18 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
               accentColor: _PlanColors.activeGreen,
               systemPrompt: _fitnessSystemPrompt(),
               greeting: context.tr('exercises_fitness_coach_greeting'),
+              suggestions: [
+                context.tr('coach_suggest_stretch'),
+                context.tr('coach_suggest_recovery'),
+              ],
             ),
           ),
           const SizedBox(width: 12),
           _buildCoachCard(
             title: context.tr('exercises_nutrition_coach_title'),
             description: context.tr('exercises_nutrition_coach_description'),
-            imageAsset: "assets/nutrition_coach.png",
-            bgColor: const Color(0xFFEFEFE9),
+            imageAsset: "assets/ai_nutrition.png",
+            bgColor: const Color(0xFFE8F2E2),
             onChatTap: () => _openCoachChat(
               title: context.tr('exercises_nutrition_coach_short_title'),
               subtitle: context.tr('exercises_coach_subtitle_always_available'),
@@ -311,6 +318,10 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
               accentColor: const Color(0xFF6B8E23),
               systemPrompt: _nutritionSystemPrompt(),
               greeting: context.tr('exercises_nutrition_coach_greeting'),
+              suggestions: [
+                context.tr('coach_suggest_swap_meal'),
+                context.tr('coach_suggest_protein_snack'),
+              ],
             ),
           ),
         ],
@@ -326,76 +337,89 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
     required VoidCallback onChatTap,
   }) {
     return Container(
-      width: 250,
-      padding: const EdgeInsets.all(12),
+      width: 290,
       decoration: BoxDecoration(
-        color: bgColor,
+        gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [bgColor, Color.lerp(bgColor, Colors.white, 0.5)!],
+        ),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFD3E6C8)),
       ),
-      child: Row(
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
         children: [
-          Expanded(
+          // Coach cut-out image anchored to the bottom-right edge
+          Positioned(
+            right: 4,
+            bottom: 0,
+            top: 6,
+            child: Image.asset(
+              imageAsset,
+              width: 120,
+              fit: BoxFit.contain,
+              alignment: Alignment.bottomCenter,
+              errorBuilder: (_, _, _) => const SizedBox(
+                width: 120,
+                child: Icon(Icons.person, color: _PlanColors.primaryDark, size: 48),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 14, 130, 14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: _PlanColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      description,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 9,
-                        color: _PlanColors.textSecondary,
-                        height: 1.2,
-                      ),
-                    ),
-                  ],
-                ),
-                ElevatedButton(
-                  onPressed: onChatTap,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _PlanColors.primaryDark,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(80, 26),
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: _PlanColors.textPrimary,
                   ),
-                  child: Text(
-                    context.tr('exercises_chat_now'),
-                    style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  description,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: _PlanColors.textSecondary,
+                    height: 1.3,
+                  ),
+                ),
+                const Spacer(),
+                Material(
+                  color: _PlanColors.primaryDark,
+                  borderRadius: BorderRadius.circular(8),
+                  child: InkWell(
+                    onTap: onChatTap,
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            context.tr('exercises_chat_now'),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          const Icon(Icons.arrow_forward, color: Colors.white, size: 13),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ],
-            ),
-          ),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.asset(
-              imageAsset,
-              width: 80,
-              height: 110,
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Container(
-                width: 70,
-                height: 100,
-                color: Colors.white24,
-                child: const Icon(Icons.person, color: _PlanColors.primaryDark),
-              ),
             ),
           ),
         ],
@@ -864,7 +888,13 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
                   style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: _PlanColors.textPrimary),
                 ),
                 const Spacer(),
-                const Icon(Icons.fitness_center_outlined, size: 40, color: _PlanColors.primaryDark),
+                Image.asset(
+                  "assets/fit.png",
+                  height: 58,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, _, _) =>
+                      const Icon(Icons.fitness_center_outlined, size: 40, color: _PlanColors.primaryDark),
+                ),
                 const Spacer(),
                 Text(
                   subtitle,
@@ -919,52 +949,152 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
     );
   }
 
-  // Plan Progress Card
+  // Plan Progress Card — live values from WorkoutProgressProvider. Listening here (not in
+  // build) keeps the per-second updates during a workout from rebuilding the whole screen.
+  static const _plannedWorkoutsPerWeek = 5;
+
+  /// "45s", "12m 05s" or "1h 05m".
+  String _formatDuration(int seconds) {
+    if (seconds < 60) return '${seconds}s';
+    final h = seconds ~/ 3600;
+    final m = (seconds % 3600) ~/ 60;
+    final s = seconds % 60;
+    if (h > 0) return '${h}h ${m.toString().padLeft(2, '0')}m';
+    return '${m}m ${s.toString().padLeft(2, '0')}s';
+  }
+
   Widget _buildPlanProgressCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: _PlanColors.cardWhite,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final progress = context.read<WorkoutProgressProvider>();
+    return ListenableBuilder(
+      listenable: Listenable.merge([progress, progress.liveTick]),
+      builder: (context, _) {
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final tomorrow = DateTime(now.year, now.month, now.day + 1);
+        final weekStart = DateTime(now.year, now.month, now.day - (now.weekday - 1));
+        final weekEnd = DateTime(weekStart.year, weekStart.month, weekStart.day + 7);
+
+        // One workout = every goal video × sets × video length.
+        final perWorkoutSeconds = _videos.isNotEmpty
+            ? _videos.length * ActiveWorkoutScreen.setsPerExercise * WorkoutProgressProvider.secondsPerSet
+            : 20 * 60;
+        final weeklyTargetSeconds = perWorkoutSeconds * _plannedWorkoutsPerWeek;
+
+        final weekSeconds = progress.secondsBetween(weekStart, weekEnd);
+        final todaySeconds = progress.secondsBetween(today, tomorrow);
+        final workoutDays = progress.workoutDaysBetween(weekStart, weekEnd);
+        final streak = progress.currentStreak;
+        final ratio = (weekSeconds / weeklyTargetSeconds).clamp(0.0, 1.0);
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: _PlanColors.cardWhite,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                context.tr('exercises_plan_progress_title'),
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: _PlanColors.textPrimary),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    context.tr('exercises_plan_progress_title'),
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: _PlanColors.textPrimary),
+                  ),
+                  if (progress.workoutInProgress)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: _PlanColors.activeBgGreen,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            '${context.tr('exercises_live')} · ${_formatDuration(progress.liveSessionSeconds)}',
+                            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: _PlanColors.textPrimary),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    Text(
+                      '${(ratio * 100).round()}%',
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _PlanColors.activeGreen),
+                    ),
+                ],
               ),
-              GestureDetector(
-                onTap: () {},
-                child: Row(
-                  children: [
-                    Text(context.tr('exercises_view_progress'), style: const TextStyle(fontSize: 10, color: _PlanColors.textSecondary)),
-                    const Icon(Icons.arrow_drop_down, size: 16, color: _PlanColors.textSecondary),
-                  ],
+              const SizedBox(height: 4),
+              Text(
+                context.tr('exercises_progress_subtitle'),
+                style: const TextStyle(fontSize: 9, color: _PlanColors.textSecondary),
+              ),
+              const SizedBox(height: 14),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    _formatDuration(weekSeconds),
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: _PlanColors.textPrimary),
+                  ),
+                  const SizedBox(width: 6),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 3),
+                    child: Text(
+                      context.tr('exercises_time_this_week', {'target': _formatDuration(weeklyTargetSeconds)}),
+                      style: const TextStyle(fontSize: 10, color: _PlanColors.textSecondary),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(end: ratio),
+                  duration: const Duration(milliseconds: 400),
+                  builder: (_, value, _) => LinearProgressIndicator(
+                    value: value,
+                    minHeight: 6,
+                    backgroundColor: _PlanColors.cardLightBg,
+                    color: _PlanColors.activeGreen,
+                  ),
                 ),
               ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildProgressStat(
+                    context.tr('exercises_workouts_completed_label'),
+                    context.tr('exercises_fraction', {'a': '$workoutDays', 'b': '$_plannedWorkoutsPerWeek'}),
+                    Icons.fitness_center,
+                  ),
+                  _buildProgressStat(
+                    context.tr('exercises_today_time_label'),
+                    _formatDuration(todaySeconds),
+                    Icons.timer_outlined,
+                  ),
+                  _buildProgressStat(
+                    context.tr('exercises_active_streak_label'),
+                    context.tr(streak == 1 ? 'exercises_day_count_one' : 'exercises_days_count', {'n': '$streak'}),
+                    Icons.local_fire_department,
+                  ),
+                ],
+              ),
             ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            context.tr('exercises_progress_subtitle'),
-            style: const TextStyle(fontSize: 9, color: _PlanColors.textSecondary),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildProgressStat(context.tr('exercises_workouts_completed_label'), context.tr('exercises_fraction', {'a': '5', 'b': '12'}), Icons.fitness_center),
-              _buildProgressStat(context.tr('exercises_meals_followed_label'), context.tr('exercises_fraction', {'a': '18', 'b': '21'}), Icons.restaurant_menu),
-              _buildProgressStat(context.tr('exercises_active_streak_label'), context.tr('exercises_days_count', {'n': '12'}), Icons.local_fire_department),
-            ],
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 

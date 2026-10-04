@@ -64,6 +64,15 @@ class WorkoutProgressProvider extends ChangeNotifier {
   /// Recorded sessions, newest first.
   List<WorkoutSession> sessions = [];
 
+  /// Seconds of the workout currently open in the player. Ticks every second
+  /// on its own notifier so only widgets showing live time rebuild, not every
+  /// listener of this provider.
+  final ValueNotifier<int> liveTick = ValueNotifier(0);
+  int get liveSessionSeconds => liveTick.value;
+  DateTime? liveSessionStartedAt;
+
+  bool get workoutInProgress => liveSessionStartedAt != null;
+
   static String dateKey(DateTime date) => date.toIso8601String().split('T').first;
 
   String get _todayKey => dateKey(DateTime.now());
@@ -74,6 +83,51 @@ class WorkoutProgressProvider extends ChangeNotifier {
   /// The program day the user is on: every earlier day they worked out
   /// counts, and today is the next one (so a new user is on day 1).
   int get programDay => (pastActiveDays + 1).clamp(1, programDays);
+
+  /// Seconds trained between [start] (inclusive) and [end] (exclusive), including
+  /// the workout currently in progress.
+  int secondsBetween(DateTime start, DateTime end) {
+    bool inRange(DateTime t) => !t.isBefore(start) && t.isBefore(end);
+    var total = 0;
+    for (final session in sessions) {
+      if (inRange(session.startedAt)) total += session.durationSeconds;
+    }
+    final live = liveSessionStartedAt;
+    if (live != null && inRange(live)) total += liveSessionSeconds;
+    return total;
+  }
+
+  /// Distinct days between [start] and [end] (exclusive) with a workout,
+  /// counting today as soon as a workout is in progress.
+  int workoutDaysBetween(DateTime start, DateTime end) {
+    final days = <String>{};
+    for (final key in activeDates) {
+      final date = DateTime.parse(key);
+      if (!date.isBefore(DateTime(start.year, start.month, start.day)) && date.isBefore(end)) days.add(key);
+    }
+    for (final session in sessions) {
+      if (!session.startedAt.isBefore(start) && session.startedAt.isBefore(end)) days.add(session.date);
+    }
+    final live = liveSessionStartedAt;
+    if (live != null && !live.isBefore(start) && live.isBefore(end)) days.add(dateKey(live));
+    return days.length;
+  }
+
+  /// Consecutive days with a workout, ending today (or yesterday, so the
+  /// streak isn't lost before today's workout).
+  int get currentStreak {
+    final days = {...activeDates, for (final s in sessions) s.date};
+    if (workoutInProgress) days.add(_todayKey);
+    final now = DateTime.now();
+    var day = DateTime(now.year, now.month, now.day);
+    if (!days.contains(dateKey(day))) day = day.subtract(const Duration(days: 1));
+    var streak = 0;
+    while (days.contains(dateKey(day))) {
+      streak++;
+      day = DateTime(day.year, day.month, day.day - 1);
+    }
+    return streak;
+  }
 
   int get totalSets => exerciseCount * setsPerExercise;
 
@@ -104,11 +158,25 @@ class WorkoutProgressProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  @override
+  void dispose() {
+    liveTick.dispose();
+    super.dispose();
+  }
+
   /// Called when the dashboard's workout list is (re)loaded.
   void setExerciseCount(int count) {
     if (count == exerciseCount) return;
     exerciseCount = count;
     notifyListeners();
+  }
+
+  /// Called by the workout player every second while it is open.
+  void updateLiveSession(DateTime startedAt, int seconds) {
+    final started = liveSessionStartedAt == null;
+    liveSessionStartedAt = startedAt;
+    liveTick.value = seconds;
+    if (started) notifyListeners();
   }
 
   /// Called each time the user finishes a set (a video play-through).
@@ -126,7 +194,17 @@ class WorkoutProgressProvider extends ChangeNotifier {
     required int durationSeconds,
     required int sets,
   }) async {
-    if (sets <= 0) return;
+    // Called from the player's dispose(); notifying listeners synchronously
+    // there would rebuild widgets while the tree is locked.
+    await Future<void>.delayed(Duration.zero);
+    liveSessionStartedAt = null;
+    liveTick.value = 0;
+    // Keep visits with time spent even if no full set was played, so the
+    // Plan Progress time doesn't drop when the player is closed.
+    if (sets <= 0 && durationSeconds < 60) {
+      notifyListeners();
+      return;
+    }
     final session = WorkoutSession(
       title: title,
       date: dateKey(startedAt),

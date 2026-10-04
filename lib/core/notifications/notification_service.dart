@@ -80,6 +80,15 @@ class NotificationService {
     return await ios?.requestPermissions(alert: true, badge: true, sound: true) ?? false;
   }
 
+  /// Exact alarms fire on the minute; without the permission (denied by
+  /// default on Android 14+) fall back to inexact, which may arrive late.
+  Future<AndroidScheduleMode> _scheduleMode() async {
+    if (defaultTargetPlatform != TargetPlatform.android) return AndroidScheduleMode.exactAllowWhileIdle;
+    final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    final canExact = await android?.canScheduleExactNotifications() ?? false;
+    return canExact ? AndroidScheduleMode.exactAllowWhileIdle : AndroidScheduleMode.inexactAllowWhileIdle;
+  }
+
   NotificationDetails _details({required bool sound}) => NotificationDetails(
         android: AndroidNotificationDetails(
           sound ? _channelId : _silentChannelId,
@@ -99,6 +108,7 @@ class NotificationService {
     await _plugin.cancelAll();
 
     final details = _details(sound: sound);
+    final mode = await _scheduleMode();
     for (final reminder in reminders) {
       for (var weekday = DateTime.monday; weekday <= DateTime.sunday; weekday++) {
         if (!reminder.days[weekday - 1]) continue;
@@ -108,9 +118,7 @@ class NotificationService {
           body: reminder.body,
           scheduledDate: _nextInstance(weekday, reminder.hour, reminder.minute),
           notificationDetails: details,
-          // Inexact keeps us clear of the exact-alarm permission; reminders
-          // may arrive a few minutes late on Android.
-          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          androidScheduleMode: mode,
           matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
         );
       }

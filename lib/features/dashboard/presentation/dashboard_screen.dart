@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/database/firestore_service.dart';
+import '../../../core/notifications/background_activity.dart';
+import '../../../core/notifications/reminder_preferences.dart';
 import '../../profile/domain/entities/user_profile.dart';
 import '../../meal_plan/domain/entities/meal.dart';
 import '../../meal_plan/presentation/providers/meal_plan_provider.dart';
@@ -44,6 +46,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     _loadProfile();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _setUpReminders());
+  }
+
+  /// Schedules the user's reminders (once per launch), then — on phones whose
+  /// battery saver blocks them — asks once to allow background activity.
+  Future<void> _setUpReminders() async {
+    if (!mounted) return;
+    await ReminderScheduler.scheduleOnStartup(context);
+    if (!mounted) return;
+    await BackgroundActivity.maybePrompt(context);
   }
 
   Future<void> _loadProfile() async {
@@ -853,8 +865,8 @@ class _DashboardMealTileState extends State<_DashboardMealTile> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<MealPlanProvider>();
-    final imageState =
-        provider.imageStates[widget.meal.cacheKey] ?? LoadState.idle;
+    final meal = provider.currentMeal(widget.meal);
+    final imageState = provider.imageStates[meal.cacheKey] ?? LoadState.idle;
 
     return GestureDetector(
       onTap: _openRecipe,
@@ -871,7 +883,7 @@ class _DashboardMealTileState extends State<_DashboardMealTile> {
               child: SizedBox(
                 width: 52,
                 height: 52,
-                child: _buildImage(context, imageState),
+                child: _buildImage(context, meal, imageState),
               ),
             ),
             const SizedBox(width: 12),
@@ -931,30 +943,48 @@ class _DashboardMealTileState extends State<_DashboardMealTile> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => MealDetailScreen(
-          meal: widget.meal,
+          meal: context.read<MealPlanProvider>().currentMeal(widget.meal),
           categoryLabel: _dashboardMealCategoryLabel(context, widget.index),
         ),
       ),
     );
   }
 
-  Widget _buildImage(BuildContext context, LoadState state) {
-    if (widget.meal.imagePath != null) {
-      return Image.file(File(widget.meal.imagePath!), fit: BoxFit.cover);
+  Widget _buildImage(BuildContext context, Meal meal, LoadState state) {
+    debugPrint(
+      '[MealImage] tile ${meal.cacheKey}: state=$state path=${meal.imagePath}',
+    );
+    if (meal.imagePath != null) {
+      return Image.file(
+        File(meal.imagePath!),
+        fit: BoxFit.cover,
+        width: 52,
+        height: 52,
+        // Decode at thumbnail size instead of the full generated image.
+        cacheWidth: (52 * MediaQuery.devicePixelRatioOf(context)).round(),
+        // An unreadable file would otherwise render as an empty box.
+        errorBuilder: (context, error, _) {
+          debugPrint(
+            '[MealImage] tile ${meal.cacheKey}: decode FAILED for '
+            '${meal.imagePath}: $error',
+          );
+          return _retryBox(
+            () => context.read<MealPlanProvider>().retryImage(meal),
+          );
+        },
+      );
     }
     if (state == LoadState.error) {
-      return GestureDetector(
-        onTap: () =>
-            context.read<MealPlanProvider>().ensureImageForMeal(widget.meal),
-        child: Container(
-          color: DashboardColors.background,
-          child: const Icon(
-            Icons.refresh,
-            size: 18,
-            color: DashboardColors.textSecondary,
-          ),
-        ),
+      return _retryBox(
+        () => context.read<MealPlanProvider>().ensureImageForMeal(meal),
       );
+    }
+    if (state == LoadState.idle) {
+      // Not requested yet for this meal instance (e.g. the list was reloaded).
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        context.read<MealPlanProvider>().ensureImageForMeal(meal);
+      });
     }
     return Container(
       color: DashboardColors.background,
@@ -963,6 +993,20 @@ class _DashboardMealTileState extends State<_DashboardMealTile> {
           width: 16,
           height: 16,
           child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
+    );
+  }
+
+  Widget _retryBox(VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        color: DashboardColors.background,
+        child: const Icon(
+          Icons.refresh,
+          size: 18,
+          color: DashboardColors.textSecondary,
         ),
       ),
     );
