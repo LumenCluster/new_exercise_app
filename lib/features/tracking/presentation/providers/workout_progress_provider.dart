@@ -113,20 +113,49 @@ class WorkoutProgressProvider extends ChangeNotifier {
     return days.length;
   }
 
-  /// Consecutive days with a workout, ending today (or yesterday, so the
-  /// streak isn't lost before today's workout).
-  int get currentStreak {
+  /// Dates (yyyy-MM-dd) with a workout, counting today as soon as a workout
+  /// is in progress.
+  Set<String> get workoutDates {
     final days = {...activeDates, for (final s in sessions) s.date};
     if (workoutInProgress) days.add(_todayKey);
+    return days;
+  }
+
+  /// Consecutive days with a workout, ending today (or yesterday, so the
+  /// streak isn't lost before today's workout).
+  int get currentStreak => streakEndingToday(workoutDates);
+
+  /// Consecutive days in [days] ending today, or yesterday if today isn't
+  /// in [days] yet.
+  static int streakEndingToday(Set<String> days) {
     final now = DateTime.now();
     var day = DateTime(now.year, now.month, now.day);
-    if (!days.contains(dateKey(day))) day = day.subtract(const Duration(days: 1));
+    if (!days.contains(dateKey(day))) day = DateTime(day.year, day.month, day.day - 1);
     var streak = 0;
     while (days.contains(dateKey(day))) {
       streak++;
       day = DateTime(day.year, day.month, day.day - 1);
     }
     return streak;
+  }
+
+  /// Longest run of consecutive days in [days].
+  static int longestStreak(Set<String> days) {
+    final sorted = days.toList()..sort();
+    var best = 0;
+    var run = 0;
+    String? previous;
+    for (final key in sorted) {
+      if (previous != null) {
+        final prev = DateTime.parse(previous);
+        run = dateKey(DateTime(prev.year, prev.month, prev.day + 1)) == key ? run + 1 : 1;
+      } else {
+        run = 1;
+      }
+      if (run > best) best = run;
+      previous = key;
+    }
+    return best;
   }
 
   int get totalSets => exerciseCount * setsPerExercise;

@@ -92,6 +92,16 @@ class FirestoreService {
     return meals?.keys.toSet() ?? {};
   }
 
+  /// Dates (yyyy-MM-dd) on which the user logged at least one meal.
+  Future<List<String>> getMealLogDates() async {
+    final col = await _subcollection('meal_logs');
+    final snap = await col.get();
+    return [
+      for (final doc in snap.docs)
+        if ((doc.data()['meals'] as Map?)?.isNotEmpty ?? false) doc.id,
+    ];
+  }
+
   /// Stores one finished (or left early) workout session.
   Future<void> addWorkoutSession(Map<String, dynamic> session) async {
     final col = await _subcollection('workout_sessions');

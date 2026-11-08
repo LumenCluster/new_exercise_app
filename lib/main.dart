@@ -15,6 +15,7 @@ import 'features/exercises/domain/repositories/exercise_repository.dart';
 import 'features/coach/data/datasources/coach_remote_data_source.dart';
 import 'features/coach/data/repositories/coach_repository_impl.dart';
 import 'features/coach/domain/repositories/coach_repository.dart';
+import 'features/tracking/presentation/providers/meal_log_provider.dart';
 import 'features/tracking/presentation/providers/water_intake_provider.dart';
 import 'features/tracking/presentation/providers/weight_log_provider.dart';
 import 'features/tracking/presentation/providers/workout_progress_provider.dart';
@@ -64,6 +65,9 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => WorkoutProgressProvider()..load(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => MealLogProvider()..load(),
         ),
         ChangeNotifierProvider(
           create: (_) => LocaleProvider()..load(),

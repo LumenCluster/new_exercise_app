@@ -25,17 +25,22 @@ class GoalVideoRemoteDataSource {
   static String labelKeyFor(String? primaryGoal) => _entry(primaryGoal).$2;
 
   /// Every video in the goal's folder (including sub-folders), sorted by name.
-  static Future<List<WorkoutVideo>> fetch(String? primaryGoal) async {
+  static Future<List<WorkoutVideo>> fetch(String? primaryGoal) =>
+      fetchFolder(folderFor(primaryGoal));
+
+  /// Every video in the Storage [folder] (including sub-folders), sorted by name.
+  static Future<List<WorkoutVideo>> fetchFolder(String folder) async {
     // Storage rules only allow authenticated reads.
     final auth = FirebaseAuth.instance;
     if (auth.currentUser == null) {
       await auth.signInAnonymously();
     }
-    final refs = await _listVideos(FirebaseStorage.instance.ref(folderFor(primaryGoal)));
-    refs.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-    return [
+    final refs = await _listVideos(FirebaseStorage.instance.ref(folder));
+    final videos = [
       for (final ref in refs) WorkoutVideo(name: _titleFor(ref.name), storagePath: ref.fullPath),
     ];
+    videos.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    return videos;
   }
 
   static Future<List<Reference>> _listVideos(Reference folder) async {
@@ -50,10 +55,13 @@ class GoalVideoRemoteDataSource {
     return videos;
   }
 
-  /// "side_plank-hold.mp4" -> "Side Plank Hold".
+  /// "side_plank-hold.mp4" -> "Side Plank Hold";
+  /// "4. Torso Rotation Stretch.mp4" -> "Torso Rotation Stretch".
   static String _titleFor(String fileName) {
     final dot = fileName.lastIndexOf('.');
-    final base = dot == -1 ? fileName : fileName.substring(0, dot);
+    final raw = dot == -1 ? fileName : fileName.substring(0, dot);
+    final stripped = raw.replaceFirst(RegExp(r'^\s*\d+\s*[.)\-_:]?\s*'), '');
+    final base = stripped.isEmpty ? raw : stripped;
     final words = base.replaceAll(RegExp(r'[_\-]+'), ' ').trim().split(RegExp(r'\s+'));
     return words
         .where((w) => w.isNotEmpty)

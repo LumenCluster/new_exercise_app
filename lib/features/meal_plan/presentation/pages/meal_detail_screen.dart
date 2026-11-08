@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:untitled/core/database/firestore_service.dart';
 import 'package:untitled/core/localization/app_localizations.dart';
 import 'package:untitled/features/meal_plan/domain/entities/meal.dart';
+import 'package:untitled/features/tracking/presentation/providers/meal_log_provider.dart';
 
 class _RecipeColors {
   static const background = Colors.white;
@@ -60,7 +62,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
   Future<void> _logMeal() async {
     setState(() => _logging = true);
     try {
-      await FirestoreService().logMeal(_todayKey, _meal.cacheKey, _meal.calories);
+      await context.read<MealLogProvider>().logMeal(_meal.cacheKey, _meal.calories);
       if (!mounted) return;
       setState(() {
         _logged = true;

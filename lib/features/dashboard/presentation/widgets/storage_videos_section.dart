@@ -14,18 +14,17 @@ const _rowGrey = Color(0xFFF1F1EF);
 const _textPrimary = Color(0xFF1B2A26);
 const _textSecondary = Color(0xFF757575);
 
-/// A workout category chip and the Firebase Storage goal folder its
-/// exercises are listed from.
-typedef _WorkoutCategory = ({String labelKey, String sourceGoal});
+/// A workout category chip and the Firebase Storage folder its exercises
+/// are listed from.
+typedef _WorkoutCategory = ({String labelKey, String folder});
 
-/// Every category reads the "muscle gain" folder until per-category
-/// folders exist in Firebase Storage — change `sourceGoal` here then.
+/// `folder` must match the Storage folder name exactly (case-sensitive).
 const List<_WorkoutCategory> _categories = [
-  (labelKey: 'workout_full_body', sourceGoal: 'muscle_gain'),
-  (labelKey: 'workout_abs', sourceGoal: 'muscle_gain'),
-  (labelKey: 'workout_upper', sourceGoal: 'muscle_gain'),
-  (labelKey: 'workout_hiit', sourceGoal: 'muscle_gain'),
-  (labelKey: 'workout_chest', sourceGoal: 'muscle_gain'),
+  (labelKey: 'workout_full_body', folder: 'full body'),
+  (labelKey: 'workout_abs', folder: 'abs'),
+  (labelKey: 'workout_upper', folder: 'upper body'),
+  (labelKey: 'workout_hiit', folder: 'hiit'),
+  (labelKey: 'workout_chest', folder: 'chest'),
 ];
 
 /// Shows a banner for the user's onboarding [primaryGoal], then category
@@ -61,12 +60,12 @@ class _StorageVideosSectionState extends State<StorageVideosSection> {
   bool _loading = true;
   bool _failed = false;
 
-  /// Videos already listed, keyed by Storage folder, so switching between
-  /// categories that share a folder doesn't list it again.
+  /// Videos already listed, keyed by Storage folder, so switching back to a
+  /// category doesn't list it again.
   final Map<String, List<WorkoutVideo>> _cache = {};
 
   _WorkoutCategory get _category => _categories[_selectedCategory];
-  String get _folder => GoalVideoRemoteDataSource.folderFor(_category.sourceGoal);
+  String get _folder => _category.folder;
 
   @override
   void initState() {
@@ -102,7 +101,7 @@ class _StorageVideosSectionState extends State<StorageVideosSection> {
       _failed = false;
     });
     try {
-      final videos = await GoalVideoRemoteDataSource.fetch(_category.sourceGoal);
+      final videos = await GoalVideoRemoteDataSource.fetchFolder(folder);
       _cache[folder] = videos;
       if (!mounted || folder != _folder) return; // stale load for a previous category
       setState(() {

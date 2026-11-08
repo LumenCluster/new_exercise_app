@@ -8,6 +8,7 @@ import '../../profile/domain/entities/user_profile.dart';
 import '../../meal_plan/domain/entities/meal.dart';
 import '../../meal_plan/presentation/providers/meal_plan_provider.dart';
 import '../../meal_plan/presentation/pages/meal_detail_screen.dart';
+import '../../tracking/presentation/providers/meal_log_provider.dart';
 import '../../tracking/presentation/providers/water_intake_provider.dart';
 import '../../tracking/presentation/providers/workout_progress_provider.dart';
 import '../../../core/widgets/app_bottom_nav_bar.dart';
@@ -193,8 +194,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // Streak Banner Widget
+  // Streak Banner Widget — a day counts once the user logs a meal or plays
+  // a workout set; the streak survives until the end of today.
   Widget _buildStreakCard() {
+    final activeDays = {
+      ...context.watch<WorkoutProgressProvider>().workoutDates,
+      ...context.watch<MealLogProvider>().loggedDates,
+    };
+    final streak = WorkoutProgressProvider.streakEndingToday(activeDays);
+    final best = WorkoutProgressProvider.longestStreak(activeDays);
+    final daysToRecord = best - streak + 1;
+    final String subtitle;
+    if (streak == 0) {
+      subtitle = context.tr('dashboard_streak_start');
+    } else if (streak >= best) {
+      subtitle = context.tr('dashboard_streak_record');
+    } else if (daysToRecord == 1) {
+      subtitle = context.tr('dashboard_streak_day_left');
+    } else {
+      subtitle = context.tr('dashboard_streak_days_left', {'n': '$daysToRecord'});
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
@@ -230,7 +250,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  context.tr('dashboard_streak_progress'),
+                  streak == 1
+                      ? context.tr('dashboard_streak_day_one')
+                      : context.tr('dashboard_streak_days', {'n': '$streak'}),
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -239,7 +261,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  context.tr('dashboard_streak_days_left'),
+                  subtitle,
                   style: const TextStyle(
                     fontSize: 10,
                     color: DashboardColors.textSecondary,
@@ -255,7 +277,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
-              context.tr('dashboard_keep_it_up'),
+              context.tr(streak == 0 ? 'dashboard_start_today' : 'dashboard_keep_it_up'),
               style: const TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
