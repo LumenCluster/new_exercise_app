@@ -91,6 +91,16 @@ class WeeklyMealPlanProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Drops all in-memory plans so each day is regenerated on next view
+  /// (used after "Restart Data" wipes the cached plans).
+  void clear() {
+    _mealsByDay.clear();
+    _stateByDay.clear();
+    _errorByDay.clear();
+    _imageStateByKey.clear();
+    notifyListeners();
+  }
+
   Future<void> _persistDay(DateTime day, List<Meal> meals) async {
     final encoded = jsonEncode(meals.map((m) => (m as MealModel).toJson()).toList());
     await FirestoreService().setCacheValue(_cacheKey(day), encoded);

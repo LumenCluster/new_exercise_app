@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../core/database/firestore_service.dart';
-import '../../../core/localization/app_language.dart';
+// import '../../../core/localization/app_language.dart'; // used by language selection (disabled)
 import '../../../core/localization/app_localizations.dart';
-import '../../../core/localization/locale_provider.dart';
+// import '../../../core/localization/locale_provider.dart'; // used by language selection (disabled)
 import '../../../core/notifications/notification_service.dart';
-import '../../../core/notifications/reminder_preferences.dart';
+// import '../../../core/notifications/reminder_preferences.dart'; // used by sound settings (disabled)
 import '../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../meal_plan/presentation/providers/meal_plan_provider.dart';
+import '../../meal_plan/presentation/providers/weekly_meal_plan_provider.dart';
+import '../../tracking/presentation/providers/meal_log_provider.dart';
+import '../../tracking/presentation/providers/workout_progress_provider.dart';
 import '../../tracking/presentation/providers/water_intake_provider.dart';
 import '../../tracking/presentation/providers/weight_log_provider.dart';
 import '../domain/entities/user_profile.dart';
@@ -38,10 +42,11 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
 
   bool _settingsLoaded = false;
   bool _remindersEnabled = true;
-  bool _soundEnabled = true;
-  bool _voiceCuesEnabled = true;
-  double _volume = 0.7;
-  bool _wearableConnected = true;
+  // Sound & vibration settings temporarily disabled.
+  // bool _soundEnabled = true;
+  // bool _voiceCuesEnabled = true;
+  // double _volume = 0.7;
+  // bool _wearableConnected = true;
   bool _isPremium = false;
   bool _busy = false;
 
@@ -54,18 +59,18 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
   Future<void> _loadSettings() async {
     final db = FirestoreService();
     final reminders = await db.getCacheValue('settings_reminders_enabled');
-    final sound = await db.getCacheValue('settings_sound_enabled');
-    final voice = await db.getCacheValue('settings_voice_enabled');
-    final volume = await db.getCacheValue('settings_volume');
-    final wearable = await db.getCacheValue('settings_wearable_connected');
+    // final sound = await db.getCacheValue('settings_sound_enabled');
+    // final voice = await db.getCacheValue('settings_voice_enabled');
+    // final volume = await db.getCacheValue('settings_volume');
+    // final wearable = await db.getCacheValue('settings_wearable_connected');
     final premium = await db.getCacheValue('settings_premium');
     if (!mounted) return;
     setState(() {
       _remindersEnabled = reminders != null ? reminders == 'true' : true;
-      _soundEnabled = sound != null ? sound == 'true' : true;
-      _voiceCuesEnabled = voice != null ? voice == 'true' : true;
-      _volume = volume != null ? double.tryParse(volume) ?? 0.7 : 0.7;
-      _wearableConnected = wearable != null ? wearable == 'true' : true;
+      // _soundEnabled = sound != null ? sound == 'true' : true;
+      // _voiceCuesEnabled = voice != null ? voice == 'true' : true;
+      // _volume = volume != null ? double.tryParse(volume) ?? 0.7 : 0.7;
+      // _wearableConnected = wearable != null ? wearable == 'true' : true;
       _isPremium = premium == 'true';
       _settingsLoaded = true;
     });
@@ -84,7 +89,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currentLanguage = languageForCode(context.watch<LocaleProvider>().locale.languageCode);
+    // final currentLanguage = languageForCode(context.watch<LocaleProvider>().locale.languageCode);
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -128,34 +133,37 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                           setState(() => _remindersEnabled = enabled != null ? enabled == 'true' : true);
                         },
                       ),
-                      _SettingsItem(
-                        icon: Icons.volume_up_outlined,
-                        iconBg: const Color(0xFFF3E5F5),
-                        iconColor: const Color(0xFFAB47BC),
-                        title: context.tr('settings_sound_title'),
-                        subtitle: context.tr('settings_sound_subtitle'),
-                        onTap: _showSoundSettingsDialog,
-                      ),
-                      _SettingsItem(
-                        icon: Icons.language_outlined,
-                        iconBg: const Color(0xFFE1F5FE),
-                        iconColor: const Color(0xFF29B6F6),
-                        title: context.tr('settings_language_title'),
-                        subtitle: context.tr('settings_language_subtitle'),
-                        trailingText: currentLanguage.nativeName,
-                        trailingTextColor: const Color(0xFF29B6F6),
-                        onTap: _showLanguageDialog,
-                      ),
-                      _SettingsItem(
-                        icon: Icons.sync_rounded,
-                        iconBg: const Color(0xFFE0F2F1),
-                        iconColor: const Color(0xFF26A69A),
-                        title: context.tr('settings_wearable_title'),
-                        subtitle: context.tr('settings_wearable_subtitle'),
-                        trailingText: _wearableConnected ? context.tr('settings_connected') : context.tr('settings_not_connected'),
-                        trailingTextColor: _wearableConnected ? const Color(0xFF26A69A) : textSecondary,
-                        onTap: _showWearableDialog,
-                      ),
+                      // TODO: Sound & vibration temporarily disabled.
+                      // _SettingsItem(
+                      //   icon: Icons.volume_up_outlined,
+                      //   iconBg: const Color(0xFFF3E5F5),
+                      //   iconColor: const Color(0xFFAB47BC),
+                      //   title: context.tr('settings_sound_title'),
+                      //   subtitle: context.tr('settings_sound_subtitle'),
+                      //   onTap: _showSoundSettingsDialog,
+                      // ),
+                      // TODO: Language selection temporarily disabled.
+                      // _SettingsItem(
+                      //   icon: Icons.language_outlined,
+                      //   iconBg: const Color(0xFFE1F5FE),
+                      //   iconColor: const Color(0xFF29B6F6),
+                      //   title: context.tr('settings_language_title'),
+                      //   subtitle: context.tr('settings_language_subtitle'),
+                      //   trailingText: currentLanguage.nativeName,
+                      //   trailingTextColor: const Color(0xFF29B6F6),
+                      //   onTap: _showLanguageDialog,
+                      // ),
+                      // TODO: Wearable sync temporarily disabled.
+                      // _SettingsItem(
+                        // icon: Icons.sync_rounded,
+                        // iconBg: const Color(0xFFE0F2F1),
+                        // iconColor: const Color(0xFF26A69A),
+                        // title: context.tr('settings_wearable_title'),
+                        // subtitle: context.tr('settings_wearable_subtitle'),
+                        // trailingText: _wearableConnected ? context.tr('settings_connected') : context.tr('settings_not_connected'),
+                        // trailingTextColor: _wearableConnected ? const Color(0xFF26A69A) : textSecondary,
+                        // onTap: _showWearableDialog,
+                      // ),
                     ]),
                     const SizedBox(height: 20),
 
@@ -280,136 +288,139 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
   // Preferences
   // ---------------------------------------------------------------------
 
-  Future<void> _showSoundSettingsDialog() async {
-    bool sound = _soundEnabled;
-    bool voice = _voiceCuesEnabled;
-    double volume = _volume;
-    await showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text(context.tr('settings_sound_title')),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(context.tr('settings_sound_effects')),
-                value: sound,
-                activeThumbColor: activeGreen,
-                onChanged: (v) => setDialogState(() => sound = v),
-              ),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(context.tr('settings_voice_cues')),
-                value: voice,
-                activeThumbColor: activeGreen,
-                onChanged: (v) => setDialogState(() => voice = v),
-              ),
-              Row(
-                children: [
-                  const Icon(Icons.volume_down, size: 18, color: textSecondary),
-                  Expanded(
-                    child: Slider(
-                      value: volume,
-                      activeColor: activeGreen,
-                      onChanged: (v) => setDialogState(() => volume = v),
-                    ),
-                  ),
-                  const Icon(Icons.volume_up, size: 18, color: textSecondary),
-                ],
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: Text(context.tr('common_cancel'))),
-            FilledButton(
-              onPressed: () async {
-                setState(() {
-                  _soundEnabled = sound;
-                  _voiceCuesEnabled = voice;
-                  _volume = volume;
-                });
-                await _persist('settings_sound_enabled', sound.toString());
-                await _persist('settings_voice_enabled', voice.toString());
-                await _persist('settings_volume', volume.toString());
-                // Scheduled reminders pick up the new sound preference.
-                if (mounted) await ReminderScheduler.refresh(this.context);
-                if (context.mounted) Navigator.pop(context);
-              },
-              child: Text(context.tr('common_save')),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Sound & vibration settings temporarily disabled.
+  // Future<void> _showSoundSettingsDialog() async {
+  //   bool sound = _soundEnabled;
+  //   bool voice = _voiceCuesEnabled;
+  //   double volume = _volume;
+  //   await showDialog(
+  //     context: context,
+  //     builder: (context) => StatefulBuilder(
+  //       builder: (context, setDialogState) => AlertDialog(
+  //         title: Text(context.tr('settings_sound_title')),
+  //         content: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             SwitchListTile(
+  //               contentPadding: EdgeInsets.zero,
+  //               title: Text(context.tr('settings_sound_effects')),
+  //               value: sound,
+  //               activeThumbColor: activeGreen,
+  //               onChanged: (v) => setDialogState(() => sound = v),
+  //             ),
+  //             SwitchListTile(
+  //               contentPadding: EdgeInsets.zero,
+  //               title: Text(context.tr('settings_voice_cues')),
+  //               value: voice,
+  //               activeThumbColor: activeGreen,
+  //               onChanged: (v) => setDialogState(() => voice = v),
+  //             ),
+  //             Row(
+  //               children: [
+  //                 const Icon(Icons.volume_down, size: 18, color: textSecondary),
+  //                 Expanded(
+  //                   child: Slider(
+  //                     value: volume,
+  //                     activeColor: activeGreen,
+  //                     onChanged: (v) => setDialogState(() => volume = v),
+  //                   ),
+  //                 ),
+  //                 const Icon(Icons.volume_up, size: 18, color: textSecondary),
+  //               ],
+  //             ),
+  //           ],
+  //         ),
+  //         actions: [
+  //           TextButton(onPressed: () => Navigator.pop(context), child: Text(context.tr('common_cancel'))),
+  //           FilledButton(
+  //             onPressed: () async {
+  //               setState(() {
+  //                 _soundEnabled = sound;
+  //                 _voiceCuesEnabled = voice;
+  //                 _volume = volume;
+  //               });
+  //               await _persist('settings_sound_enabled', sound.toString());
+  //               await _persist('settings_voice_enabled', voice.toString());
+  //               await _persist('settings_volume', volume.toString());
+  //               // Scheduled reminders pick up the new sound preference.
+  //               if (mounted) await ReminderScheduler.refresh(this.context);
+  //               if (context.mounted) Navigator.pop(context);
+  //             },
+  //             child: Text(context.tr('common_save')),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  Future<void> _showLanguageDialog() async {
-    final localeProvider = context.read<LocaleProvider>();
-    final currentCode = localeProvider.locale.languageCode;
-    final selected = await showDialog<AppLanguage>(
-      context: context,
-      builder: (context) => SimpleDialog(
-        title: Text(context.tr('settings_choose_language')),
-        children: [
-          RadioGroup<String>(
-            groupValue: currentCode,
-            onChanged: (code) => Navigator.pop(
-              context,
-              kSupportedLanguages.firstWhere((lang) => lang.code == code),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: kSupportedLanguages
-                  .map((lang) => RadioListTile<String>(
-                        title: Text(lang.nativeName),
-                        subtitle: lang.nativeName != lang.englishName ? Text(lang.englishName) : null,
-                        value: lang.code,
-                        activeColor: activeGreen,
-                      ))
-                  .toList(),
-            ),
-          ),
-        ],
-      ),
-    );
-    if (selected != null && selected.code != currentCode) {
-      await localeProvider.setLanguageCode(selected.code);
-      if (!mounted) return;
-      _toast(context.tr('settings_language_set_to', {'language': selected.nativeName}));
-    }
-  }
+  // Language selection temporarily disabled.
+  // Future<void> _showLanguageDialog() async {
+  //   final localeProvider = context.read<LocaleProvider>();
+  //   final currentCode = localeProvider.locale.languageCode;
+  //   final selected = await showDialog<AppLanguage>(
+  //     context: context,
+  //     builder: (context) => SimpleDialog(
+  //       title: Text(context.tr('settings_choose_language')),
+  //       children: [
+  //         RadioGroup<String>(
+  //           groupValue: currentCode,
+  //           onChanged: (code) => Navigator.pop(
+  //             context,
+  //             kSupportedLanguages.firstWhere((lang) => lang.code == code),
+  //           ),
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: kSupportedLanguages
+  //                 .map((lang) => RadioListTile<String>(
+  //                       title: Text(lang.nativeName),
+  //                       subtitle: lang.nativeName != lang.englishName ? Text(lang.englishName) : null,
+  //                       value: lang.code,
+  //                       activeColor: activeGreen,
+  //                     ))
+  //                 .toList(),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  //   if (selected != null && selected.code != currentCode) {
+  //     await localeProvider.setLanguageCode(selected.code);
+  //     if (!mounted) return;
+  //     _toast(context.tr('settings_language_set_to', {'language': selected.nativeName}));
+  //   }
+  // }
 
-  Future<void> _showWearableDialog() async {
-    final connected = _wearableConnected;
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.tr('settings_wearable_title')),
-        content: Text(
-          connected
-              ? context.tr('settings_wearable_connected_body')
-              : context.tr('settings_wearable_disconnected_body'),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text(context.tr('common_close'))),
-          FilledButton(
-            onPressed: () async {
-              final message = !connected
-                  ? context.tr('settings_wearable_connected_toast')
-                  : context.tr('settings_wearable_disconnected_toast');
-              setState(() => _wearableConnected = !connected);
-              await _persist('settings_wearable_connected', (!connected).toString());
-              if (context.mounted) Navigator.pop(context);
-              _toast(message);
-            },
-            child: Text(connected ? context.tr('settings_disconnect') : context.tr('settings_connect')),
-          ),
-        ],
-      ),
-    );
-  }
+  // Wearable sync temporarily disabled.
+  // Future<void> _showWearableDialog() async {
+    // final connected = _wearableConnected;
+    // await showDialog(
+      // context: context,
+      // builder: (context) => AlertDialog(
+        // title: Text(context.tr('settings_wearable_title')),
+        // content: Text(
+          // connected
+              // ? context.tr('settings_wearable_connected_body')
+              // : context.tr('settings_wearable_disconnected_body'),
+        // ),
+        // actions: [
+          // TextButton(onPressed: () => Navigator.pop(context), child: Text(context.tr('common_close'))),
+          // FilledButton(
+            // onPressed: () async {
+              // final message = !connected
+                  // ? context.tr('settings_wearable_connected_toast')
+                  // : context.tr('settings_wearable_disconnected_toast');
+              // setState(() => _wearableConnected = !connected);
+              // await _persist('settings_wearable_connected', (!connected).toString());
+              // if (context.mounted) Navigator.pop(context);
+              // _toast(message);
+            // },
+            // child: Text(connected ? context.tr('settings_disconnect') : context.tr('settings_connect')),
+          // ),
+        // ],
+      // ),
+    // );
+  // }
 
   // ---------------------------------------------------------------------
   // Account & Data
@@ -436,12 +447,18 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
     final waterProvider = context.read<WaterIntakeProvider>();
     final weightProvider = context.read<WeightLogProvider>();
     final mealPlanProvider = context.read<MealPlanProvider>();
+    final weeklyPlanProvider = context.read<WeeklyMealPlanProvider>();
+    final workoutProvider = context.read<WorkoutProgressProvider>();
+    final mealLogProvider = context.read<MealLogProvider>();
     setState(() => _busy = true);
     try {
       await FirestoreService().clearTrackingData();
       if (!mounted) return;
       await waterProvider.load();
       await weightProvider.load();
+      await workoutProvider.load();
+      await mealLogProvider.load();
+      weeklyPlanProvider.clear();
       final profile = widget.profile;
       if (profile != null) {
         await mealPlanProvider.submitProfileAndGenerate(profile);
@@ -473,6 +490,9 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
 
     final waterProvider = context.read<WaterIntakeProvider>();
     final weightProvider = context.read<WeightLogProvider>();
+    final weeklyPlanProvider = context.read<WeeklyMealPlanProvider>();
+    final workoutProvider = context.read<WorkoutProgressProvider>();
+    final mealLogProvider = context.read<MealLogProvider>();
     setState(() => _busy = true);
     try {
       await FirestoreService().clearAllData();
@@ -480,6 +500,9 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
       if (!mounted) return;
       await waterProvider.load();
       await weightProvider.load();
+      await workoutProvider.load();
+      await mealLogProvider.load();
+      weeklyPlanProvider.clear();
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const ProfileInputScreen()),
@@ -501,19 +524,26 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           title: Text(context.tr('settings_rate_us_title')),
-          content: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(5, (i) {
-              final filled = i < rating;
-              return IconButton(
-                icon: Icon(
-                  filled ? Icons.star_rounded : Icons.star_border_rounded,
-                  color: const Color(0xFFFFB300),
-                  size: 28,
-                ),
-                onPressed: () => setDialogState(() => rating = i + 1),
-              );
-            }),
+          // 5 stars must fit narrow dialogs: compact buttons, and scale the
+          // whole row down if it still doesn't fit.
+          content: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: List.generate(5, (i) {
+                final filled = i < rating;
+                return IconButton(
+                  padding: const EdgeInsets.all(4),
+                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                  icon: Icon(
+                    filled ? Icons.star_rounded : Icons.star_border_rounded,
+                    color: const Color(0xFFFFB300),
+                    size: 28,
+                  ),
+                  onPressed: () => setDialogState(() => rating = i + 1),
+                );
+              }),
+            ),
           ),
           actions: [
             TextButton(onPressed: () => Navigator.pop(context), child: Text(context.tr('common_cancel'))),
@@ -534,43 +564,29 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
     );
   }
 
+  /// Public store link included in every share.
+  static const _appStoreLink =
+      'https://play.google.com/store/apps/details?id=com.lumencluster.noorishhub';
+
+  /// Opens the system share sheet (WhatsApp, Instagram, Telegram, Gmail,
+  /// SMS, Copy, ...) with the share message + store link.
   Future<void> _showShareSheet() async {
-    final shareText = context.tr('settings_share_text');
-    await showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(context.tr('settings_share_app_title'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: textPrimary)),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(12)),
-              child: Text(shareText, style: const TextStyle(fontSize: 12, color: textSecondary)),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                style: FilledButton.styleFrom(backgroundColor: primaryDark),
-                onPressed: () async {
-                  final message = context.tr('settings_copied_toast');
-                  await Clipboard.setData(ClipboardData(text: shareText));
-                  if (context.mounted) Navigator.pop(context);
-                  _toast(message);
-                },
-                icon: const Icon(Icons.copy_rounded, size: 18),
-                label: Text(context.tr('settings_copy_link')),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    final shareText = '${context.tr('settings_share_text')}\n$_appStoreLink';
+    final subject = context.tr('app_title');
+    // iPad needs an anchor rect for the share popover.
+    final box = context.findRenderObject() as RenderBox?;
+    final origin = box != null ? box.localToGlobal(Offset.zero) & box.size : null;
+    try {
+      await SharePlus.instance.share(
+        ShareParams(text: shareText, subject: subject, sharePositionOrigin: origin),
+      );
+    } catch (e) {
+      // No share target available: fall back to copying the link.
+      debugPrint('Share failed: $e');
+      await Clipboard.setData(ClipboardData(text: shareText));
+      if (!mounted) return;
+      _toast(context.tr('settings_copied_toast'));
+    }
   }
 
   Future<void> _showFeedbackDialog() async {

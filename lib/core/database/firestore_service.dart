@@ -148,22 +148,45 @@ class FirestoreService {
     return UserProfile.fromJson(Map<String, dynamic>.from(data as Map));
   }
 
-  Future<void> _deleteAll(CollectionReference<Map<String, dynamic>> col) async {
-    final snap = await col.get();
-    if (snap.docs.isEmpty) return;
-    final batch = FirebaseFirestore.instance.batch();
-    for (final doc in snap.docs) {
-      batch.delete(doc.reference);
+  /// Deletes the given docs in chunks (Firestore batches max out at 500 ops).
+  Future<void> _deleteDocs(List<DocumentSnapshot<Map<String, dynamic>>> docs) async {
+    const chunkSize = 400;
+    for (var i = 0; i < docs.length; i += chunkSize) {
+      final batch = FirebaseFirestore.instance.batch();
+      for (final doc in docs.skip(i).take(chunkSize)) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
     }
-    await batch.commit();
   }
 
-  /// Used by "Restart Data": wipes logged progress and generated-plan
-  /// cache, but keeps the profile so onboarding isn't repeated.
+  Future<void> _deleteAll(CollectionReference<Map<String, dynamic>> col) async {
+    final snap = await col.get();
+    await _deleteDocs(snap.docs);
+  }
+
+  /// Every per-user collection holding logged progress.
+  static const _progressCollections = [
+    'weight_logs',
+    'water_logs',
+    'workout_logs',
+    'workout_sessions',
+    'meal_logs',
+  ];
+
+  /// Cache entries that are generated content (AI meal plans), as opposed to
+  /// user settings like `settings_*` / `reminders_*` / premium status.
+  static bool _isGeneratedCacheKey(String key) => key.startsWith('meal_plan_');
+
+  /// Used by "Restart Data": wipes all logged progress (weight, water,
+  /// workouts, meals) and generated meal plans, but keeps the profile and
+  /// the user's settings (premium, reminders, sound, language...).
   Future<void> clearTrackingData() async {
-    await _deleteAll(await _subcollection('weight_logs'));
-    await _deleteAll(await _subcollection('water_logs'));
-    await _deleteAll(await _subcollection('cache'));
+    for (final name in _progressCollections) {
+      await _deleteAll(await _subcollection(name));
+    }
+    final cache = await (await _subcollection('cache')).get();
+    await _deleteDocs(cache.docs.where((d) => _isGeneratedCacheKey(d.id)).toList());
   }
 
   /// Used by "Delete Data": wipes everything, including the profile, so
@@ -172,7 +195,8 @@ class FirestoreService {
     final userDoc = await _userDoc;
     await userDoc.set({'profile': FieldValue.delete()}, SetOptions(merge: true));
     await _deleteAll(await _subcollection('cache'));
-    await _deleteAll(await _subcollection('weight_logs'));
-    await _deleteAll(await _subcollection('water_logs'));
+    for (final name in _progressCollections) {
+      await _deleteAll(await _subcollection(name));
+    }
   }
 }
