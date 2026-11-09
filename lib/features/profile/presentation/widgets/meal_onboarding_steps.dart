@@ -717,12 +717,7 @@ class _IngredientLikesStepState extends State<IngredientLikesStep> {
                   },
                 ),
               ),
-              TextButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.refresh, size: 16, color: MealColors.textSecondary),
-                label: Text(context.tr('onboarding_discover_more'), style: const TextStyle(color: MealColors.textSecondary)),
-              ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
               MealActionButton(text: context.tr('common_continue'), onPressed: () => widget.onNext(_selected.toList())),
               const SizedBox(height: 12),
             ],

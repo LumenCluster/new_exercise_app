@@ -77,7 +77,6 @@ const Map<String, Map<String, String>> onboardingDict2 = {
   'onboarding_ingredient_cheese': {'en': 'Cheese', 'es': 'Queso', 'fr': 'Fromage', 'de': 'Käse', 'hi': 'चीज़'},
   'onboarding_ingredient_shrimp': {'en': 'Shrimp', 'es': 'Camarones', 'fr': 'Crevettes', 'de': 'Garnelen', 'hi': 'झींगा'},
   'onboarding_ingredient_corn': {'en': 'Corn', 'es': 'Maíz', 'fr': 'Maïs', 'de': 'Mais', 'hi': 'मक्का'},
-  'onboarding_discover_more': {'en': 'Discover More', 'es': 'Descubrir Más', 'fr': 'Découvrir Plus', 'de': 'Mehr Entdecken', 'hi': 'और खोजें'},
   'onboarding_habits_title': {'en': 'How would you describe your eating habits?', 'es': '¿Cómo describirías tus hábitos alimentarios?', 'fr': 'Comment décririez-vous vos habitudes alimentaires ?', 'de': 'Wie würdest du deine Essgewohnheiten beschreiben?', 'hi': 'आप अपनी खाने की आदतों का वर्णन कैसे करेंगे?'},
   'onboarding_habits_subtitle': {'en': 'This helps us plan your meals better.', 'es': 'Esto nos ayuda a planificar mejor tus comidas.', 'fr': 'Cela nous aide à mieux planifier vos repas.', 'de': 'Das hilft uns, deine Mahlzeiten besser zu planen.', 'hi': 'यह हमें आपके भोजन की बेहतर योजना बनाने में मदद करता है।'},
   'onboarding_habit_balanced': {'en': 'Balanced Meals', 'es': 'Comidas Equilibradas', 'fr': 'Repas Équilibrés', 'de': 'Ausgewogene Mahlzeiten', 'hi': 'संतुलित भोजन'},

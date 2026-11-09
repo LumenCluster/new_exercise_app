@@ -70,7 +70,6 @@ class AppBottomNavBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _item(context, AppTab.home, Icons.home_filled, context.tr('nav_home')),
-          _item(context, AppTab.discover, Icons.explore_outlined, context.tr('nav_discover')),
           _item(context, AppTab.plan, Icons.fitness_center_outlined, context.tr('nav_plan')),
           _item(context, AppTab.report, Icons.bar_chart_rounded, context.tr('nav_report')),
           _item(context, AppTab.profile, Icons.person_outline, context.tr('nav_profile')),

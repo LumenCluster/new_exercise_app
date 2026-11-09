@@ -105,9 +105,12 @@ class _ReportScreenState extends State<ReportScreen> {
         }
       }
 
+      // Use the weight entered during onboarding instead of prompting with a
+      // check-in dialog: seed the log with it when nothing is logged yet.
       if (!mounted) return;
-      if (!weightProvider.hasLoggedToday) {
-        _showWeightCheckInDialog(weightProvider);
+      final onboardingWeight = profile?.currentWeightKg;
+      if (weightProvider.history.isEmpty && onboardingWeight != null && onboardingWeight > 0) {
+        await weightProvider.logWeight(onboardingWeight);
       }
     });
   }

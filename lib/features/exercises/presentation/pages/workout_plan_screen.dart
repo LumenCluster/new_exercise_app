@@ -7,6 +7,7 @@ import '../../../meal_plan/presentation/providers/meal_plan_provider.dart' show 
 import '../../../meal_plan/presentation/providers/weekly_meal_plan_provider.dart';
 import '../../../tracking/presentation/providers/workout_progress_provider.dart';
 import '../../../meal_plan/presentation/pages/shopping_list_screen.dart';
+import '../../../meal_plan/presentation/pages/meal_detail_screen.dart';
 import '../../../coach/presentation/pages/coach_chat_screen.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../../core/localization/app_localizations.dart';
@@ -1152,7 +1153,10 @@ class _PlanMealCardState extends State<_PlanMealCard> {
     final provider = context.watch<WeeklyMealPlanProvider>();
     final imageState = provider.imageStateFor(widget.day, widget.meal);
 
-    return Container(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _openRecipe,
+      child: Container(
       width: 140,
       margin: const EdgeInsets.only(right: 12),
       padding: const EdgeInsets.all(10),
@@ -1211,7 +1215,34 @@ class _PlanMealCardState extends State<_PlanMealCard> {
           ),
         ],
       ),
+      ),
     );
+  }
+
+  void _openRecipe() {
+    try {
+      // Use the provider's latest copy so the recipe gets the image if it
+      // finished loading after this card was built (same as the dashboard).
+      // A plain loop, not firstWhere(orElse:): the list's runtime type is
+      // List<MealModel>, so an orElse returning a Meal throws a type error.
+      Meal meal = widget.meal;
+      for (final m in context.read<WeeklyMealPlanProvider>().mealsFor(widget.day)) {
+        if (m.cacheKey == widget.meal.cacheKey) {
+          meal = m;
+          break;
+        }
+      }
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => MealDetailScreen(meal: meal, categoryLabel: widget.categoryLabel),
+        ),
+      );
+    } catch (e, st) {
+      debugPrint('[PlanMealCard] open recipe failed: $e\n$st');
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text('Open recipe failed: $e')));
+    }
   }
 
   Widget _buildImage(LoadState state) {
